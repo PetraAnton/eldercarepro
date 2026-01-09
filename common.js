@@ -1,5 +1,261 @@
 // Common Utility Functions for Daycare System
 
+// --- Authentication ---
+
+/**
+ * Check if user is logged in
+ */
+function checkLogin() {
+    const sess = localStorage.getItem('mirabocaresync_session');
+    if (!sess) {
+        // Show login overlay
+        const overlay = document.getElementById('login-overlay');
+        if (overlay) overlay.classList.remove('hidden');
+    } else {
+        // Verify session validity (mock)
+        try {
+            const session = JSON.parse(sess);
+            if (new Date().getTime() > session.expiry) {
+                logout();
+            } else {
+                // Hide login overlay
+                const overlay = document.getElementById('login-overlay');
+                if (overlay) overlay.classList.add('hidden');
+
+                // Update specific UI elements with user info
+                const userNameEl = document.getElementById('header-user-name');
+                const userRoleEl = document.getElementById('header-user-role');
+                const userAvatarEl = document.getElementById('header-user-avatar');
+
+                if (userNameEl) userNameEl.textContent = session.user.fullName;
+                if (userRoleEl) userRoleEl.textContent = session.user.role === 'admin' ? 'Quản trị viên' : 'Nhân viên';
+                if (userAvatarEl) userAvatarEl.textContent = session.user.fullName.charAt(0).toUpperCase();
+            }
+        } catch (e) {
+            logout();
+        }
+    }
+}
+
+/**
+ * Register new user
+ * @param {string} fullName 
+ * @param {string} username 
+ * @param {string} password 
+ */
+function register(fullName, username, password) {
+    const users = JSON.parse(localStorage.getItem('mirabocaresync_users') || '[]');
+
+    // Check if username exists
+    if (users.find(u => u.username === username)) {
+        throw new Error('Tên đăng nhập đã tồn tại');
+    }
+
+    const newUser = {
+        id: 'USR-' + Date.now(),
+        fullName,
+        username,
+        password, // In a real app, hash this!
+        role: 'staff',
+        createdAt: new Date().toISOString()
+    };
+
+    users.push(newUser);
+    localStorage.setItem('mirabocaresync_users', JSON.stringify(users));
+    return newUser;
+}
+
+/**
+ * Login user
+ * @param {string} username 
+ * @param {string} password 
+ * @param {boolean} remember
+ */
+function login(username, password, remember = false) {
+    // 1. Check default admin
+    if (username === 'admin') {
+        const adminPw = localStorage.getItem('mirabocaresync_admin_pw') || 'admin';
+        if (password === adminPw) {
+            createSession({
+                id: 'ADMIN-001',
+                fullName: 'Administrator',
+                username: 'admin',
+                role: 'admin'
+            }, remember);
+
+            if (remember) {
+                localStorage.setItem('mirabocaresync_remembered_username', username);
+            } else {
+                localStorage.removeItem('mirabocaresync_remembered_username');
+            }
+            return true;
+        }
+    }
+
+    // 2. Check registered users
+    const users = JSON.parse(localStorage.getItem('mirabocaresync_users') || '[]');
+    const user = users.find(u => u.username === username && u.password === password);
+
+    if (user) {
+        createSession(user, remember);
+        if (remember) {
+            localStorage.setItem('mirabocaresync_remembered_username', username);
+        } else {
+            localStorage.removeItem('mirabocaresync_remembered_username');
+        }
+        return true;
+    }
+
+    throw new Error('Tên đăng nhập hoặc mật khẩu không đúng');
+}
+
+/**
+ * Create session
+ * @param {Object} user 
+ * @param {boolean} remember
+ */
+function createSession(user, remember = false) {
+    const duration = remember ? (30 * 24 * 60 * 60 * 1000) : (24 * 60 * 60 * 1000); // 30 days vs 24 hours
+    const session = {
+        user: {
+            id: user.id,
+            fullName: user.fullName,
+            username: user.username,
+            role: user.role
+        },
+        expiry: new Date().getTime() + duration
+    };
+    localStorage.setItem('mirabocaresync_session', JSON.stringify(session));
+}
+
+/**
+ * Change user password
+ * @param {string} username 
+ * @param {string} oldPassword 
+ * @param {string} newPassword 
+ */
+function changePassword(username, oldPassword, newPassword) {
+    const users = JSON.parse(localStorage.getItem('mirabocaresync_users') || '[]');
+    const userIndex = users.findIndex(u => u.username === username);
+
+    // Special case for admin (can't change default admin password in this mock, or maybe we allow it via localstorage override?)
+    if (username === 'admin') {
+        if (oldPassword === 'admin') {
+            // For mockup simplicity, we won't actually change the hardcoded admin, 
+            // but we'll pretend or maybe store an override. 
+            // Let's just say "Admin password cannot be changed in demo" or allow it via localStorage
+            // Let's implement localStorage override for admin
+            const adminOverride = localStorage.getItem('mirabocaresync_admin_pw');
+            if (adminOverride && adminOverride !== oldPassword) throw new Error('Mật khẩu cũ không đúng');
+            if (!adminOverride && oldPassword !== 'admin') throw new Error('Mật khẩu cũ không đúng');
+
+            localStorage.setItem('mirabocaresync_admin_pw', newPassword);
+            return true;
+        } else {
+            const adminOverride = localStorage.getItem('mirabocaresync_admin_pw');
+            if (adminOverride && adminOverride === oldPassword) {
+                localStorage.setItem('mirabocaresync_admin_pw', newPassword);
+                return true;
+            }
+        }
+        throw new Error('Mật khẩu cũ không đúng');
+    }
+
+    if (userIndex === -1) throw new Error('Người dùng không tồn tại');
+
+    if (users[userIndex].password !== oldPassword) {
+        throw new Error('Mật khẩu cũ không đúng');
+    }
+
+    users[userIndex].password = newPassword;
+    localStorage.setItem('mirabocaresync_users', JSON.stringify(users));
+    users[userIndex].password = newPassword;
+    localStorage.setItem('mirabocaresync_users', JSON.stringify(users));
+    return true;
+}
+
+/**
+ * Update user profile (FHIR Practitioner fields)
+ * @param {string} username
+ * @param {Object} profileData 
+ */
+function updateUserProfile(username, profileData) {
+    // 1. Update in Users DB
+    const users = JSON.parse(localStorage.getItem('mirabocaresync_users') || '[]');
+    const userIndex = users.findIndex(u => u.username === username);
+
+    // Handle Admin special case (mock) - allow saving profile for admin too
+    if (username === 'admin') {
+        let adminProfile = JSON.parse(localStorage.getItem('mirabocaresync_admin_profile') || '{}');
+        adminProfile = { ...adminProfile, ...profileData };
+        localStorage.setItem('mirabocaresync_admin_profile', JSON.stringify(adminProfile));
+
+        // Update session if currently logged in as admin
+        const sess = JSON.parse(localStorage.getItem('mirabocaresync_session'));
+        if (sess && sess.user.username === 'admin') {
+            sess.user = { ...sess.user, ...profileData };
+            localStorage.setItem('mirabocaresync_session', JSON.stringify(sess));
+        }
+        return true;
+    }
+
+    if (userIndex === -1) throw new Error('Người dùng không tồn tại');
+
+    // Merge new data
+    users[userIndex] = { ...users[userIndex], ...profileData };
+    localStorage.setItem('mirabocaresync_users', JSON.stringify(users));
+
+    // 2. Update current session if it matches
+    const sess = JSON.parse(localStorage.getItem('mirabocaresync_session'));
+    if (sess && sess.user.username === username) {
+        sess.user = { ...sess.user, ...profileData };
+        localStorage.setItem('mirabocaresync_session', JSON.stringify(sess));
+    }
+
+    return true;
+}
+
+/**
+ * Get full user profile
+ */
+function getUserProfile(username) {
+    if (username === 'admin') {
+        const base = { id: 'ADMIN-001', fullName: 'Administrator', username: 'admin', role: 'admin' };
+        const extra = JSON.parse(localStorage.getItem('mirabocaresync_admin_profile') || '{}');
+        return { ...base, ...extra };
+    }
+
+    const users = JSON.parse(localStorage.getItem('mirabocaresync_users') || '[]');
+    return users.find(u => u.username === username);
+}
+function resetDemoData() {
+    // Keep session if possible, or just logout
+    // We'll clear everything starting with mirabocaresync_ except session?
+    // User asked to reset demo data.
+
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('mirabocaresync_')) {
+            // Keep session? User probably expects a clean slate.
+            // Let's keep the current session to avoid immediate logout/confusion, 
+            // or we force logout. Forced logout is cleaner.
+            keysToRemove.push(key);
+        }
+    }
+
+    keysToRemove.forEach(k => localStorage.removeItem(k));
+    location.reload();
+}
+
+/**
+ * Logout user
+ */
+function logout() {
+    localStorage.removeItem('mirabocaresync_session');
+    location.reload(); // Reload to show login screen
+}
+
 // --- Patient Management ---
 
 /**
