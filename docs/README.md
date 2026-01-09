@@ -161,15 +161,3 @@ Xem chi tiết trong [documentation_checklist.md](documentation_checklist.md)
 | 07/01/2026 | 1.1       | Thêm Functional Requirements |
 | 07/01/2026 | 1.2       | Thêm Database Schema         |
 | 07/01/2026 | 1.3       | Thêm Test Plan               |
-
----
-
-## 💡 Tips
-
-> [!TIP] > **Tìm kiếm nhanh:** Sử dụng Ctrl+F trong VS Code để tìm kiếm trong tất cả file markdown
-
-> [!IMPORTANT] > **Luôn cập nhật:** Khi code thay đổi, nhớ cập nhật tài liệu tương ứng
-
-> [!NOTE] > **Backup:** Tài liệu được lưu trong Git, nhớ commit thường xuyên
-
----
