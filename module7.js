@@ -315,7 +315,10 @@ function renderM7HistoryTab(records) {
                             <td class="px-6 py-4 text-sm text-slate-600 font-mono font-bold">${r.muscle} <span class="text-[10px] text-slate-400 font-normal">kgf/kg</span></td>
                              <td class="px-6 py-4 text-sm text-slate-600 font-mono font-bold">${r.agility} <span class="text-[10px] text-slate-400 font-normal">kgf/s/kg</span></td>
                             <td class="px-6 py-4 text-sm text-slate-600 font-mono font-bold">${r.stability} <span class="text-[10px] text-slate-400 font-normal">ms</span></td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="px-6 py-4 text-right flex justify-end gap-2">
+                                <button onclick="printModule7Assessment(${index})" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="In phiếu">
+                                    <i data-lucide="printer" class="w-4 h-4"></i>
+                                </button>
                                 <button onclick="deleteM7Record(${index})" class="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Xóa">
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 </button>
@@ -455,13 +458,21 @@ function renderM7ReportTab(data, records) {
                  </div>
             </div>
 
-            <!-- Export Button (Fixed Position Higher) -->
-            <div class="fixed bottom-40 right-8 z-40 animate-fade-in pointer-events-none">
+            <!-- Export/Print Button Group -->
+            <div class="fixed bottom-32 right-8 z-40 animate-fade-in flex flex-col gap-4 pointer-events-none">
+                 <button type="button" onclick="printModule7Report()" 
+                    class="pointer-events-auto w-14 h-14 bg-blue-600 text-white rounded-full shadow-[0_8px_25px_rgb(37,99,235,0.4)] hover:shadow-blue-200 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+                    <i data-lucide="printer" class="w-6 h-6"></i>
+                    <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                        In Báo cáo (PDF)
+                    </span>
+                </button>
+
                  <button type="button" onclick="exportM7Excel('${getCurrentPatientId()}')" 
                     class="pointer-events-auto w-14 h-14 bg-emerald-500 text-white rounded-full shadow-[0_8px_25px_rgb(16,185,129,0.4)] hover:shadow-emerald-200 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
                     <i data-lucide="sheet" class="w-6 h-6"></i>
                     <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                        Xuất Báo cáo
+                        Xuất Excel
                     </span>
                 </button>
             </div>
@@ -588,4 +599,152 @@ function exportM7Excel(patientId) {
     XLSX.utils.book_append_sheet(wb, ws, "LichSu_M7");
 
     XLSX.writeFile(wb, `LichSu_M7_${patientId}.xlsx`);
+}
+
+// Print specific assessment
+function printModule7Assessment(index) {
+    const patientId = getCurrentPatientId();
+    const records = loadM7Records(patientId);
+    const record = records[index];
+    if (!record) return;
+
+    const printWindow = window.open('', '_blank');
+    const content = `
+        <html>
+        <head>
+            <title>Phiếu Đánh giá Chức năng Vận động - ${new Date(record.date).toLocaleDateString('vi-VN')}</title>
+            <style>
+                body { font-family: 'Times New Roman', serif; padding: 40px; line-height: 1.6; }
+                .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #000; padding-bottom: 20px; }
+                h1 { margin: 0; font-size: 24px; text-transform: uppercase; }
+                .meta { margin-bottom: 30px; }
+                .section { margin-bottom: 30px; }
+                h2 { font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 15px; color: #333; }
+                .score-box { text-align: center; border: 2px solid #333; padding: 15px; margin: 20px 0; border-radius: 8px; }
+                .score-val { font-size: 32px; font-weight: bold; color: #333; }
+                .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+                .row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
+                .label { font-weight: bold; color: #555; }
+                .value { font-weight: bold; }
+                .advice-box { background: #f9f9f9; padding: 15px; border-left: 4px solid #333; font-style: italic; }
+                .footer { margin-top: 50px; text-align: center; font-style: italic; font-size: 12px; color: #888; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>Phiếu Đánh giá Chức năng Vận động</h1>
+                <p>Hệ thống ElderCare Pro</p>
+            </div>
+            
+            <div class="meta">
+                <div class="row"><span class="label">Bệnh nhân:</span> <span class="value">${getPatientById(patientId).fullName}</span></div>
+                <div class="row"><span class="label">Mã hồ sơ:</span> <span class="value">${patientId}</span></div>
+                <div class="row"><span class="label">Ngày đánh giá:</span> <span class="value">${new Date(record.date).toLocaleDateString('vi-VN')}</span></div>
+            </div>
+
+            <div class="score-box">
+                <div>ĐIỂM TỔNG HỢP</div>
+                <div class="score-val">${record.totalScore} / 150</div>
+                <div>Đánh giá: ${record.rating}</div>
+            </div>
+
+            <div class="section">
+                <h2>Chi tiết chỉ số</h2>
+                <div class="grid">
+                    <div>
+                         <div class="row"><span class="label">Lực cơ (Muscle):</span> <span class="value">${record.muscle} kgf/kg</span></div>
+                         <div class="row"><span class="label">Nhanh nhẹn (Agility):</span> <span class="value">${record.agility} kgf/s/kg</span></div>
+                         <div class="row"><span class="label">Ổn định (Stability):</span> <span class="value">${record.stability} ms</span></div>
+                    </div>
+                     <div>
+                         <div class="row"><span class="label">Cân nặng:</span> <span class="value">${record.weight} kg</span></div>
+                         <div class="row"><span class="label">Chiều cao:</span> <span class="value">${record.height} cm</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Nhận xét & Lời khuyên</h2>
+                <div class="advice-box">
+                    <p><strong>Nhận xét:</strong> ${record.comment || 'Chưa có nhận xét'}</p>
+                    <p style="margin-top: 10px;"><strong>Lời khuyên:</strong> ${record.advice || 'Chưa có lời khuyên'}</p>
+                </div>
+            </div>
+
+            <div class="footer">
+                Đánh giá được thực hiện vào ngày ${new Date().toLocaleDateString('vi-VN')}
+            </div>
+        </body>
+        </html>
+    `;
+    printWindow.document.write(content);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+    }, 500);
+}
+
+function printModule7Report() {
+    const reportContent = document.getElementById('m7-tab-content');
+    if (!reportContent) return;
+
+    const printWindow = window.open('', '_blank');
+
+    // Convert charts
+    const canvases = reportContent.querySelectorAll('canvas');
+    const canvasImages = [];
+    canvases.forEach(c => canvasImages.push(c.toDataURL()));
+
+    const container = document.createElement('div');
+    container.innerHTML = reportContent.innerHTML;
+
+    // Replace canvas
+    const tempCanvases = container.querySelectorAll('canvas');
+    tempCanvases.forEach((c, i) => {
+        const img = document.createElement('img');
+        img.src = canvasImages[i];
+        img.style.width = '100%';
+        img.style.display = 'block';
+        c.parentNode.replaceChild(img, c);
+    });
+
+    // Clean UI
+    const buttons = container.querySelectorAll('button, .fixed'); // Remove buttons and fixed elements (export btn)
+    buttons.forEach(b => b.remove());
+
+    const doc = `
+        <html>
+        <head>
+            <title>Báo cáo Chức năng Vận động</title>
+             <script src="https://cdn.tailwindcss.com"></script>
+            <style>
+                body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 40px; }
+                @media print {
+                    body { -webkit-print-color-adjust: exact; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="text-center mb-10 pb-6 border-b border-slate-200">
+                <h1 class="text-2xl font-black uppercase text-slate-800">Báo cáo Chức năng Vận động</h1>
+                <p class="text-slate-500 font-bold mt-2">Bệnh nhân: ${getPatientById(getCurrentPatientId()).fullName} - ID: ${getCurrentPatientId()}</p>
+                <p class="text-xs text-slate-400 mt-1">Ngày xuất báo cáo: ${new Date().toLocaleDateString('vi-VN')}</p>
+            </div>
+            
+            <div class="space-y-8">
+                ${container.innerHTML}
+            </div>
+        </body>
+        </html>
+    `;
+
+    printWindow.document.write(doc);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+    }, 1000);
 }
