@@ -243,6 +243,10 @@ window.module6Content = `
                  <p class="text-xs text-slate-500 font-bold mt-1">Phân loại thể hình & Chất lượng cơ bắp</p>
             </div>
             <div class="flex items-center gap-3">
+                <button onclick="printModule6Report()" title="In báo cáo" class="bg-slate-100 text-slate-500 hover:text-indigo-600 p-2.5 rounded-xl transition-colors">
+                    <i data-lucide="printer" class="w-5 h-5"></i>
+                </button>
+                <div class="w-px h-8 bg-slate-200"></div>
                 <span class="text-xs font-bold text-slate-400 uppercase">Chọn bản ghi:</span>
                 <select id="m6-report-selector" onchange="renderModule6Report(this.value)" class="bg-slate-50 border border-slate-200 text-slate-800 text-sm font-bold rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none">
                     <!-- Options populated by JS -->
@@ -780,6 +784,11 @@ function loadModule6History() {
                             class="px-3 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors font-bold text-xs flex items-center gap-1 shadow-sm">
                         <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
                         Xem báo cáo
+                    </button>
+                    
+                    <button onclick="printModule6Assessment(${index})" 
+                            class="p-2 bg-slate-100 text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-200 transition-colors shadow-sm" title="In phiếu">
+                        <i data-lucide="printer" class="w-4 h-4"></i>
                     </button>
                     
                     <button onclick="deleteModule6Assessment(${index})" 
@@ -1340,4 +1349,193 @@ function saveM6ReportData(type = 'all') {
         localStorage.setItem(`mirabocaresync_${patientId}_body_assessments`, JSON.stringify(assessments));
         showToast('Đã lưu nhận xét thành công!', 'success');
     }
+}
+
+// Print specific assessment
+function printModule6Assessment(index) {
+    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${getCurrentPatientId()}_body_assessments`) || '[]');
+    const assessment = assessments[index];
+    if (!assessment) return;
+
+    const printWindow = window.open('', '_blank');
+    const content = `
+        <html>
+        <head>
+            <title>Phiếu Đánh giá Thành phần Cơ thể - ${new Date(assessment.assessmentDate).toLocaleDateString('vi-VN')}</title>
+            <style>
+                body { font-family: 'Times New Roman', serif; padding: 40px; line-height: 1.6; }
+                h1 { text-align: center; font-size: 24px; margin-bottom: 20px; text-transform: uppercase; }
+                .meta { border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
+                .section { margin-bottom: 30px; }
+                h2 { font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 15px; color: #333; }
+                .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+                .row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
+                .label { font-weight: bold; color: #555; }
+                .value { font-weight: bold; }
+                .footer { margin-top: 50px; text-align: center; font-style: italic; font-size: 12px; color: #888; }
+            </style>
+        </head>
+        <body>
+            <h1>Phiếu Đánh giá Thành phần Cơ thể</h1>
+            
+            <div class="meta">
+                <div class="row"><span class="label">Bệnh nhân:</span> <span class="value">${getPatientById(getCurrentPatientId()).fullName}</span></div>
+                <div class="row"><span class="label">Mã hồ sơ:</span> <span class="value">${getCurrentPatientId()}</span></div>
+                <div class="row"><span class="label">Ngày đánh giá:</span> <span class="value">${new Date(assessment.assessmentDate).toLocaleDateString('vi-VN')}</span></div>
+                <div class="row"><span class="label">Người thực hiện:</span> <span class="value">${assessment.assessor || 'Quản trị viên'}</span></div>
+            </div>
+
+            <div class="section">
+                <h2>1. Thông số Chung</h2>
+                <div class="grid">
+                    <div>
+                         <div class="row"><span class="label">Chiều cao:</span> <span class="value">${assessment.general.height} cm</span></div>
+                         <div class="row"><span class="label">Cân nặng:</span> <span class="value">${assessment.general.weight} kg</span></div>
+                         <div class="row"><span class="label">BMI:</span> <span class="value">${assessment.general.bmi || '--'}</span></div>
+                    </div>
+                    <div>
+                         <div class="row"><span class="label">Tỷ lệ mỡ:</span> <span class="value">${assessment.general.bodyFat || '--'} %</span></div>
+                         <div class="row"><span class="label">Khối lượng cơ:</span> <span class="value">${assessment.general.muscleMass || '--'} kg</span></div>
+                         <div class="row"><span class="label">BMR:</span> <span class="value">${assessment.general.bmr || '--'} kcal</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>2. Phân tích Cơ bắp & Mỡ</h2>
+                <div class="grid">
+                    <div>
+                        <h3>Khối lượng Cơ</h3>
+                        <div class="row"><span class="label">Tay phải:</span> <span class="value">${assessment.muscle.rightArm || '--'} kg</span></div>
+                        <div class="row"><span class="label">Tay trái:</span> <span class="value">${assessment.muscle.leftArm || '--'} kg</span></div>
+                        <div class="row"><span class="label">Thân mình:</span> <span class="value">${assessment.muscle.trunk || '--'} kg</span></div>
+                        <div class="row"><span class="label">Chân phải:</span> <span class="value">${assessment.muscle.rightLeg || '--'} kg</span></div>
+                        <div class="row"><span class="label">Chân trái:</span> <span class="value">${assessment.muscle.leftLeg || '--'} kg</span></div>
+                    </div>
+                    <div>
+                         <h3>CHẤT LƯỢNG CƠ (Góc pha)</h3>
+                        <div class="row"><span class="label">Tay phải:</span> <span class="value">${assessment.muscle.paRightArm || '--'} °</span></div>
+                        <div class="row"><span class="label">Tay trái:</span> <span class="value">${assessment.muscle.paLeftArm || '--'} °</span></div>
+                        <div class="row"><span class="label">Thân mình:</span> <span class="value">${assessment.muscle.paTrunk || '--'} °</span></div>
+                        <div class="row"><span class="label">Chân phải:</span> <span class="value">${assessment.muscle.paRightLeg || '--'} °</span></div>
+                        <div class="row"><span class="label">Chân trái:</span> <span class="value">${assessment.muscle.paLeftLeg || '--'} °</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>3. Chỉ số Chuyên sâu</h2>
+                <div class="grid">
+                     <div class="row"><span class="label">SMI:</span> <span class="value">${assessment.advanced.smi || '--'} kg/m²</span></div>
+                     <div class="row"><span class="label">Góc pha TB (Phase Angle):</span> <span class="value">${assessment.advanced.phaseAngle || '--'} độ</span></div>
+                     <div class="row"><span class="label">ECW/TBW:</span> <span class="value">${assessment.advanced.ecwTbw || '--'}</span></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Ghi chú</h2>
+                <p>${assessment.notes || 'Không có ghi chú'}</p>
+            </div>
+
+            <div class="footer">
+                In từ hệ thống ElderCare Pro vào ngày ${new Date().toLocaleDateString('vi-VN')}
+            </div>
+        </body>
+        </html>
+    `;
+    printWindow.document.write(content);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+    }, 500);
+}
+
+// Print Report Analysis
+function printModule6Report() {
+    // We need to capture the current state of the report tab
+    // Since charts are canvas, we need to convert them
+
+    // 1. Selector for content
+    const reportTab = document.getElementById('module6-report-tab');
+    if (!reportTab) return;
+
+    const printWindow = window.open('', '_blank');
+
+    // 2. Clone the content (deep clone to not mess up original)
+    // Actually, deep cloning canvas doesn't copy the image.
+    // So we iterate original canvases and convert to images.
+
+    const canvases = reportTab.querySelectorAll('canvas');
+    const canvasImages = [];
+    canvases.forEach(c => canvasImages.push(c.toDataURL()));
+
+    // Create a temporary container to manipulate HTML string
+    const container = document.createElement('div');
+    container.innerHTML = reportTab.innerHTML;
+
+    // Replace canvases with images in the container
+    const tempCanvases = container.querySelectorAll('canvas');
+    tempCanvases.forEach((c, i) => {
+        const img = document.createElement('img');
+        img.src = canvasImages[i];
+        img.style.width = '100%';
+        img.style.maxWidth = '600px';
+        img.style.display = 'block';
+        img.style.margin = '0 auto';
+        c.parentNode.replaceChild(img, c);
+    });
+
+    // Remove non-printable elements (buttons, selectors)
+    const buttons = container.querySelectorAll('button, select, #m6-report-selector');
+    buttons.forEach(b => b.remove());
+
+    // Also remove the "Chọn bản ghi" label
+    const labels = container.querySelectorAll('span');
+    labels.forEach(l => {
+        if (l.textContent.includes('Chọn bản ghi')) l.remove();
+    });
+
+    const htmlContent = container.innerHTML;
+
+    const doc = `
+        <html>
+        <head>
+            <title>Báo cáo Phân tích Thành phần Cơ thể</title>
+             <script src="https://cdn.tailwindcss.com"></script>
+            <style>
+                body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 40px; }
+                .page-break { page-break-before: always; }
+                /* Fix tailwind print issues */
+                @media print {
+                    body { -webkit-print-color-adjust: exact; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="text-center mb-10 pb-6 border-b border-slate-200">
+                <h1 class="text-2xl font-black uppercase text-slate-800">Báo cáo Phân tích Thành phần Cơ thể</h1>
+                <p class="text-slate-500 font-bold mt-2">Bệnh nhân: ${getPatientById(getCurrentPatientId()).fullName} - ID: ${getCurrentPatientId()}</p>
+                <p class="text-xs text-slate-400 mt-1">Ngày xuất báo cáo: ${new Date().toLocaleDateString('vi-VN')}</p>
+            </div>
+            
+            <div class="space-y-8">
+                ${htmlContent}
+            </div>
+
+            <div class="text-center text-xs text-slate-400 mt-10 pt-6 border-t border-slate-100 italic">
+                Hệ thống Quản lý ElderCare Pro
+            </div>
+        </body>
+        </html>
+    `;
+
+    printWindow.document.write(doc);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+    }, 1000);
 }
