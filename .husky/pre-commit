@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Save original git config (if exists)
+git config user.name > /tmp/.git_original_name 2>/dev/null || echo "" > /tmp/.git_original_name
+git config user.email > /tmp/.git_original_email 2>/dev/null || echo "" > /tmp/.git_original_email
+
+# Set git user configuration for Vercel deployment
+git config user.name "chau0301"
+git config user.email "nongngocchau1@gmail.com"
