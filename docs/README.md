@@ -160,4 +160,4 @@ Xem chi tiết trong [documentation_checklist.md](documentation_checklist.md)
 | 07/01/2026 | 1.0       | Tạo tài liệu ban đầu         |
 | 07/01/2026 | 1.1       | Thêm Functional Requirements |
 | 07/01/2026 | 1.2       | Thêm Database Schema         |
-| 07/01/2026 | 1.3       | Thêm Test Plan               |
+| 09/01/2026 | 1.3       | Thêm build stage             |
