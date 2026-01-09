@@ -190,95 +190,68 @@ function generateActivityGrid() {
 
 window.module4Content = `
 <div class="animate-fade-in">
-    <!-- Tab Navigation -->
-    <div class="flex gap-2 mb-6 border-b-2 border-slate-200">
-        <button onclick="switchModule4Tab('form')" id="tab-form" 
-            class="px-6 py-3 font-black text-sm transition-all border-b-4 border-pink-600 text-pink-600">
-            <i data-lucide="clipboard-list" class="w-4 h-4 inline mr-2"></i>
-            Tạo đánh giá mới
-        </button>
-        <button onclick="switchModule4Tab('history')" id="tab-history"
-            class="px-6 py-3 font-black text-sm transition-all border-b-4 border-transparent text-slate-500 hover:text-slate-700">
-            <i data-lucide="history" class="w-4 h-4 inline mr-2"></i>
-            Lịch sử đánh giá
-        </button>
-    </div>
+    
+    <form id="module4-form" class="space-y-6 pb-20">
 
-    <!-- Tab Content: Form -->
-    <div id="content-form" class="tab-content">
-        <form id="module4-form" class="space-y-6">
+        <!-- Activity Grid -->
+        ${generateActivityGrid()}
 
-            <!-- Activity Grid -->
-            ${generateActivityGrid()}
-
-            <!-- Recommendations Panel -->
-            <div class="glass-panel rounded-[32px] p-8 border border-amber-100/50 relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-                <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-                    <i data-lucide="sparkles" class="w-32 h-32 text-amber-500"></i>
-                </div>
-                <h3 class="font-black text-amber-600 text-lg mb-4 flex items-center gap-2 uppercase tracking-wide relative z-10">
-                    <i data-lucide="lightbulb" class="w-6 h-6"></i>
-                    Gợi ý hoạt động phù hợp
-                </h3>
-                <div id="recommendations-list" class="flex flex-wrap gap-3 relative z-10 min-h-[60px]">
-                    <span class="text-sm text-slate-400 italic">Chọn các hoạt động để nhận gợi ý cá nhân hóa...</span>
-                </div>
+        <!-- Recommendations Panel -->
+        <div class="glass-panel rounded-[32px] p-8 border border-amber-100/50 relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+            <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                <i data-lucide="sparkles" class="w-32 h-32 text-amber-500"></i>
             </div>
-
-            <!-- Notes Section -->
-            <div class="glass-panel p-6 rounded-[32px] border border-pink-100/50">
-                <h3 class="font-black text-pink-900 text-xs uppercase tracking-widest mb-3 flex items-center gap-2">
-                    <i data-lucide="file-text" class="w-5 h-5"></i>
-                    Ghi chú bổ sung
-                </h3>
-                <textarea id="additionalNotes" rows="4"
-                    class="input-glass w-full px-4 py-3 rounded-2xl outline-none text-sm font-medium resize-none shadow-inner"
-                    placeholder="Nhận xét về sở thích, khả năng tham gia, hạn chế, khuyến nghị..."></textarea>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex flex-col sm:flex-row gap-4 pt-4 px-1">
-                <button type="submit" id="module4-save-btn"
-                    class="flex-1 px-8 py-4 bg-gradient-to-r from-pink-600 to-rose-500 text-white rounded-2xl font-black text-sm hover:shadow-lg hover:shadow-pink-500/30 hover:scale-[1.01] active:scale-[0.99] transition-all">
-                    <i data-lucide="save" class="w-4 h-4 inline mr-2 ring-offset-2"></i>
-                    Lưu đánh giá
-                </button>
-                <button type="button" onclick="resetModule4Form()"
-                    class="px-8 py-4 glass-panel text-slate-500 rounded-2xl font-black text-sm hover:bg-white/80 hover:text-rose-500 transition-all">
-                    <i data-lucide="x" class="w-4 h-4 inline mr-2"></i>
-                    Hủy
-                </button>
-            </div>
-            
-        </form>
-    </div>
-
-    <!-- Tab Content: History -->
-    <div id="content-history" class="tab-content hidden">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
-            <!-- Left: Assessment List -->
-            <div class="lg:col-span-1 bg-white rounded-2xl border-2 border-slate-200 overflow-hidden flex flex-col">
-                <div class="bg-slate-100 px-5 py-3 border-b-2 border-slate-200">
-                    <h3 class="font-black text-slate-800 text-sm">Danh sách đánh giá</h3>
-                </div>
-                <div id="assessment-list" class="flex-1 overflow-y-auto p-4 space-y-2">
-                    <!-- Assessment items will be inserted here -->
-                </div>
-            </div>
-
-            <!-- Right: Assessment Detail -->
-            <div class="lg:col-span-2 bg-white rounded-2xl border-2 border-slate-200 overflow-hidden flex flex-col">
-                <div class="bg-slate-100 px-5 py-3 border-b-2 border-slate-200">
-                    <h3 class="font-black text-slate-800 text-sm">Chi tiết đánh giá</h3>
-                </div>
-                <div id="assessment-detail" class="flex-1 overflow-y-auto p-6">
-                    <div class="text-center text-slate-400 py-12">
-                        <i data-lucide="heart" class="w-16 h-16 mx-auto mb-4 opacity-50"></i>
-                        <p class="font-semibold">Chọn một đánh giá để xem chi tiết</p>
-                    </div>
-                </div>
+            <h3 class="font-black text-amber-600 text-lg mb-4 flex items-center gap-2 uppercase tracking-wide relative z-10">
+                <i data-lucide="lightbulb" class="w-6 h-6"></i>
+                Gợi ý hoạt động phù hợp
+            </h3>
+            <div id="recommendations-list" class="flex flex-wrap gap-3 relative z-10 min-h-[60px]">
+                <span class="text-sm text-slate-400 italic">Chọn các hoạt động để nhận gợi ý cá nhân hóa...</span>
             </div>
         </div>
+
+        <!-- Notes Section -->
+        <div class="glass-panel p-6 rounded-[32px] border border-pink-100/50">
+            <h3 class="font-black text-pink-900 text-xs uppercase tracking-widest mb-3 flex items-center gap-2">
+                <i data-lucide="file-text" class="w-5 h-5"></i>
+                Ghi chú bổ sung
+            </h3>
+            <textarea id="additionalNotes" rows="4"
+                class="input-glass w-full px-4 py-3 rounded-2xl outline-none text-sm font-medium resize-none shadow-inner"
+                placeholder="Nhận xét về sở thích, khả năng tham gia, hạn chế, khuyến nghị..."></textarea>
+        </div>
+        
+    </form>
+
+    <!-- FLOATING ACTION BUTTONS (FAB) -->
+    <div class="fixed bottom-40 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
+        
+        <!-- SAVE (Update) -->
+        <button type="button" id="module4-fab-save" onclick="saveModule4Assessment()" 
+            class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-pink-600 to-rose-500 text-white rounded-full shadow-[0_8px_30px_rgb(219,39,119,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+            <i data-lucide="save" class="w-7 h-7"></i>
+            <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                Lưu đánh giá
+            </span>
+        </button>
+
+        <!-- EDIT (View Mode) -->
+        <button type="button" id="module4-fab-edit" onclick="toggleModule4EditMode(true)" 
+            class="pointer-events-auto w-14 h-14 bg-amber-500 text-white rounded-full shadow-[0_8px_25px_rgb(245,158,11,0.5)] hover:bg-amber-400 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+            <i data-lucide="edit-2" class="w-6 h-6"></i>
+             <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                Chỉnh sửa
+            </span>
+        </button>
+
+        <!-- CANCEL (Edit Mode) -->
+        <button type="button" id="module4-fab-cancel" onclick="cancelModule4Edit()" 
+            class="pointer-events-auto hidden w-12 h-12 bg-white text-rose-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-rose-100 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-rose-50 ring-2 ring-white">
+            <i data-lucide="x" class="w-6 h-6"></i>
+             <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                Hủy bỏ
+            </span>
+        </button>
     </div>
 </div>
 `;
@@ -336,6 +309,10 @@ function updateRecommendations() {
 // STEP 4.5: Toggle Category Collapse/Expand
 // ============================================
 
+// ============================================
+// STEP 5: Toggle Category Collapse/Expand
+// ============================================
+
 function toggleCategory(categoryId) {
     const categoryContent = document.getElementById('category-' + categoryId);
     const chevron = document.getElementById('chevron-' + categoryId);
@@ -352,183 +329,113 @@ function toggleCategory(categoryId) {
 }
 
 // ============================================
-// STEP 5: Tab Switching
+// STEP 6: Logic Functions (View/Edit Mode)
 // ============================================
 
-function switchModule4Tab(tab) {
-    const formTab = document.getElementById('tab-form');
-    const historyTab = document.getElementById('tab-history');
-    const formContent = document.getElementById('content-form');
-    const historyContent = document.getElementById('content-history');
+// Global state
+let module4ResetFormState = null;
+let module4OriginalData = null;
 
-    if (tab === 'form') {
-        formTab.className = 'px-6 py-3 font-black text-sm transition-all border-b-4 border-pink-600 text-pink-600';
-        historyTab.className = 'px-6 py-3 font-black text-sm transition-all border-b-4 border-transparent text-slate-500 hover:text-slate-700';
-        formContent.classList.remove('hidden');
-        historyContent.classList.add('hidden');
+// Toggle Edit/View Mode
+function toggleModule4EditMode(isEdit) {
+    const form = document.getElementById('module4-form');
+    // FABs
+    const fabEdit = document.getElementById('module4-fab-edit');
+    const fabSave = document.getElementById('module4-fab-save');
+    const fabCancel = document.getElementById('module4-fab-cancel');
+
+    // Select inputs (excluding read-only displays if any)
+    const inputs = form.querySelectorAll('input, textarea');
+
+    if (isEdit) {
+        // Enable Form
+        inputs.forEach(input => input.disabled = false);
+
+        // UI State: Edit Mode
+        if (fabEdit) fabEdit.classList.add('hidden');
+        if (fabSave) fabSave.classList.add('hidden');
+        if (fabCancel) fabCancel.classList.remove('hidden');
+
+        // Show validation styling or hints if needed
+        form.classList.remove('opacity-80', 'pointer-events-none');
     } else {
-        formTab.className = 'px-6 py-3 font-black text-sm transition-all border-b-4 border-transparent text-slate-500 hover:text-slate-700';
-        historyTab.className = 'px-6 py-3 font-black text-sm transition-all border-b-4 border-pink-600 text-pink-600';
-        formContent.classList.add('hidden');
-        historyContent.classList.remove('hidden');
-        loadAssessmentHistory();
+        // Disable Form (View Mode)
+        inputs.forEach(input => input.disabled = true);
+
+        // UI State: View Mode
+        if (fabEdit) fabEdit.classList.remove('hidden');
+        if (fabSave) fabSave.classList.add('hidden');
+        if (fabCancel) fabCancel.classList.add('hidden');
+
+        // Visual indicator for Read-Only
+        form.classList.add('opacity-80');
     }
 
+    // Create new icons if needed
     lucide.createIcons();
 }
 
-// ============================================
-// STEP 6: History Functions
-// ============================================
+// Load Data into Form
+function loadModule4Data(data) {
+    if (!data) return;
+    module4OriginalData = data; // Cache for revert
 
-function loadAssessmentHistory() {
-    const patientId = 'patient_001';
-    const assessments = JSON.parse(localStorage.getItem('mirabocaresync_' + patientId + '_interests') || '[]');
+    // 1. Activities
+    if (data.activities) {
+        Object.keys(data.activities).forEach(key => {
+            const item = data.activities[key];
+            const parts = key.split('_');
+            if (parts.length < 2) return;
+            // Key format: categoryId_activityId
+            // HTML ID format: doing-categoryId-activityId
 
-    const listContainer = document.getElementById('assessment-list');
-    if (!listContainer) return;
+            const categoryId = parts[0];
+            const activityId = parts.slice(1).join('_'); // Handle if activityId has underscore? actually split limit 2 is safer but our ID const data uses simple IDs.
+            // Wait, the key stored was `category.id + '_' + activity.id`. 
+            // The HTML IDs are `doing-category.id-activity.id`.
 
-    if (assessments.length === 0) {
-        listContainer.innerHTML = '<div class="text-center text-slate-400 py-8"><p class="text-sm font-semibold">Chưa có đánh giá nào</p></div>';
-        return;
-    }
-
-    listContainer.innerHTML = assessments.map(function (assessment, index) {
-        const date = new Date(assessment.timestamp);
-        const dateStr = date.toLocaleDateString('vi-VN');
-        const timeStr = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-
-        const totalActivities = Object.values(assessment.activities).filter(a => a.doing || a.want || a.interested).length;
-
-        return `
-        <div onclick="showAssessmentDetail(${index})" 
-            class="p-4 rounded-xl border-2 border-slate-200 hover:border-pink-400 hover:bg-pink-50 cursor-pointer transition-all">
-            <div class="flex items-center justify-between mb-2">
-                <span class="font-black text-slate-800 text-sm">Đánh giá #${assessments.length - index}</span>
-                <span class="text-xs font-semibold text-pink-600">${totalActivities} hoạt động</span>
-            </div>
-            <div class="text-xs text-slate-500 font-semibold">
-                <div>${dateStr} ${timeStr}</div>
-                <div class="text-blue-600 mt-1">${assessment.assessor || ''}</div>
-            </div>
-        </div>
-        `;
-    }).join('');
-}
-
-function showAssessmentDetail(index) {
-    const patientId = 'patient_001';
-    const assessments = JSON.parse(localStorage.getItem('mirabocaresync_' + patientId + '_interests') || '[]');
-    const assessment = assessments[index];
-
-    if (!assessment) return;
-
-    const detailContainer = document.getElementById('assessment-detail');
-    if (!detailContainer) return;
-
-    const date = new Date(assessment.timestamp);
-    const dateStr = date.toLocaleDateString('vi-VN');
-    const timeStr = date.toLocaleTimeString('vi-VN');
-
-    // Count activities by type
-    let doingCount = 0, wantCount = 0, interestedCount = 0;
-    Object.values(assessment.activities).forEach(function (a) {
-        if (a.doing) doingCount++;
-        if (a.want) wantCount++;
-        if (a.interested) interestedCount++;
-    });
-
-    let html = `
-    <div class="space-y-6">
-        <div class="bg-pink-50 rounded-xl p-4 border border-pink-200">
-            <h4 class="font-black text-pink-900 mb-2">Thông tin đánh giá</h4>
-            <div class="grid grid-cols-2 gap-3 text-sm">
-                <div><span class="font-semibold text-slate-600">Ngày đánh giá:</span> <span class="font-bold">${assessment.assessmentDate}</span></div>
-                <div><span class="font-semibold text-slate-600">Nhân viên:</span> <span class="font-bold">${assessment.assessor || '---'}</span></div>
-                <div><span class="font-semibold text-slate-600">Đang làm:</span> <span class="font-bold text-emerald-600">${doingCount} hoạt động</span></div>
-                <div><span class="font-semibold text-slate-600">Muốn làm:</span> <span class="font-bold text-blue-600">${wantCount} hoạt động</span></div>
-                <div><span class="font-semibold text-slate-600">Quan tâm:</span> <span class="font-bold text-amber-600">${interestedCount} hoạt động</span></div>
-            </div>
-        </div>
-    `;
-
-    // Display activities by category
-    activityCategories.forEach(function (category) {
-        const categoryActivities = category.activities.filter(function (activity) {
-            const key = category.id + '_' + activity.id;
-            return assessment.activities[key] &&
-                (assessment.activities[key].doing || assessment.activities[key].want || assessment.activities[key].interested);
-        });
-
-        if (categoryActivities.length > 0) {
-            const colorClasses = {
-                rose: 'bg-rose-50 border-rose-200 text-rose-900',
-                fuchsia: 'bg-fuchsia-50 border-fuchsia-200 text-fuchsia-900',
-                pink: 'bg-pink-50 border-pink-200 text-pink-900',
-                purple: 'bg-purple-50 border-purple-200 text-purple-900'
+            const setChecked = (type, val) => {
+                const el = document.getElementById(`${type}-${categoryId}-${activityId}`);
+                if (el) el.checked = !!val;
             };
-            const colorClass = colorClasses[category.color] || 'bg-pink-50 border-pink-200 text-pink-900';
 
-            html += `
-            <div class="${colorClass} rounded-xl p-4 border">
-                <h4 class="font-black mb-3">${category.name}</h4>
-                <div class="space-y-2">
-                    ${categoryActivities.map(function (activity) {
-                const key = category.id + '_' + activity.id;
-                const data = assessment.activities[key];
-                const badges = [];
-                if (data.doing) badges.push('<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-bold">Đang làm</span>');
-                if (data.want) badges.push('<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold">Muốn làm</span>');
-                if (data.interested) badges.push('<span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs font-bold">Quan tâm</span>');
-
-                return `
-                        <div class="bg-white rounded-lg p-3 border border-slate-200">
-                            <div class="font-bold text-slate-800 mb-1">${activity.name}</div>
-                            <div class="flex gap-2">${badges.join('')}</div>
-                        </div>
-                        `;
-            }).join('')}
-                </div>
-            </div>
-            `;
-        }
-    });
-
-    if (assessment.recommendations && assessment.recommendations.length > 0) {
-        html += `
-        <div class="bg-amber-50 rounded-xl p-4 border border-amber-200">
-            <h4 class="font-black text-amber-900 mb-2">Gợi ý hoạt động</h4>
-            <div class="flex flex-wrap gap-2">
-                ${assessment.recommendations.map(r => `<span class="px-3 py-1 bg-white border border-amber-300 text-amber-800 rounded-lg text-sm font-bold">${r}</span>`).join('')}
-            </div>
-        </div>
-        `;
+            setChecked('doing', item.doing);
+            setChecked('want', item.want);
+            setChecked('interested', item.interested);
+        });
     }
 
-    if (assessment.notes) {
-        html += `
-        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
-            <h4 class="font-black text-slate-900 mb-2">Ghi chú</h4>
-            <p class="text-sm text-slate-700 whitespace-pre-wrap">${assessment.notes}</p>
-        </div>
-        `;
-    }
+    // 2. Notes
+    const notesEl = document.getElementById('additionalNotes');
+    if (notesEl) notesEl.value = data.notes || '';
 
-    html += '</div>';
-    detailContainer.innerHTML = html;
+    // 3. Recommendations (Read-only display, re-calculated on edit)
+    // We can run updateRecommendations to reflect current checked state
+    updateRecommendations();
 }
 
-// ============================================
-// STEP 7: Form Functions
-// ============================================
-// Global variable to store resetFormState function
-let module4ResetFormState = null;
+
+// Cancel Edit
+function cancelModule4Edit() {
+    if (confirm('Hủy bỏ thay đổi? Dữ liệu sẽ quay về trạng thái cũ.')) {
+        if (module4OriginalData) {
+            loadModule4Data(module4OriginalData); // Revert data
+            toggleModule4EditMode(false); // Switch to view mode
+            showToast('Đã hủy bỏ thay đổi', 'info');
+        } else {
+            // If no data existed, clear form
+            document.getElementById('module4-form').reset();
+            updateRecommendations();
+            toggleModule4EditMode(true); // Stay in edit mode as "New"
+        }
+    }
+}
 
 // Reset Form
 function resetModule4Form() {
     if (confirm('Bạn có chắc muốn xóa tất cả dữ liệu đã nhập?')) {
         document.getElementById('module4-form').reset();
-        document.getElementById('recommendation-list').innerHTML = '<p class="text-slate-400 text-sm">Chọn hoạt động để xem gợi ý...</p>';
+        document.getElementById('recommendation-list').innerHTML = '<span class="text-sm text-slate-400 italic">Chọn các hoạt động để nhận gợi ý cá nhân hóa...</span>';
 
         // Reset form state (disable save button)
         if (typeof module4ResetFormState === 'function') {
@@ -540,72 +447,137 @@ function resetModule4Form() {
 }
 
 // ============================================
-// STEP 8: Initialize Module
+// STEP 7: Initialize Module
 // ============================================
 
 function initModule4() {
     const patientId = getCurrentPatientId();
 
-    // Setup form change detection and store in global variable
-    const resetFormState = setupFormChangeDetection('module4-form', 'module4-save-btn');
-    module4ResetFormState = resetFormState; // Make accessible to resetForm()
+    // Load existing data (Single Record)
+    const savedData = localStorage.getItem(`mirabocaresync_${patientId}_interests_assessment`); // New key
 
-    // 2. Form Submission
-    const form = document.getElementById('module4-form');
-    if (form) {
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
+    if (savedData) {
+        try {
+            const data = JSON.parse(savedData);
+            loadModule4Data(data);
+            toggleModule4EditMode(false); // Default to View Mode
+        } catch (e) {
+            console.error('Error loading module 4 data:', e);
+            toggleModule4EditMode(true);
+        }
+    } else {
+        // Check legacy array data for migration
+        const legacyData = localStorage.getItem(`mirabocaresync_${patientId}_interests`);
+        if (legacyData) {
+            try {
+                const arr = JSON.parse(legacyData);
+                if (arr.length > 0) {
+                    const latest = arr[arr.length - 1]; // Take latest
+                    loadModule4Data(latest);
+                    toggleModule4EditMode(false);
+                } else {
+                    toggleModule4EditMode(true); // New record
+                }
+            } catch (e) {
+                toggleModule4EditMode(true);
+            }
+        } else {
+            toggleModule4EditMode(true); // New record
+        }
+    }
 
-            // Collect activity data
-            const activities = {};
+    // Setup form change detection
+    // Note: 'module4-fab-save' is the ID of the FAB save button
+    const resetFormState = setupFormChangeDetection('module4-form', 'module4-fab-save', (isDirty) => {
+        const fabSave = document.getElementById('module4-fab-save');
+        if (!fabSave) return;
+
+        // Only toggle visibility if we are in Edit Mode (inputs not disabled)
+        // Check generic input state or check if fabEdit is hidden
+        const fabEdit = document.getElementById('module4-fab-edit');
+        const isEditMode = fabEdit && fabEdit.classList.contains('hidden');
+
+        if (isEditMode) {
+            if (isDirty) {
+                fabSave.classList.remove('hidden');
+            } else {
+                fabSave.classList.add('hidden');
+            }
+        } else {
+            // In View Mode, Save is always hidden
+            fabSave.classList.add('hidden');
+        }
+    });
+    module4ResetFormState = resetFormState;
+
+
+    // Global Save Function for Module 4
+    window.saveModule4Assessment = function () {
+        const patientId = getCurrentPatientId();
+
+        // Collect activity data
+        const activities = {};
+        if (typeof activityCategories !== 'undefined') {
             activityCategories.forEach(function (category) {
                 category.activities.forEach(function (activity) {
-                    const doing = document.getElementById('doing-' + category.id + '-' + activity.id).checked;
-                    const want = document.getElementById('want-' + category.id + '-' + activity.id).checked;
-                    const interested = document.getElementById('interested-' + category.id + '-' + activity.id).checked;
+                    // Safe check elements
+                    const doingEl = document.getElementById('doing-' + category.id + '-' + activity.id);
+                    const wantEl = document.getElementById('want-' + category.id + '-' + activity.id);
+                    const interestedEl = document.getElementById('interested-' + category.id + '-' + activity.id);
 
-                    activities[category.id + '_' + activity.id] = {
-                        doing: doing,
-                        want: want,
-                        interested: interested
-                    };
+                    const doing = doingEl ? doingEl.checked : false;
+                    const want = wantEl ? wantEl.checked : false;
+                    const interested = interestedEl ? interestedEl.checked : false;
+
+                    // Only save if at least one is checked? No, save all state or only checked ones to save space.
+                    // Previous logic saved all. Let's save only if relevant to keep it clean, 
+                    // BUT current load logic iterates keys. If we skip keys, load logic assumes false.
+                    if (doing || want || interested) {
+                        activities[category.id + '_' + activity.id] = {
+                            doing: doing,
+                            want: want,
+                            interested: interested
+                        };
+                    }
                 });
             });
+        }
 
-            // Get recommendations
-            const recommendationElements = document.querySelectorAll('#recommendations-list span');
-            const recommendations = Array.from(recommendationElements)
-                .filter(el => !el.classList.contains('italic'))
-                .map(el => el.textContent);
+        // Get recommendations
+        const recommendationElements = document.querySelectorAll('#recommendations-list span');
+        const recommendations = Array.from(recommendationElements)
+            .filter(el => !el.classList.contains('italic'))
+            .map(el => el.textContent);
 
-            const assessmentData = {
-                assessmentDate: document.getElementById('assessmentDate').value,
-                assessor: document.getElementById('assessorName').value,
-                activities: activities,
-                recommendations: recommendations,
-                notes: document.getElementById('additionalNotes').value,
-                timestamp: new Date().toISOString()
-            };
+        const assessmentData = {
+            patientId: patientId,
+            assessmentDate: new Date().toLocaleDateString('vi-VN'),
+            assessor: 'Administrator', // Mock user
+            activities: activities,
+            recommendations: recommendations,
+            notes: document.getElementById('additionalNotes').value,
+            timestamp: new Date().toISOString()
+        };
 
-            // Save to LocalStorage
-            const assessments = JSON.parse(localStorage.getItem('mirabocaresync_' + patientId + '_interests') || '[]');
-            assessments.push(assessmentData);
-            localStorage.setItem('mirabocaresync_' + patientId + '_interests', JSON.stringify(assessments));
+        // Save Single Record
+        localStorage.setItem('mirabocaresync_' + patientId + '_interests_assessment', JSON.stringify(assessmentData));
 
-            // Mark complete and show toast
-            markModuleComplete(patientId, 'module4');
-            showToast('Đã lưu đánh giá sở thích thành công!', 'success');
-            console.log('Saved interests assessment:', assessmentData);
+        // Mark complete and show toast
+        if (typeof markModuleComplete === 'function') markModuleComplete(patientId, 'module4');
 
-            // Reset form state
-            if (typeof resetFormState === 'function') {
-                resetFormState();
-            }
+        // Dispatch event for sidebar update
+        window.dispatchEvent(new Event('module-data-saved'));
+        showToast('Đã lưu đánh giá sở thích thành công!', 'success');
 
-            // Switch to history tab
-            switchModule4Tab('history');
-        });
-    }
+        // Update State
+        module4OriginalData = assessmentData;
+        toggleModule4EditMode(false); // Switch to View Mode
+
+        // Reset form state
+        if (typeof module4ResetFormState === 'function') {
+            module4ResetFormState();
+        }
+    };
 
     // Initialize icons
     setTimeout(function () {

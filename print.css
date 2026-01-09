@@ -1,0 +1,19 @@
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #m7-print-area, #m7-print-area * {
+        visibility: visible;
+    }
+    #m7-print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 20px;
+    }
+    /* Hide buttons in print view */
+    .no-print {
+        display: none !important;
+    }
+}

@@ -592,8 +592,10 @@ function toggleModule1EditMode(isEdit) {
         deleteBtns.forEach(btn => btn.disabled = false);
 
         // UI State: Edit Mode
+        // UI State: Edit Mode
         if (fabEdit) fabEdit.classList.add('hidden');
-        if (fabSave) fabSave.classList.remove('hidden');
+        // Save Button: Hidden initially, shown only on change (handled by setupFormChangeDetection callback)
+        if (fabSave) fabSave.classList.add('hidden');
         if (fabCancel) fabCancel.classList.remove('hidden');
         if (fabReset) fabReset.classList.add('hidden'); // Optional: show if needed
 
@@ -750,7 +752,24 @@ function initModule1() {
     }
 
     // Setup form change detection and store in global variable
-    const resetFormState = setupFormChangeDetection('module1-form', 'fab-save-btn');
+    const resetFormState = setupFormChangeDetection('module1-form', 'fab-save-btn', (isDirty) => {
+        const fabSave = document.getElementById('fab-save-btn');
+        if (!fabSave) return;
+
+        // Only toggle visibility if we are in Edit Mode
+        const fabEdit = document.getElementById('fab-edit-btn');
+        const isEditMode = fabEdit && fabEdit.classList.contains('hidden');
+
+        if (isEditMode) {
+            if (isDirty) {
+                fabSave.classList.remove('hidden');
+            } else {
+                fabSave.classList.add('hidden');
+            }
+        } else {
+            fabSave.classList.add('hidden');
+        }
+    });
     module1ResetFormState = resetFormState; // Make accessible to resetForm()
 
     // Add initial contact if empty
@@ -852,6 +871,10 @@ function initModule1() {
 
         // 4. Feedback & UI Update
         showToast('Đã lưu hồ sơ thành công!', 'success');
+
+        // Dispatch event to update sidebar progress
+        window.dispatchEvent(new Event('module-data-saved'));
+
         console.log('Face Sheet Saved:', formData);
 
         // Update original data cache and switch to view mode

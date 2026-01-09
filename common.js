@@ -72,6 +72,15 @@ function register(fullName, username, password) {
  * @param {boolean} remember
  */
 function login(username, password, remember = false) {
+    // Helper to handle remember
+    const handleRemember = () => {
+        if (remember) {
+            localStorage.setItem('mirabocaresync_remembered_username', username);
+        } else {
+            localStorage.removeItem('mirabocaresync_remembered_username');
+        }
+    };
+
     // 1. Check default admin
     if (username === 'admin') {
         const adminPw = localStorage.getItem('mirabocaresync_admin_pw') || 'admin';
@@ -82,31 +91,28 @@ function login(username, password, remember = false) {
                 username: 'admin',
                 role: 'admin'
             }, remember);
-
-            if (remember) {
-                localStorage.setItem('mirabocaresync_remembered_username', username);
-            } else {
-                localStorage.removeItem('mirabocaresync_remembered_username');
-            }
+            handleRemember();
             return true;
+        } else {
+            throw new Error('Mật khẩu không đúng');
         }
     }
 
     // 2. Check registered users
     const users = JSON.parse(localStorage.getItem('mirabocaresync_users') || '[]');
-    const user = users.find(u => u.username === username && u.password === password);
+    const user = users.find(u => u.username === username);
 
     if (user) {
-        createSession(user, remember);
-        if (remember) {
-            localStorage.setItem('mirabocaresync_remembered_username', username);
+        if (user.password === password) {
+            createSession(user, remember);
+            handleRemember();
+            return true;
         } else {
-            localStorage.removeItem('mirabocaresync_remembered_username');
+            throw new Error('Mật khẩu không đúng');
         }
-        return true;
     }
 
-    throw new Error('Tên đăng nhập hoặc mật khẩu không đúng');
+    throw new Error('Tài khoản không tồn tại');
 }
 
 /**
@@ -414,9 +420,10 @@ function getPatientById(patientId) {
  * Only enables save button when actual changes are detected.
  * @param {string} formId 
  * @param {string} saveBtnId 
+ * @param {function(boolean)} [onStateChange] - Optional callback receiving isDirty status
  * @returns {function} Function to reset the form state (disable save button)
  */
-function setupFormChangeDetection(formId, saveBtnId) {
+function setupFormChangeDetection(formId, saveBtnId, onStateChange) {
     const form = document.getElementById(formId);
     const saveBtn = document.getElementById(saveBtnId);
 
@@ -438,15 +445,21 @@ function setupFormChangeDetection(formId, saveBtnId) {
             saveBtn.disabled = false;
             saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             saveBtn.classList.add('ring-4', 'ring-blue-200');
-            if (!saveBtn.textContent.includes('*')) {
-                saveBtn.textContent = saveBtn.textContent.trim() + ' *';
-            }
+            // Do NOT overwrite text content as it may contain icons
+            // if (!saveBtn.textContent.includes('*')) {
+            //    saveBtn.textContent = saveBtn.textContent.trim() + ' *';
+            // }
         } else {
             // Disable and remove highlight
             saveBtn.disabled = true;
             saveBtn.classList.add('opacity-50', 'cursor-not-allowed');
             saveBtn.classList.remove('ring-4', 'ring-blue-200');
-            saveBtn.textContent = saveBtn.textContent.replace('*', '').trim();
+            // saveBtn.textContent = saveBtn.textContent.replace('*', '').trim();
+        }
+
+        // Trigger custom callback if provided
+        if (typeof onStateChange === 'function') {
+            onStateChange(hasChanges);
         }
     };
 
@@ -462,7 +475,12 @@ function setupFormChangeDetection(formId, saveBtnId) {
         saveBtn.disabled = true;
         saveBtn.classList.add('opacity-50', 'cursor-not-allowed');
         saveBtn.classList.remove('ring-4', 'ring-blue-200');
-        saveBtn.textContent = saveBtn.textContent.replace('*', '').trim();
+        // saveBtn.textContent = saveBtn.textContent.replace('*', '').trim();
+
+        // Reset callback state
+        if (typeof onStateChange === 'function') {
+            onStateChange(false);
+        }
     };
 }
 
@@ -517,7 +535,7 @@ function showToast(message, type = 'success') {
     if (!container) {
         container = document.createElement('div');
         container.id = 'toast-container';
-        container.className = 'fixed bottom-5 right-5 z-50 flex flex-col gap-3';
+        container.className = 'fixed bottom-5 right-5 z-[200] flex flex-col gap-3';
         document.body.appendChild(container);
     }
 

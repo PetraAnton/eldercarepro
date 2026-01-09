@@ -11,6 +11,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- SheetJS -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
@@ -63,6 +65,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="print.css">
 </head>
 
 <body class="bg-[#f8fafc] text-slate-900 h-screen flex overflow-hidden">
@@ -221,14 +224,30 @@
             <section id="section-business" class="hidden-section max-w-7xl mx-auto space-y-8 animate-fade-in">
                 <!-- Profile Card -->
                 <div
-                    class="bg-white p-8 rounded-[40px] border shadow-sm flex flex-col md:flex-row gap-8 items-center border-slate-100">
+                    class="bg-white p-8 rounded-[40px] border shadow-sm flex flex-col md:flex-row gap-8 items-center border-slate-100 relative">
                     <div id="patient-avatar"
-                        class="w-24 h-24 rounded-[32px] bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white text-4xl font-black">
+                        class="w-24 h-24 rounded-[32px] bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white text-4xl font-black shadow-2xl shadow-blue-500/20">
                         ?
                     </div>
                     <div class="flex-1 text-center md:text-left">
-                        <h1 id="patient-detail-name" class="text-3xl font-black text-slate-800 tracking-tight mb-2">Chưa
-                            chọn bệnh nhân</h1>
+                        <div class="flex items-center justify-center md:justify-start gap-4 mb-2">
+                            <h1 id="patient-detail-name" class="text-3xl font-black text-slate-800 tracking-tight">Chưa
+                                chọn bệnh nhân</h1>
+                            <!-- Patient Switcher Dropdown (Hidden trigger, styled as button) -->
+                            <div class="relative group">
+                                <button
+                                    onclick="document.getElementById('patient-switcher-dropdown').classList.toggle('hidden')"
+                                    class="p-2 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                                    title="Chuyển bệnh nhân">
+                                    <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+                                </button>
+                                <div id="patient-switcher-dropdown"
+                                    class="hidden absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden max-h-60 overflow-y-auto animate-fade-in">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+
                         <div
                             class="flex flex-wrap gap-4 text-[11px] font-bold text-slate-400 justify-center md:justify-start">
                             <span id="patient-detail-care-level"
@@ -255,7 +274,7 @@
 
                     <!-- Work Area -->
                     <div
-                        class="flex-1 bg-white rounded-[48px] border border-slate-100 shadow-2xl overflow-hidden min-h-[600px] flex flex-col">
+                        class="flex-1 bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden min-h-[600px] flex flex-col">
                         <div class="p-10 border-b bg-slate-50/40 flex justify-between items-center">
                             <div>
                                 <h2 id="module-title" class="text-3xl font-black text-slate-800 tracking-tight italic">
@@ -718,6 +737,7 @@
     <script src="module3.js"></script>
     <script src="module4.js"></script>
     <script src="module6.js"></script>
+    <script src="module7.js"></script>
 
     <script>
         // --- State ---
@@ -733,7 +753,7 @@
             { id: 4, title: 'Sở thích & Quan tâm', icon: 'heart' },
             { id: 5, title: 'Phân tích Tư thế', icon: 'activity' },
             { id: 6, title: 'Thành phần Cơ (SMI)', icon: 'bar-chart-3' },
-            { id: 7, title: 'Thể lực & Vận động', icon: 'zap' },
+            { id: 7, title: 'Chức năng vận động', icon: 'zap' },
             { id: 8, title: 'Bảo mật & Đồng ý', icon: 'shield-check' },
             { id: 9, title: 'Khảo sát Nhà ở', icon: 'home' }
         ];
@@ -743,6 +763,65 @@
         function updateActivePatientDisplay() {
             // Also update patient detail profile
             updatePatientDetailProfile();
+            renderPatientSwitcher();
+        }
+
+        function renderPatientSwitcher(filterText = '') {
+            const patients = getAllPatients();
+            const activeId = getCurrentPatientId();
+            const container = document.getElementById('patient-switcher-dropdown');
+            if (!container) return;
+
+            // Filter patients if search text exists
+            const filteredPatients = filterText
+                ? patients.filter(p => p.fullName.toLowerCase().includes(filterText.toLowerCase()) || p.id.toLowerCase().includes(filterText.toLowerCase()))
+                : patients;
+
+            const listHtml = filteredPatients.map(p => `
+                <button onclick="switchToPatient('${p.id}'); document.getElementById('patient-switcher-dropdown').classList.add('hidden');" 
+                    class="w-full text-left px-4 py-3 hover:bg-slate-50 flex items-center gap-3 transition-colors border-b last:border-0 border-slate-50 ${p.id === activeId ? 'bg-blue-50/50' : ''}">
+                    <div class="w-8 h-8 rounded-lg ${p.id === activeId ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'} flex items-center justify-center font-bold text-xs">
+                        ${p.fullName.charAt(0).toUpperCase()}
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-xs font-bold text-slate-700">${p.fullName}</p>
+                        <p class="text-[9px] text-slate-400 uppercase">ID: ${p.id}</p>
+                    </div>
+                    ${p.id === activeId ? '<i data-lucide="check" class="w-4 h-4 text-blue-600"></i>' : ''}
+                </button>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="p-3 border-b border-slate-100 sticky top-0 bg-white z-10">
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                         <input type="text" placeholder="Tìm bệnh nhân..." 
+                            oninput="renderPatientSwitcher(this.value)"
+                            class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue-100"
+                            value="${filterText}" autofocus>
+                    </div>
+                </div>
+                <div class="max-h-60 overflow-y-auto">
+                    ${listHtml.length > 0 ? listHtml : '<p class="text-xs text-slate-400 text-center py-4">Không tìm thấy</p>'}
+                </div>
+                <div class="p-2 border-t border-slate-100 sticky bottom-0 bg-white z-10">
+                    <button onclick="document.getElementById('patient-switcher-dropdown').classList.add('hidden'); openCreatePatientModal();" 
+                        class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Thêm bệnh nhân
+                    </button>
+                </div>
+            `;
+
+            // Focus input if filterText is present (to keep focus during re-render)
+            if (filterText) {
+                const input = container.querySelector('input');
+                if (input) {
+                    input.selectionStart = input.selectionEnd = input.value.length;
+                    setTimeout(() => input.focus(), 0);
+                }
+            }
+
+            lucide.createIcons();
         }
 
         function updatePatientDetailProfile() {
@@ -816,7 +895,10 @@
 
         function switchToPatient(patientId) {
             setCurrentPatientId(patientId);
-            // togglePatientSwitcher(); // Component removed
+
+            // Update UI
+            updateActivePatientDisplay();
+            renderModuleTabs();
 
             // Reload current module to show data for new patient
             if (currentModuleId) {
@@ -1187,6 +1269,7 @@
             // Set the patient as active
             setCurrentPatientId(id);
             updateActivePatientDisplay();
+            renderModuleTabs(); // Ensure checkmarks update
 
             switchTab('business');
             setActiveModule(1);
@@ -1279,13 +1362,29 @@
                     `;
                 }
 
+                // Calculate Progress
+                const status = JSON.parse(localStorage.getItem(`mirabocaresync_${patient.id}_status`) || '{}');
+                // Filter specifically for module1..9 to be safe if other keys exist
+                const validModules = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                const realCount = validModules.filter(id => status[`module${id}`]).length;
+                const totalModules = 9;
+                const progressPercent = Math.round((realCount / totalModules) * 100);
+
                 return `
                     <tr class="hover:bg-slate-50/50 transition-all">
                         <td class="px-10 py-6 text-slate-800 flex items-center gap-4">
                             <div class="w-10 h-10 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-600 font-black">
                                 ${initial}
                             </div>
-                            ${patient.fullName}
+                            <div>
+                                <div class="font-bold">${patient.fullName}</div>
+                                <div class="text-[10px] text-slate-400 font-bold mt-1 flex items-center gap-2">
+                                     <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                        <div class="h-full bg-emerald-500 rounded-full" style="width: ${progressPercent}%"></div>
+                                     </div>
+                                     <span>${realCount}/${totalModules}</span>
+                                </div>
+                            </div>
                         </td>
                         <td class="px-10 py-6 text-slate-600">${patient.careLevel || 'Chăm sóc 1'}</td>
                         <td class="px-10 py-6">
@@ -1319,9 +1418,9 @@
             const patient = getPatientById(patientId);
             if (!patient) return;
 
-            if (confirm(`Kích hoạt lại bệnh nhân "${patient.fullName}"?\n\nBệnh nhân sẽ được đánh dấu là đang hoạt động.`)) {
+            if (confirm(`Kích hoạt lại bệnh nhân "${patient.fullName}" ?\n\nBệnh nhân sẽ được đánh dấu là đang hoạt động.`)) {
                 if (reactivatePatient(patientId)) {
-                    showToast(`Đã kích hoạt lại bệnh nhân: ${patient.fullName}`, 'success');
+                    showToast(`Đã kích hoạt lại bệnh nhân: ${patient.fullName} `, 'success');
                     renderPatientList();
                 }
             }
@@ -1329,6 +1428,22 @@
 
         // Handle deactivation form submission
         document.addEventListener('DOMContentLoaded', function () {
+            // Click outside to close Patient Switcher
+            document.addEventListener('click', function (event) {
+                const switcher = document.getElementById('patient-switcher-dropdown');
+                const toggleBtn = event.target.closest('button[onclick*="patient-switcher-dropdown"]');
+                const isInsideSwitcher = event.target.closest('#patient-switcher-dropdown');
+
+                if (switcher && !switcher.classList.contains('hidden') && !toggleBtn && !isInsideSwitcher) {
+                    switcher.classList.add('hidden');
+                }
+            });
+
+            // Listen for module data save events to refresh progress
+            window.addEventListener('module-data-saved', function () {
+                renderModuleTabs();
+            });
+
             document.getElementById('deactivate-patient-form')?.addEventListener('submit', function (e) {
                 e.preventDefault();
 
@@ -1340,7 +1455,7 @@
                 if (!patient) return;
 
                 if (deactivatePatient(patientId, reason, notes)) {
-                    showToast(`Đã vô hiệu hóa bệnh nhân: ${patient.fullName}`, 'success');
+                    showToast(`Đã vô hiệu hóa bệnh nhân: ${patient.fullName} `, 'success');
                     closeDeactivateModal();
                     renderPatientList();
                 }
@@ -1349,10 +1464,15 @@
 
         function renderModuleTabs() {
             const container = document.getElementById('module-tabs');
-            container.innerHTML = modules.map(m => `
+            const patientId = getCurrentPatientId();
+            const status = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_status`) || '{}');
+
+            container.innerHTML = modules.map(m => {
+                const isComplete = status[`module${m.id}`];
+                return `
                 <button onclick="setActiveModule(${m.id})" id="module-btn-${m.id}" 
-                    class="w-full flex items-center justify-between p-5 rounded-3xl border transition-all text-left bg-white border-slate-100 hover:border-blue-300 group shadow-sm">
-                    <div class="flex items-center gap-5">
+                    class="w-full flex items-center justify-between p-5 rounded-3xl border transition-all text-left bg-white border-slate-100 hover:border-blue-300 group shadow-sm relative overflow-hidden">
+                    <div class="flex items-center gap-5 z-10">
                         <div class="module-icon-box p-3 rounded-2xl bg-slate-100 text-slate-500 transition-all">
                             <i data-lucide="${m.icon}" class="w-5 h-5"></i>
                         </div>
@@ -1361,8 +1481,13 @@
                             <p class="text-sm font-bold text-slate-700">${m.title.split(' (')[0]}</p>
                         </div>
                     </div>
+                    ${isComplete ? `
+                    <div class="bg-emerald-100 p-1.5 rounded-full mr-2 z-10">
+                        <i data-lucide="check" class="w-4 h-4 text-emerald-600 font-bold"></i>
+                    </div>
+                    ` : ''}
                 </button>
-            `).join('');
+            `}).join('');
             lucide.createIcons();
         }
 
@@ -1390,7 +1515,15 @@
         function renderModuleView(id) {
             const content = document.getElementById('module-content');
 
-            // Check if module content variable exists (e.g., module1Content)
+            // Check for modern render function first (e.g., renderModule7(content))
+            const renderFuncName = 'renderModule' + id;
+            if (typeof window[renderFuncName] === 'function') {
+                content.innerHTML = ''; // Clear previous content
+                window[renderFuncName](content);
+                return;
+            }
+
+            // Fallback to legacy string content variable (e.g., module1Content)
             const contentVarName = 'module' + id + 'Content';
 
             if (window[contentVarName]) {

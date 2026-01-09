@@ -342,178 +342,152 @@ function generateBasicMovementTableRows() {
 // STEP 3: Define Template Literal LAST
 // ============================================
 
+
 window.module3Content = `
 <div class="animate-fade-in">
-    <!-- Tab Navigation -->
-    <div class="flex gap-2 mb-6 border-b-2 border-slate-200">
-        <button onclick="switchModule3Tab('form')" id="tab-form" 
-            class="px-6 py-3 font-black text-sm transition-all border-b-4 border-blue-600 text-blue-600">
-            <i data-lucide="clipboard-list" class="w-4 h-4 inline mr-2"></i>
-            Tạo đánh giá mới
-        </button>
-        <button onclick="switchModule3Tab('history')" id="tab-history"
-            class="px-6 py-3 font-black text-sm transition-all border-b-4 border-transparent text-slate-500 hover:text-slate-700">
-            <i data-lucide="history" class="w-4 h-4 inline mr-2"></i>
-            Lịch sử đánh giá
-        </button>
-    </div>
+    
+    <form id="module3-form" class="space-y-6 pb-20">
 
-    <!-- Tab Content: Form -->
-    <div id="content-form" class="tab-content">
-        <form id="module3-form" class="space-y-6">
-
-            <!-- ADL Assessment Table -->
-            <div class="glass-panel rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
-                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-4">
-                    <h3 class="font-black text-white text-sm flex items-center gap-2 tracking-wide uppercase">
-                        <i data-lucide="user-check" class="w-5 h-5"></i>
-                        ADL - Hoạt động Sinh hoạt Cơ bản
-                    </h3>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-emerald-50/50 backdrop-blur-md">
-                            <tr class="border-b border-emerald-100">
-                                <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Hạng mục</th>
-                                <th colspan="3" class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Mức độ</th>
-                                <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Tình trạng</th>
-                                <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Môi trường<br/>(địa điểm thực hiện và dụng cụ hỗ trợ)</th>
-                                <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Tình trạng - vấn đề<br/>sinh hoạt</th>
-                            </tr>
-                            <tr class="border-b border-emerald-100">
-                                <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-24">Tự lập<br/>(10)</th>
-                                <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-32">Hỗ trợ một phần (5)</th>
-                                <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-32">HT toàn phần (0)</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-50/50">
-                            ${generateADLTableRows()}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="bg-emerald-50/30 px-6 py-5 border-t border-emerald-100/50">
-                    <div class="flex items-center justify-between">
-                        <span class="font-black text-emerald-900 uppercase tracking-widest text-xs">Tổng điểm ADL:</span>
-                        <div class="flex items-center gap-2">
-                            <span id="adl-total-score" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">0</span>
-                            <span class="text-sm font-bold text-emerald-400">/ 100</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- IADL Assessment Table -->
-            <div class="glass-panel rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
-                <div class="bg-gradient-to-r from-violet-500 to-purple-500 px-6 py-4">
-                    <h3 class="font-black text-white text-sm flex items-center gap-2 tracking-wide uppercase">
-                        <i data-lucide="briefcase" class="w-5 h-5"></i>
-                        IADL - Hoạt động Sinh hoạt Công cụ
-                    </h3>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-violet-50/50 backdrop-blur-md border-b border-violet-100/50">
-                            <tr>
-                                <th class="p-4 text-left font-black text-violet-900 text-[10px] uppercase tracking-widest">Hạng mục</th>
-                                <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Tự lập</th>
-                                <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Giám sát</th>
-                                <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Hỗ trợ</th>
-                                <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Phụ thuộc</th>
-                                <th class="p-4 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Vấn đề</th>
-                                <th class="p-4 text-left font-black text-violet-900 text-[10px] uppercase tracking-widest">Dung cụ hỗ trợ</th>
-                                <th class="p-4 text-left font-black text-violet-900 text-[10px] uppercase tracking-widest">Ghi chú</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-50/50">
-                            ${generateIADLTableRows()}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Basic Movement Assessment Table -->
-            <div class="glass-panel rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
-                <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4">
-                    <h3 class="font-black text-white text-sm flex items-center gap-2 tracking-wide uppercase">
-                        <i data-lucide="zap" class="w-5 h-5"></i>
-                        Vận Động Cơ Bản
-                    </h3>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                         <thead class="bg-amber-50/50 backdrop-blur-md border-b border-amber-100/50">
-                            <tr>
-                                <th class="p-4 text-left font-black text-amber-900 text-[10px] uppercase tracking-widest">Hạng mục</th>
-                                <th class="p-3 text-center font-black text-amber-900 text-[10px] uppercase tracking-widest w-24">Tự lập</th>
-                                <th class="p-3 text-center font-black text-amber-900 text-[10px] uppercase tracking-widest w-24">Giám sát</th>
-                                <th class="p-3 text-center font-black text-amber-900 text-[10px] uppercase tracking-widest w-24">Hỗ trợ</th>
-                                <th class="p-3 text-center font-black text-amber-900 text-[10px] uppercase tracking-widest w-24">Phụ thuộc</th>
-                                <th class="p-4 text-center font-black text-amber-900 text-[10px] uppercase tracking-widest w-24">Vấn đề</th>
-                                <th class="p-4 text-left font-black text-amber-900 text-[10px] uppercase tracking-widest">Dung cụ hỗ trợ</th>
-                                <th class="p-4 text-left font-black text-amber-900 text-[10px] uppercase tracking-widest">Ghi chú</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-50/50">
-                            ${generateBasicMovementTableRows()}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- General Notes -->
-            <div class="glass-panel p-6 rounded-[32px] border border-amber-100/50">
-                <h3 class="font-black text-amber-900 text-xs uppercase tracking-widest mb-3 flex items-center gap-2">
-                    <i data-lucide="file-text" class="w-5 h-5"></i>
-                    Ghi chú chung
+        <!-- ADL Assessment Table -->
+        <div class="glass-panel rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
+            <div class="bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-4">
+                <h3 class="font-black text-white text-sm flex items-center gap-2 tracking-wide uppercase">
+                    <i data-lucide="user-check" class="w-5 h-5"></i>
+                    ADL - Hoạt động Sinh hoạt Cơ bản
                 </h3>
-                <textarea id="generalNotes" rows="4"
-                    class="input-glass w-full px-4 py-3 rounded-2xl outline-none text-sm font-medium resize-none shadow-inner"
-                    placeholder="Nhận xét tổng quan, xu hướng cải thiện/suy giảm, khuyến nghị..."></textarea>
             </div>
-
-            <!-- Action Buttons -->
-            <div class="flex flex-col sm:flex-row gap-4 pt-4 px-1">
-                <button type="submit" id="module3-save-btn"
-                    class="flex-1 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black text-sm hover:shadow-lg hover:shadow-blue-500/30 hover:scale-[1.01] active:scale-[0.99] transition-all">
-                    <i data-lucide="save" class="w-4 h-4 inline mr-2 ring-offset-2"></i>
-                    Lưu đánh giá
-                </button>
-                <button type="button" onclick="resetModule3Form()"
-                    class="px-8 py-4 glass-panel text-slate-500 rounded-2xl font-black text-sm hover:bg-white/80 hover:text-rose-500 transition-all">
-                    <i data-lucide="x" class="w-4 h-4 inline mr-2"></i>
-                    Hủy
-                </button>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-emerald-50/50 backdrop-blur-md">
+                        <tr class="border-b border-emerald-100">
+                            <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Hạng mục</th>
+                            <th colspan="3" class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Mức độ</th>
+                            <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Tình trạng</th>
+                            <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Môi trường<br/>(địa điểm thực hiện và dụng cụ hỗ trợ)</th>
+                            <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Tình trạng - vấn đề<br/>sinh hoạt</th>
+                        </tr>
+                        <tr class="border-b border-emerald-100">
+                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-24">Tự lập<br/>(10)</th>
+                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-32">Hỗ trợ một phần (5)</th>
+                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-32">HT toàn phần (0)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50/50">
+                        ${generateADLTableRows()}
+                    </tbody>
+                </table>
             </div>
-            
-        </form>
-    </div>
-
-    <!-- Tab Content: History -->
-    <div id="content-history" class="tab-content hidden">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
-            <!-- Left: Assessment List -->
-            <div class="lg:col-span-1 bg-white rounded-2xl border-2 border-slate-200 overflow-hidden flex flex-col">
-                <div class="bg-slate-100 px-5 py-3 border-b-2 border-slate-200">
-                    <h3 class="font-black text-slate-800 text-sm">Danh sách đánh giá</h3>
-                </div>
-                <div id="assessment-list" class="flex-1 overflow-y-auto p-4 space-y-2">
-                    <!-- Assessment items will be inserted here -->
-                </div>
-            </div>
-
-            <!-- Right: Assessment Detail -->
-            <div class="lg:col-span-2 bg-white rounded-2xl border-2 border-slate-200 overflow-hidden flex flex-col">
-                <div class="bg-slate-100 px-5 py-3 border-b-2 border-slate-200">
-                    <h3 class="font-black text-slate-800 text-sm">Chi tiết đánh giá</h3>
-                </div>
-                <div id="assessment-detail" class="flex-1 overflow-y-auto p-6">
-                    <div class="text-center text-slate-400 py-12">
-                        <i data-lucide="clipboard-list" class="w-16 h-16 mx-auto mb-4 opacity-50"></i>
-                        <p class="font-semibold">Chọn một đánh giá để xem chi tiết</p>
+            <div class="bg-emerald-50/30 px-6 py-5 border-t border-emerald-100/50">
+                <div class="flex items-center justify-between">
+                    <span class="font-black text-emerald-900 uppercase tracking-widest text-xs">Tổng điểm ADL:</span>
+                    <div class="flex items-center gap-2">
+                        <span id="adl-total-score" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">0</span>
+                        <span class="text-sm font-bold text-emerald-400">/ 100</span>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- IADL Assessment Table -->
+        <div class="glass-panel rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
+            <div class="bg-gradient-to-r from-violet-500 to-purple-500 px-6 py-4">
+                <h3 class="font-black text-white text-sm flex items-center gap-2 tracking-wide uppercase">
+                    <i data-lucide="briefcase" class="w-5 h-5"></i>
+                    IADL - Hoạt động Sinh hoạt Công cụ
+                </h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-violet-50/50 backdrop-blur-md border-b border-violet-100/50">
+                        <tr>
+                            <th class="p-4 text-left font-black text-violet-900 text-[10px] uppercase tracking-widest">Hạng mục</th>
+                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Tự lập</th>
+                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Giám sát</th>
+                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Hỗ trợ</th>
+                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Phụ thuộc</th>
+                            <th class="p-4 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Vấn đề</th>
+                            <th class="p-4 text-left font-black text-violet-900 text-[10px] uppercase tracking-widest">Dung cụ hỗ trợ</th>
+                            <th class="p-4 text-left font-black text-violet-900 text-[10px] uppercase tracking-widest">Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50/50">
+                        ${generateIADLTableRows()}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Basic Movement Assessment Table -->
+        <div class="glass-panel rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
+            <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4">
+                <h3 class="font-black text-white text-sm flex items-center gap-2 tracking-wide uppercase">
+                    <i data-lucide="zap" class="w-5 h-5"></i>
+                    Vận Động Cơ Bản
+                </h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                     <thead class="bg-amber-50/50 backdrop-blur-md border-b border-amber-100/50">
+                        <tr>
+                            <th class="p-4 text-left font-black text-amber-900 text-[10px] uppercase tracking-widest">Hạng mục</th>
+                            <th class="p-3 text-center font-black text-amber-900 text-[10px] uppercase tracking-widest w-24">Tự lập</th>
+                            <th class="p-3 text-center font-black text-amber-900 text-[10px] uppercase tracking-widest w-24">Giám sát</th>
+                            <th class="p-3 text-center font-black text-amber-900 text-[10px] uppercase tracking-widest w-24">Hỗ trợ</th>
+                            <th class="p-3 text-center font-black text-amber-900 text-[10px] uppercase tracking-widest w-24">Phụ thuộc</th>
+                            <th class="p-4 text-center font-black text-amber-900 text-[10px] uppercase tracking-widest w-24">Vấn đề</th>
+                            <th class="p-4 text-left font-black text-amber-900 text-[10px] uppercase tracking-widest">Dung cụ hỗ trợ</th>
+                            <th class="p-4 text-left font-black text-amber-900 text-[10px] uppercase tracking-widest">Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50/50">
+                        ${generateBasicMovementTableRows()}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- General Notes -->
+        <div class="glass-panel p-6 rounded-[32px] border border-amber-100/50">
+            <h3 class="font-black text-amber-900 text-xs uppercase tracking-widest mb-3 flex items-center gap-2">
+                <i data-lucide="file-text" class="w-5 h-5"></i>
+                Ghi chú chung
+            </h3>
+            <textarea id="generalNotes" rows="4"
+                class="input-glass w-full px-4 py-3 rounded-2xl outline-none text-sm font-medium resize-none shadow-inner"
+                placeholder="Nhận xét tổng quan, xu hướng cải thiện/suy giảm, khuyến nghị..."></textarea>
+        </div>
+        
+    </form>
+
+    <!-- FLOATING ACTION BUTTONS (FAB) -->
+    <div class="fixed bottom-40 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
+        
+        <!-- SAVE (Update) -->
+        <button type="button" id="module3-fab-save" onclick="saveModule3Assessment()" 
+            class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+            <i data-lucide="save" class="w-7 h-7"></i>
+            <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                Lưu đánh giá
+            </span>
+        </button>
+
+        <!-- EDIT (View Mode) -->
+        <button type="button" id="module3-fab-edit" onclick="toggleModule3EditMode(true)" 
+            class="pointer-events-auto w-14 h-14 bg-amber-500 text-white rounded-full shadow-[0_8px_25px_rgb(245,158,11,0.5)] hover:bg-amber-400 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+            <i data-lucide="edit-2" class="w-6 h-6"></i>
+             <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                Chỉnh sửa
+            </span>
+        </button>
+
+        <!-- CANCEL (Edit Mode) -->
+        <button type="button" id="module3-fab-cancel" onclick="cancelModule3Edit()" 
+            class="pointer-events-auto hidden w-12 h-12 bg-white text-rose-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-rose-100 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-rose-50 ring-2 ring-white">
+            <i data-lucide="x" class="w-6 h-6"></i>
+             <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                Hủy bỏ
+            </span>
+        </button>
     </div>
 </div>
 `;
@@ -537,177 +511,133 @@ function updateADLScore() {
     }
 }
 
-function switchModule3Tab(tab) {
-    // Update tab buttons
-    var formTab = document.getElementById('tab-form');
-    var historyTab = document.getElementById('tab-history');
-    var formContent = document.getElementById('content-form');
-    var historyContent = document.getElementById('content-history');
 
-    if (tab === 'form') {
-        formTab.className = 'px-6 py-3 font-black text-sm transition-all border-b-4 border-blue-600 text-blue-600';
-        historyTab.className = 'px-6 py-3 font-black text-sm transition-all border-b-4 border-transparent text-slate-500 hover:text-slate-700';
-        formContent.classList.remove('hidden');
-        historyContent.classList.add('hidden');
+// Global state
+let module3ResetFormState = null;
+let module3OriginalData = null;
+
+// Toggle Edit/View Mode
+function toggleModule3EditMode(isEdit) {
+    const form = document.getElementById('module3-form');
+    // FABs
+    const fabEdit = document.getElementById('module3-fab-edit');
+    const fabSave = document.getElementById('module3-fab-save');
+    const fabCancel = document.getElementById('module3-fab-cancel');
+
+    // Select inputs (excluding read-only displays if any)
+    const inputs = form.querySelectorAll('input, textarea');
+
+    if (isEdit) {
+        // Enable Form
+        inputs.forEach(input => input.disabled = false);
+
+        // UI State: Edit Mode
+        if (fabEdit) fabEdit.classList.add('hidden');
+        // Save Button: Hidden initially, shown only on change (handled by setupFormChangeDetection callback)
+        if (fabSave) fabSave.classList.add('hidden');
+        if (fabCancel) fabCancel.classList.remove('hidden');
+
+        // Show validation styling or hints if needed
+        form.classList.remove('opacity-80', 'pointer-events-none');
     } else {
-        formTab.className = 'px-6 py-3 font-black text-sm transition-all border-b-4 border-transparent text-slate-500 hover:text-slate-700';
-        historyTab.className = 'px-6 py-3 font-black text-sm transition-all border-b-4 border-emerald-600 text-emerald-600';
-        formContent.classList.add('hidden');
-        historyContent.classList.remove('hidden');
-        loadAssessmentHistory();
+        // Disable Form (View Mode)
+        inputs.forEach(input => input.disabled = true);
+
+        // UI State: View Mode
+        if (fabEdit) fabEdit.classList.remove('hidden');
+        if (fabSave) fabSave.classList.add('hidden');
+        if (fabCancel) fabCancel.classList.add('hidden');
+
+        // Visual indicator for Read-Only
+        form.classList.add('opacity-80');
     }
 
+    // Create new icons if needed
     lucide.createIcons();
 }
 
-function loadAssessmentHistory() {
-    var patientId = 'patient_001';
-    var assessments = JSON.parse(localStorage.getItem('mirabocaresync_' + patientId + '_adl_assessments') || '[]');
 
-    var listContainer = document.getElementById('assessment-list');
-    if (!listContainer) return;
+// Load Data into Form
+function loadModule3Data(data) {
+    if (!data) return;
+    module3OriginalData = data; // Cache for revert
 
-    if (assessments.length === 0) {
-        listContainer.innerHTML = '<div class="text-center text-slate-400 py-8"><p class="text-sm font-semibold">Chưa có đánh giá nào</p></div>';
-        return;
+    // Helper to safely set value
+    const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val || '';
+    };
+    const setCheckedVal = (name, val) => {
+        if (!val && val !== 0 && val !== '0') return; // Handle 0 value
+        const radio = document.querySelector(`input[name="${name}"][value="${val}"]`);
+        if (radio) radio.checked = true;
+    };
+    const setCheckedBool = (id, checked) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = !!checked;
+    };
+
+    // 1. ADL
+    if (data.adl) {
+        Object.keys(data.adl).forEach(key => {
+            const item = data.adl[key];
+            setCheckedVal(`adl-level-${key}`, item.level);
+            setCheckedBool(`adl-status-${key}`, item.hasProblem);
+        });
+    }
+    setVal('adl-environment', data.adlEnvironment);
+    setVal('adl-problems', data.adlProblems);
+
+    // 2. IADL
+    if (data.iadl) {
+        Object.keys(data.iadl).forEach(key => {
+            const item = data.iadl[key];
+            setCheckedVal(`iadl-level-${key}`, item.level);
+            setCheckedBool(`iadl-status-${key}`, item.hasProblem);
+        });
+    }
+    setVal('iadl-environment', data.iadlEnvironment);
+    setVal('iadl-problems', data.iadlProblems);
+
+    // 3. Basic Movement
+    if (data.basicMovement) {
+        Object.keys(data.basicMovement).forEach(key => {
+            const item = data.basicMovement[key];
+            setCheckedVal(`movement-level-${key}`, item.level);
+            setCheckedBool(`movement-problem-${key}`, item.hasProblem);
+            setVal(`movement-support-${key}`, item.support);
+            setVal(`movement-notes-${key}`, item.notes);
+        });
     }
 
-    listContainer.innerHTML = assessments.map(function (assessment, index) {
-        var date = new Date(assessment.timestamp);
-        var dateStr = date.toLocaleDateString('vi-VN');
-        var timeStr = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    // 4. General Notes
+    setVal('generalNotes', data.generalNotes);
 
-        return `
-        <div onclick="showAssessmentDetail(${index})" 
-            class="p-4 rounded-xl border-2 border-slate-200 hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all">
-            <div class="flex items-center justify-between mb-2">
-                <span class="font-black text-slate-800 text-sm">Đánh giá #${assessments.length - index}</span>
-                <span class="text-xs font-semibold text-emerald-600">${assessment.adlTotal}/100</span>
-            </div>
-            <div class="text-xs text-slate-500 font-semibold">
-                <div>${dateStr} ${timeStr}</div>
-                <div class="text-blue-600 mt-1">${assessment.assessor || ''}</div>
-            </div>
-        </div>
-        `;
-    }).join('');
+    // Recalculate score
+    updateADLScore();
 }
 
-function showAssessmentDetail(index) {
-    var patientId = 'patient_001';
-    var assessments = JSON.parse(localStorage.getItem('mirabocaresync_' + patientId + '_adl_assessments') || '[]');
-    var assessment = assessments[index];
-
-    if (!assessment) return;
-
-    var detailContainer = document.getElementById('assessment-detail');
-    if (!detailContainer) return;
-
-    var date = new Date(assessment.timestamp);
-    var dateStr = date.toLocaleDateString('vi-VN');
-    var timeStr = date.toLocaleTimeString('vi-VN');
-
-    var html = `
-    <div class="space-y-6">
-        <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
-            <h4 class="font-black text-blue-900 mb-2">Thông tin đánh giá</h4>
-            <div class="grid grid-cols-2 gap-3 text-sm">
-                <div><span class="font-semibold text-slate-600">Ngày đánh giá:</span> <span class="font-bold">${assessment.assessmentDate}</span></div>
-                <div><span class="font-semibold text-slate-600">Nhân viên:</span> <span class="font-bold">${assessment.assessor || '---'}</span></div>
-                <div><span class="font-semibold text-slate-600">Tổng điểm ADL:</span> <span class="font-bold text-emerald-600">${assessment.adlTotal}/100</span></div>
-            </div>
-        </div>
-        
-        <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
-            <h4 class="font-black text-emerald-900 mb-3">ADL - Hoạt động Sinh hoạt Cơ bản</h4>
-            <div class="space-y-2">
-                ${Object.keys(assessment.adl).map(function (key) {
-        var activity = adlActivities.find(function (a) { return a.id === key; });
-        if (!activity) return '';
-        var data = assessment.adl[key];
-        return `
-                    <div class="bg-white rounded-lg p-3 border border-emerald-100">
-                        <div class="font-bold text-slate-800 mb-1">${activity.name}</div>
-                        <div class="text-sm text-slate-600">
-                            <div><strong>Mức độ:</strong> ${data.level !== null ? data.level + ' điểm' : 'Chưa đánh giá'}</div>
-                            ${data.hasProblem ? '<div class="text-red-600 font-semibold">⚠️ Có vấn đề</div>' : ''}
-                            ${data.support ? '<div><strong>Hỗ trợ:</strong> ' + data.support + '</div>' : ''}
-                            ${data.notes ? '<div><strong>Ghi chú:</strong> ' + data.notes + '</div>' : ''}
-                        </div>
-                    </div>
-                    `;
-    }).join('')}
-            </div>
-        </div>
-        
-        <div class="bg-violet-50 rounded-xl p-4 border border-violet-200">
-            <h4 class="font-black text-violet-900 mb-3">IADL - Hoạt động Sinh hoạt Công cụ</h4>
-            <div class="space-y-2">
-                ${Object.keys(assessment.iadl).map(function (key) {
-        var activity = iadlActivities.find(function (a) { return a.id === key; });
-        if (!activity) return '';
-        var data = assessment.iadl[key];
-        var levelLabel = '';
-        if (data.level) {
-            var levelObj = activity.levels.find(function (l) { return l.value === data.level; });
-            levelLabel = levelObj ? levelObj.label : data.level;
+// Cancel Edit
+function cancelModule3Edit() {
+    if (confirm('Hủy bỏ thay đổi? Dữ liệu sẽ quay về trạng thái cũ.')) {
+        if (module3OriginalData) {
+            loadModule3Data(module3OriginalData); // Revert data
+            toggleModule3EditMode(false); // Switch to view mode
+            showToast('Đã hủy bỏ thay đổi', 'info');
+        } else {
+            // If no data existed, clear form
+            document.getElementById('module3-form').reset();
+            updateADLScore();
+            toggleModule3EditMode(true); // Stay in edit mode as "New"
         }
-        return `
-                    <div class="bg-white rounded-lg p-3 border border-violet-100">
-                        <div class="font-bold text-slate-800 mb-1">${activity.name}</div>
-                        <div class="text-sm text-slate-600">
-                            <div><strong>Mức độ:</strong> ${levelLabel || 'Chưa đánh giá'}</div>
-                            ${data.hasProblem ? '<div class="text-red-600 font-semibold">⚠️ Có vấn đề</div>' : ''}
-                            ${data.support ? '<div><strong>Hỗ trợ:</strong> ' + data.support + '</div>' : ''}
-                            ${data.notes ? '<div><strong>Ghi chú:</strong> ' + data.notes + '</div>' : ''}
-                        </div>
-                    </div>
-                    `;
-    }).join('')}
-            </div>
-        </div>
-        
-        <div class="bg-orange-50 rounded-xl p-4 border border-orange-200">
-            <h4 class="font-black text-orange-900 mb-3">Vận Động Cơ Bản</h4>
-            <div class="space-y-2">
-                ${assessment.basicMovement ? Object.keys(assessment.basicMovement).map(function (key) {
-        var activity = basicMovementActivities.find(function (a) { return a.id === key; });
-        if (!activity) return '';
-        var data = assessment.basicMovement[key];
-        var levelLabel = '';
-        if (data.level) {
-            var levelObj = activity.levels.find(function (l) { return l.value === data.level; });
-            levelLabel = levelObj ? levelObj.label : data.level;
-        }
-        return `
-                    <div class="bg-white rounded-lg p-3 border border-orange-100">
-                        <div class="font-bold text-slate-800 mb-1">${activity.name}</div>
-                        <div class="text-sm text-slate-600">
-                            <div><strong>Mức độ:</strong> ${levelLabel || 'Chưa đánh giá'}</div>
-                            ${data.hasProblem ? '<div class="text-red-600 font-semibold">⚠️ Có vấn đề</div>' : ''}
-                            ${data.support ? '<div><strong>Hỗ trợ:</strong> ' + data.support + '</div>' : ''}
-                            ${data.notes ? '<div><strong>Ghi chú:</strong> ' + data.notes + '</div>' : ''}
-                        </div>
-                    </div>
-                    `;
-    }).join('') : '<p class="text-sm text-slate-500">Chưa có dữ liệu</p>'}
-            </div>
-        </div>
-        
-        ${assessment.generalNotes ? `
-        <div class="bg-amber-50 rounded-xl p-4 border border-amber-200">
-            <h4 class="font-black text-amber-900 mb-2">Ghi chú chung</h4>
-            <p class="text-sm text-slate-700 whitespace-pre-wrap">${assessment.generalNotes}</p>
-        </div>
-        ` : ''}
-    </div>
-    `;
-
-    detailContainer.innerHTML = html;
+    }
 }
 
-// Global variable to store resetFormState function
-let module3ResetFormState = null;
+// Global variable to store resetFormState function used above or below
+// Note: We already defined module3ResetFormState at the top of this block in previous step, 
+// so we don't redefine it here to avoid error. 
+// But wait, the previous step added it at line ~515. The original one is at 706. 
+// This replacement removes line 706, so we are safe.
 
 // Reset Form
 function resetModule3Form() {
@@ -728,110 +658,78 @@ function resetModule3Form() {
 // STEP 5: Initialize Module
 // ============================================
 // Initialize Module 3
+// Initialize Module 3
 function initModule3() {
     const patientId = getCurrentPatientId();
 
-    // Setup form change detection and store in global variable
-    const resetFormState = setupFormChangeDetection('module3-form', 'module3-save-btn');
-    module3ResetFormState = resetFormState; // Make accessible to resetForm()
+    // Load existing data
+    // Use singular key for Single Record pattern
+    const savedData = localStorage.getItem(`mirabocaresync_${patientId}_adl_assessment`);
+
+    if (savedData) {
+        try {
+            const data = JSON.parse(savedData);
+            loadModule3Data(data);
+            toggleModule3EditMode(false); // Default to View Mode
+        } catch (e) {
+            console.error('Error loading module 3 data:', e);
+            toggleModule3EditMode(true);
+        }
+    } else {
+        // Check legacy array data for migration
+        const legacyData = localStorage.getItem(`mirabocaresync_${patientId}_adl_assessments`);
+        if (legacyData) {
+            try {
+                const arr = JSON.parse(legacyData);
+                if (arr.length > 0) {
+                    const latest = arr[arr.length - 1]; // Take latest
+                    loadModule3Data(latest);
+                    toggleModule3EditMode(false);
+                    // Optionally save as new format immediately or wait for explicit save
+                    // We just load it for now.
+                } else {
+                    toggleModule3EditMode(true); // New record
+                }
+            } catch (e) {
+                toggleModule3EditMode(true);
+            }
+        } else {
+            toggleModule3EditMode(true); // New record
+        }
+    }
+
+    // Setup form change detection
+    // Note: 'module3-fab-save' is the ID of the FAB save button
+    const resetFormState = setupFormChangeDetection('module3-form', 'module3-fab-save', (isDirty) => {
+        const fabSave = document.getElementById('module3-fab-save');
+        if (!fabSave) return;
+
+        // Only toggle visibility if we are in Edit Mode
+        const fabEdit = document.getElementById('module3-fab-edit');
+        const isEditMode = fabEdit && fabEdit.classList.contains('hidden');
+
+        if (isEditMode) {
+            if (isDirty) {
+                fabSave.classList.remove('hidden');
+            } else {
+                fabSave.classList.add('hidden');
+            }
+        } else {
+            fabSave.classList.add('hidden');
+        }
+    });
+    module3ResetFormState = resetFormState;
 
     // 1. Load Patient Info from Module 1
     const facesheetData = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_facesheet`) || '{}');
     if (facesheetData.basic) {
-        document.getElementById('patient-name-display').textContent = facesheetData.basic.fullName || '--';
-        document.getElementById('patient-age-gender-display').textContent =
-            `${facesheetData.basic.age || '--'} / ${facesheetData.basic.gender === 'male' ? 'Nam' : 'Nữ'}`;
-        document.getElementById('patient-care-level-display').textContent = facesheetData.careInfo?.level || 'Chưa có phân loại';
-    }
+        const nameDisplay = document.getElementById('patient-name-display');
+        const ageGenderDisplay = document.getElementById('patient-age-gender-display');
+        const careLevelDisplay = document.getElementById('patient-care-level-display');
 
-    // Form Submission
-    var form = document.getElementById('module3-form');
-    if (form) {
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            // Collect ADL data
-            var adlData = {};
-            var adlTotal = 0;
-            adlActivities.forEach(function (activity) {
-                var level = document.getElementById('adl-level-' + activity.id).value;
-                var problem = document.getElementById('adl-problem-' + activity.id).checked;
-                var support = document.getElementById('adl-support-' + activity.id).value;
-                var notes = document.getElementById('adl-notes-' + activity.id).value;
-
-                adlData[activity.id] = {
-                    level: level ? parseInt(level) : null,
-                    hasProblem: problem,
-                    support: support,
-                    notes: notes
-                };
-
-                if (level) {
-                    adlTotal += parseInt(level);
-                }
-            });
-
-            // Collect IADL data
-            var iadlData = {};
-            iadlActivities.forEach(function (activity) {
-                var level = document.getElementById('iadl-level-' + activity.id).value;
-                var problem = document.getElementById('iadl-problem-' + activity.id).checked;
-                var support = document.getElementById('iadl-support-' + activity.id).value;
-                var notes = document.getElementById('iadl-notes-' + activity.id).value;
-
-                iadlData[activity.id] = {
-                    level: level || null,
-                    hasProblem: problem,
-                    support: support,
-                    notes: notes
-                };
-            });
-
-            // Collect Basic Movement data
-            var basicMovementData = {};
-            basicMovementActivities.forEach(function (activity) {
-                var level = document.getElementById('movement-level-' + activity.id).value;
-                var problem = document.getElementById('movement-problem-' + activity.id).checked;
-                var support = document.getElementById('movement-support-' + activity.id).value;
-                var notes = document.getElementById('movement-notes-' + activity.id).value;
-
-                basicMovementData[activity.id] = {
-                    level: level || null,
-                    hasProblem: problem,
-                    support: support,
-                    notes: notes
-                };
-            });
-
-            var assessmentData = {
-                assessmentDate: document.getElementById('assessmentDate').value,
-                assessor: document.getElementById('assessorName').value, // Add assessor
-                adl: adlData,
-                adlTotal: adlTotal,
-                iadl: iadlData,
-                basicMovement: basicMovementData,
-                generalNotes: document.getElementById('generalNotes').value,
-                timestamp: new Date().toISOString()
-            };
-
-            // Save to LocalStorage
-            var assessments = JSON.parse(localStorage.getItem('mirabocaresync_' + patientId + '_adl_assessments') || '[]');
-            assessments.push(assessmentData);
-            localStorage.setItem('mirabocaresync_' + patientId + '_adl_assessments', JSON.stringify(assessments));
-
-            // Mark complete and show toast
-            markModuleComplete(patientId, 'module3');
-            showToast('Đã lưu đánh giá ADL/IADL thành công!', 'success');
-            console.log('Saved assessment data:', assessmentData);
-
-            // Reset form state
-            if (typeof resetFormState === 'function') {
-                resetFormState();
-            }
-
-            // Switch to history tab
-            switchModule3Tab('history');
-        });
+        if (nameDisplay) nameDisplay.textContent = facesheetData.basic.fullName || '--';
+        if (ageGenderDisplay) ageGenderDisplay.textContent = `${facesheetData.basic.age || '--'} / ${facesheetData.basic.gender === 'male' ? 'Nam' : 'Nữ'}`;
+        if (careLevelDisplay) careLevelDisplay.textContent = facesheetData.careInfo?.level || 'Chưa có phân loại';
     }
 
     // Initialize icons
@@ -839,3 +737,115 @@ function initModule3() {
         lucide.createIcons();
     }, 100);
 }
+
+// Global Save Function for Module 3
+// Global Save Function for Module 3
+window.saveModule3Assessment = function () {
+    const patientId = getCurrentPatientId();
+
+    // Collect ADL data
+    var adlData = {};
+    var adlTotal = 0;
+    adlActivities.forEach(function (activity) {
+        // Fix: Get Radio Value correctly
+        var radio = document.querySelector('input[name="adl-level-' + activity.id + '"]:checked');
+        var level = radio ? parseInt(radio.value) : null;
+
+        // Fix: Correct Checkbox ID
+        var checkbox = document.getElementById('adl-status-' + activity.id);
+        var problem = checkbox ? checkbox.checked : false;
+
+        adlData[activity.id] = {
+            level: level,
+            hasProblem: problem,
+            support: null,
+            notes: null
+        };
+
+        if (level !== null) {
+            adlTotal += level;
+        }
+    });
+
+    // Collect ADL Environment & Problems
+    var adlEnvironment = document.getElementById('adl-environment').value;
+    var adlProblems = document.getElementById('adl-problems').value;
+
+    // Collect IADL data
+    var iadlData = {};
+    iadlActivities.forEach(function (activity) {
+        var radio = document.querySelector('input[name="iadl-level-' + activity.id + '"]:checked');
+        var level = radio ? radio.value : null;
+
+        var checkbox = document.getElementById('iadl-status-' + activity.id);
+        var problem = checkbox ? checkbox.checked : false;
+
+        iadlData[activity.id] = {
+            level: level,
+            hasProblem: problem,
+            support: null,
+            notes: null
+        };
+    });
+
+    // Collect IADL Environment & Problems
+    var iadlEnvironment = document.getElementById('iadl-environment').value;
+    var iadlProblems = document.getElementById('iadl-problems').value;
+
+    // Collect Basic Movement data
+    var movementData = {};
+    basicMovementActivities.forEach(function (activity) {
+        // Fix: Get Radio Value
+        var radio = document.querySelector('input[name="movement-level-' + activity.id + '"]:checked');
+        var level = radio ? radio.value : null;
+
+        // Fix: Checkbox ID is correct in HTML (movement-problem-...)
+        var checkbox = document.getElementById('movement-problem-' + activity.id);
+        var problem = checkbox ? checkbox.checked : false;
+
+        // Fix Inputs (support/notes exist)
+        var support = document.getElementById('movement-support-' + activity.id).value;
+        var notes = document.getElementById('movement-notes-' + activity.id).value;
+
+        movementData[activity.id] = {
+            level: level,
+            hasProblem: problem,
+            support: support,
+            notes: notes
+        };
+    });
+
+    // Construct Assessment Object
+    var assessment = {
+        patientId: patientId,
+        assessmentDate: new Date().toLocaleDateString('vi-VN'),
+        assessor: 'Administrator', // Mock user
+        adl: adlData,
+        adlTotal: adlTotal,
+        adlEnvironment: adlEnvironment,
+        adlProblems: adlProblems,
+        iadl: iadlData,
+        iadlEnvironment: iadlEnvironment,
+        iadlProblems: iadlProblems,
+        basicMovement: movementData,
+        generalNotes: document.getElementById('generalNotes').value,
+        timestamp: new Date().toISOString()
+    };
+
+    // Save Single Record
+    localStorage.setItem('mirabocaresync_' + patientId + '_adl_assessment', JSON.stringify(assessment));
+
+    showToast('Đã lưu đánh giá ADL thành công!', 'success');
+
+    // Update State
+    module3OriginalData = assessment;
+    toggleModule3EditMode(false); // Switch to View Mode
+
+    // Reset save button state
+    if (typeof module3ResetFormState === 'function') module3ResetFormState();
+
+    if (typeof markModuleComplete === 'function') markModuleComplete(patientId, 'module3');
+
+    // Dispatch event for sidebar update
+    window.dispatchEvent(new Event('module-data-saved'));
+};

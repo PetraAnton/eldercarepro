@@ -266,7 +266,7 @@ window.module2Content = `
             </div>
 
             <!-- Right: Meeting Detail (70%) -->
-            <div class="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200 overflow-y-auto">
+            <div class="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200 overflow-y-auto relative">
                 <div id="meeting-detail">
                     <div class="flex flex-col items-center justify-center h-full text-center py-20">
                         <i data-lucide="mouse-pointer-click" class="w-16 h-16 text-slate-300 mb-4"></i>
@@ -278,6 +278,9 @@ window.module2Content = `
     </div>
 </div>
 `;
+
+// Global State for Module 2
+let m2EditingIndex = null;
 
 // Module 2 JavaScript Functions
 function switchModule2Tab(tabName) {
@@ -307,7 +310,7 @@ function switchModule2Tab(tabName) {
 }
 
 function loadMeetingHistory() {
-    const patientId = 'patient_001';
+    const patientId = getCurrentPatientId();
     const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_meetings`) || '[]');
     const listContainer = document.getElementById('meeting-list');
 
@@ -345,7 +348,7 @@ function loadMeetingHistory() {
 }
 
 function showMeetingDetail(index) {
-    const patientId = 'patient_001';
+    const patientId = getCurrentPatientId();
     const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_meetings`) || '[]');
     const meeting = meetings[index];
     const detailContainer = document.getElementById('meeting-detail');
@@ -371,10 +374,17 @@ function showMeetingDetail(index) {
                         ${meeting.meetingTime ? `lúc ${meeting.meetingTime}` : ''}
                     </p>
                 </div>
-                <span class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-xl text-sm font-bold">
-                    <i data-lucide="check-circle" class="w-4 h-4 inline"></i>
-                    Đã hoàn thành
-                </span>
+                <div class="flex gap-2">
+                    <button onclick="printMeeting(${index})" class="p-2 text-slate-600 hover:bg-slate-100 rounded-xl transition-all" title="In biên bản">
+                        <i data-lucide="printer" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="editMeeting(${index})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-all" title="Chỉnh sửa">
+                        <i data-lucide="edit" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="deleteMeeting(${index})" class="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-all" title="Xóa">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- Meeting Info -->
@@ -539,6 +549,273 @@ function resetModule2Form() {
 
         showToast('Đã xóa dữ liệu form', 'info');
     }
+    m2EditingIndex = null;
+    const saveBtn = document.getElementById('module2-save-btn');
+    if (saveBtn) {
+        saveBtn.innerHTML = '<i data-lucide="save" class="w-4 h-4 inline mr-2"></i> Lưu biên bản họp';
+    }
+}
+
+// Edit Record
+function editMeeting(index) {
+    const patientId = getCurrentPatientId();
+    const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_meetings`) || '[]');
+    const meeting = meetings[index];
+    if (!meeting) return;
+
+    // Set State
+    m2EditingIndex = index;
+
+    // Switch to Form
+    switchModule2Tab('form');
+
+    // Update Button Text
+    const saveBtn = document.getElementById('module2-save-btn');
+    if (saveBtn) {
+        saveBtn.innerHTML = '<i data-lucide="edit" class="w-4 h-4 inline mr-2"></i> Cập nhật biên bản';
+    }
+
+    // Populate Fields
+    document.getElementById('meetingDate').value = meeting.meetingDate || '';
+    document.getElementById('meetingTime').value = meeting.meetingTime || '';
+    document.getElementById('meetingLocation').value = meeting.meetingLocation || '';
+    document.getElementById('recorder').value = meeting.recorder || '';
+
+    // Participants: Clear and Rebuild
+    const pContainer = document.getElementById('participants-list');
+    pContainer.innerHTML = ''; // clear default
+    if (meeting.participants && meeting.participants.length > 0) {
+        meeting.participants.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'participant-item bg-white rounded-2xl p-4 border border-blue-100 relative';
+            div.innerHTML = `
+                <button type="button" onclick="this.parentElement.remove(); lucide.createIcons();"
+                    class="absolute top-2 right-2 p-2 text-red-500 hover:bg-red-100 rounded-lg transition-all">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-2">Họ tên</label>
+                        <input type="text" class="participant-name w-full px-3 py-2 rounded-lg border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none text-sm font-semibold"
+                            value="${p.name || ''}" placeholder="Họ tên">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-2">Đơn vị / Chức danh</label>
+                        <input type="text" class="participant-role w-full px-3 py-2 rounded-lg border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none text-sm font-semibold"
+                            value="${p.role || ''}" placeholder="Chức danh">
+                    </div>
+                </div>
+           `;
+            pContainer.appendChild(div);
+        });
+    } else {
+        // Add 1 empty if none
+        addParticipant();
+    }
+
+    // Textareas
+    document.getElementById('familyWishes').value = meeting.discussion?.familyWishes || '';
+    document.getElementById('additionalNotes').value = meeting.discussion?.additionalNotes || '';
+    document.getElementById('serviceStartDate').value = meeting.conclusions?.serviceStartDate || '';
+    document.getElementById('transportSchedule').value = meeting.conclusions?.transportSchedule || '';
+    document.getElementById('invoiceAddress').value = meeting.conclusions?.invoiceAddress || '';
+    document.getElementById('carePlanContent').value = meeting.conclusions?.carePlanContent || '';
+
+    // Radio: Payment
+    if (meeting.conclusions?.paymentMethod) {
+        const radio = document.querySelector(`input[name="paymentMethod"][value="${meeting.conclusions.paymentMethod}"]`);
+        if (radio) radio.checked = true;
+    }
+
+    // Checkboxes (Basic Info & Risks)
+    // Clear all first
+    document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+
+    // Restore Basic
+    if (meeting.discussion?.basicInfoConfirmed) {
+        document.querySelectorAll('input[type="checkbox"]').forEach(c => {
+            const text = c.nextElementSibling?.textContent?.trim();
+            if (text && meeting.discussion.basicInfoConfirmed.includes(text)) {
+                c.checked = true;
+            }
+        });
+    }
+    // Restore Risks
+    if (meeting.discussion?.risksConfirmed) {
+        document.querySelectorAll('input[type="checkbox"]').forEach(c => {
+            const text = c.nextElementSibling?.textContent?.trim();
+            if (text && meeting.discussion.risksConfirmed.includes(text)) {
+                c.checked = true;
+            }
+        });
+    }
+
+    // Other inputs
+    if (meeting.discussion?.basicInfoOther) {
+        const chk = document.getElementById('basicInfoOther');
+        const txt = document.getElementById('basicInfoOtherText');
+        if (chk && txt) {
+            chk.checked = true;
+            txt.disabled = false;
+            txt.value = meeting.discussion.basicInfoOther;
+        }
+    }
+    if (meeting.discussion?.riskOther) {
+        const chk = document.getElementById('riskOther');
+        const txt = document.getElementById('riskOtherText');
+        if (chk && txt) {
+            chk.checked = true;
+            txt.disabled = false;
+            txt.value = meeting.discussion.riskOther;
+        }
+    }
+
+    lucide.createIcons();
+    showToast('Đã tải dữ liệu để chỉnh sửa', 'info');
+}
+
+// Delete Record
+function deleteMeeting(index) {
+    if (!confirm('Bạn có chắc muốn xóa bản ghi biên bản họp này không? Cannot undo.')) return;
+
+    const patientId = getCurrentPatientId();
+    const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_meetings`) || '[]');
+
+    meetings.splice(index, 1);
+    localStorage.setItem(`mirabocaresync_${patientId}_meetings`, JSON.stringify(meetings));
+
+    loadMeetingHistory(); // Refresh list
+    document.getElementById('meeting-detail').innerHTML = `
+        <div class="flex flex-col items-center justify-center h-full text-center py-20">
+            <i data-lucide="trash" class="w-16 h-16 text-slate-200 mb-4"></i>
+            <p class="text-slate-400 font-semibold">Đã xóa bản ghi.</p>
+        </div>
+    `;
+    lucide.createIcons();
+    showToast('Đã xóa bản ghi', 'success');
+}
+
+// Helper for Payment Text
+function getPaymentMethodText(value) {
+    if (!value) return '--';
+    const map = {
+        'cash': 'Tiền mặt',
+        'transfer': 'Chuyển khoản',
+        'card': 'Thẻ tín dụng/Ghi nợ'
+    };
+    return map[value] || value;
+}
+
+// Print Record
+function printMeeting(index) {
+    const patientId = getCurrentPatientId();
+    const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_meetings`) || '[]');
+    const meeting = meetings[index];
+    if (!meeting) return;
+
+    // Build Print Content
+    const printWindow = window.open('', '_blank');
+    const content = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Biên bản họp - ${new Date(meeting.meetingDate).toLocaleDateString('vi-VN')}</title>
+            <style>
+                body { font-family: 'Times New Roman', serif; padding: 40px; line-height: 1.6; }
+                h1 { text-align: center; color: #000; font-size: 24px; margin-bottom: 30px; }
+                h2 { font-size: 18px; border-bottom: 1px solid #000; padding-bottom: 5px; margin-top: 30px; }
+                .meta { margin-bottom: 20px; }
+                .meta div { margin-bottom: 5px; }
+                table { border-collapse: collapse; margin-top: 10px; width: 100%; }
+                th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+                .section { margin-bottom: 20px; }
+                .signature-box { display: flex; justify-content: space-between; margin-top: 50px; }
+                .signature { text-align: center; width: 200px; }
+            </style>
+        </head>
+        <body>
+            <h1>BIÊN BẢN HỌP CUNG CẤP DỊCH VỤ</h1>
+            
+            <div class="meta">
+                <div><strong>Ngày họp:</strong> ${new Date(meeting.meetingDate).toLocaleDateString('vi-VN')}</div>
+                <div><strong>Thời gian:</strong> ${meeting.meetingTime || '--'}</div>
+                <div><strong>Địa điểm:</strong> ${meeting.meetingLocation || '--'}</div>
+                <div><strong>Người ghi biên bản:</strong> ${meeting.recorder || '--'}</div>
+            </div>
+
+            <h2>1. THÀNH PHẦN THAM DỰ</h2>
+            <table>
+                <thead>
+                    <tr>
+                         <th>STT</th>
+                         <th>Họ tên</th>
+                         <th>Chức danh / Đơn vị</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${meeting.participants.map((p, i) => `
+                        <tr>
+                            <td style="text-align:center">${i + 1}</td>
+                            <td>${p.name}</td>
+                            <td>${p.role}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+
+            <h2>2. NỘI DUNG THẢO LUẬN</h2>
+            <div class="section">
+                <strong>Nguyện vọng gia đình:</strong><br/>
+                ${meeting.discussion?.familyWishes || 'Không có'}
+            </div>
+            
+             <div class="section">
+                <strong>Các mục đã xác nhận:</strong>
+                <ul>
+                    ${(meeting.discussion?.basicInfoConfirmed || []).map(i => `<li>${i}</li>`).join('')}
+                    ${(meeting.discussion?.risksConfirmed || []).map(i => `<li>${i}</li>`).join('')}
+                    ${meeting.discussion?.basicInfoOther ? `<li>Khác: ${meeting.discussion.basicInfoOther}</li>` : ''}
+                    ${meeting.discussion?.riskOther ? `<li>Rủi ro khác: ${meeting.discussion.riskOther}</li>` : ''}
+                </ul>
+            </div>
+            
+            <div class="section">
+                <strong>Ghi chú thêm:</strong><br/>
+                ${meeting.discussion?.additionalNotes || 'Không có'}
+            </div>
+
+            <h2>3. KẾT LUẬN & KẾ HOẠCH</h2>
+            <div class="section">
+                <div><strong>Ngày bắt đầu dịch vụ:</strong> ${new Date(meeting.conclusions?.serviceStartDate).toLocaleDateString('vi-VN')}</div>
+                <div><strong>Lịch đưa đón:</strong> ${meeting.conclusions?.transportSchedule || '--'}</div>
+                <div><strong>Phương thức thanh toán:</strong> ${getPaymentMethodText(meeting.conclusions?.paymentMethod)}</div>
+                <div><strong>Nơi gửi hóa đơn:</strong> ${meeting.conclusions?.invoiceAddress || '--'}</div>
+            </div>
+             <div class="section">
+                <strong>Nội dung kế hoạch chăm sóc:</strong><br/>
+                ${meeting.conclusions?.carePlanContent || '--'}
+            </div>
+
+            <div class="signature-box">
+                <div class="signature">
+                    <strong>Đại diện Gia đình</strong><br/><br/><br/><br/>
+                    (Ký, ghi rõ họ tên)
+                </div>
+                <div class="signature">
+                    <strong>Đại diện Trung tâm</strong><br/><br/><br/><br/>
+                    (Ký, ghi rõ họ tên)
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+    printWindow.document.write(content);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+    }, 500);
 }
 
 function toggleOtherInput(textareaId, isEnabled) {
@@ -614,12 +891,33 @@ function initModule2() {
         };
 
         // Save to LocalStorage
-        const patientId = 'patient_001';
+        const patientId = getCurrentPatientId();
         const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_meetings`) || '[]');
-        meetings.push(meetingData);
+
+        if (m2EditingIndex !== null && m2EditingIndex >= 0 && m2EditingIndex < meetings.length) {
+            // Update existing
+            meetings[m2EditingIndex] = meetingData;
+            showToast('Đã cập nhật biên bản họp thành công!', 'success');
+        } else {
+            // Create new
+            meetings.push(meetingData);
+            showToast('Đã lưu biên bản họp thành công!', 'success');
+        }
+
         localStorage.setItem(`mirabocaresync_${patientId}_meetings`, JSON.stringify(meetings));
 
-        showToast('Đã lưu biên bản họp thành công!', 'success');
+        // Reset Edit State
+        m2EditingIndex = null;
+        const saveBtn = document.getElementById('module2-save-btn');
+        if (saveBtn) {
+            saveBtn.innerHTML = '<i data-lucide="save" class="w-4 h-4 inline mr-2"></i> Lưu biên bản họp';
+        }
+
+        // Mark module as complete
+        if (typeof markModuleComplete === 'function') markModuleComplete(patientId, 'module2');
+
+        // Dispatch event for sidebar update
+        window.dispatchEvent(new Event('module-data-saved'));
         console.log('Saved meeting data:', meetingData);
 
         // Switch to history tab to show the new meeting

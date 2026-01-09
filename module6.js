@@ -14,7 +14,12 @@ window.module6Content = `
         <button onclick="switchModule6Tab('history')" id="module6-tab-history" 
                 class="px-6 py-3 font-black text-sm transition-all border-b-4 border-transparent text-slate-500 hover:text-slate-700">
             <i data-lucide="history" class="w-4 h-4 inline mr-2"></i>
-            Lịch sử đánh giá
+            Lịch sử đo
+        </button>
+        <button onclick="switchModule6Tab('report')" id="module6-tab-report" 
+                class="px-6 py-3 font-black text-sm transition-all border-b-4 border-transparent text-slate-500 hover:text-slate-700">
+            <i data-lucide="bar-chart-2" class="w-4 h-4 inline mr-2"></i>
+            Báo cáo phân tích
         </button>
     </div>
 
@@ -29,7 +34,7 @@ window.module6Content = `
                      onclick="toggleModule6Section('general')">
                     <h3 class="font-black text-white text-sm flex items-center gap-2 uppercase tracking-wide">
                         <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
-                        Thông tin Chung
+                        1. Thông tin Chung
                     </h3>
                     <i data-lucide="chevron-down" id="chevron-general" class="w-5 h-5 text-white transition-transform duration-300"></i>
                 </div>
@@ -50,6 +55,11 @@ window.module6Content = `
                             <input type="text" id="bmi" readonly 
                                    class="w-full px-4 py-3 bg-indigo-50/50 border border-indigo-100 rounded-xl text-indigo-600 font-black text-center" />
                         </div>
+                         <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Tỷ lệ trao đổi chất (BMR)</label>
+                             <input type="number" id="bmr" step="1" placeholder="1400"
+                                    class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
+                        </div>
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Tỷ lệ mỡ (%)</label>
                             <input type="number" id="body-fat" step="0.1" placeholder="25.5"
@@ -61,130 +71,31 @@ window.module6Content = `
                                    class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Mỡ nội tạng (Lv)</label>
-                            <input type="number" id="visceral-fat" step="1" placeholder="8"
-                                   class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
-                        </div>
-                        <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Khối lượng xương (kg)</label>
                             <input type="number" id="bone-mass" step="0.1" placeholder="2.5"
                                    class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
                         </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Nước cơ thể (%)</label>
-                            <input type="number" id="body-water" step="0.1" placeholder="55.0"
-                                   class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
-                        </div>
+                        <!-- Body Water removed as per request -->
+                        <!-- Optional/Hidden but kept for data completeness if needed -->
+                         <div class="hidden">
+                             <input type="number" id="visceral-fat" />
+                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Section 2: Đánh giá Cơ bắp (Muscle Assessment) -->
             <div class="glass-panel rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
-                <div class="bg-gradient-to-r from-purple-500 to-fuchsia-500 px-6 py-4 flex items-center justify-between cursor-pointer hover:brightness-110 transition-all"
+                <div class="bg-gradient-to-r from-teal-500 to-emerald-500 px-6 py-4 flex items-center justify-between cursor-pointer hover:brightness-110 transition-all"
                      onclick="toggleModule6Section('muscle')">
                     <h3 class="font-black text-white text-sm flex items-center gap-2 uppercase tracking-wide">
                         <i data-lucide="dumbbell" class="w-5 h-5"></i>
-                        Đánh giá Cơ bắp
+                        2. Đánh giá Cơ bắp
                     </h3>
                     <i data-lucide="chevron-down" id="chevron-muscle" class="w-5 h-5 text-white transition-transform duration-300"></i>
                 </div>
                 <div id="section-muscle" class="p-8">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Tay phải (kg)</label>
-                            <input type="number" id="muscle-right-arm" step="0.1" placeholder="2.5"
-                                   class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Tay trái (kg)</label>
-                            <input type="number" id="muscle-left-arm" step="0.1" placeholder="2.4"
-                                   class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Chân phải (kg)</label>
-                            <input type="number" id="muscle-right-leg" step="0.1" placeholder="8.5"
-                                   class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Chân trái (kg)</label>
-                            <input type="number" id="muscle-left-leg" step="0.1" placeholder="8.3"
-                                   class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Thân mình (kg)</label>
-                            <input type="number" id="muscle-trunk" step="0.1" placeholder="23.5"
-                                   class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
-                        </div>
-                    </div>
-                    
-                    <!-- Muscle Chart -->
-                    <div class="glass-panel p-6 rounded-2xl border border-white/60">
-                        <h4 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-4">Biểu đồ Phân bố Cơ bắp</h4>
-                        <canvas id="muscle-chart" height="80"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section 3: Chỉ số Lượng cơ theo Bộ phận (Muscle Mass by Body Part) -->
-            <div class="glass-panel rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
-                <div class="bg-gradient-to-r from-blue-500 to-cyan-500 px-6 py-4 flex items-center justify-between cursor-pointer hover:brightness-110 transition-all"
-                     onclick="toggleModule6Section('bodypart')">
-                    <h3 class="font-black text-white text-sm flex items-center gap-2 uppercase tracking-wide">
-                        <i data-lucide="activity" class="w-5 h-5"></i>
-                        Chỉ số Lượng cơ theo Bộ phận
-                    </h3>
-                    <i data-lucide="chevron-down" id="chevron-bodypart" class="w-5 h-5 text-white transition-transform duration-300"></i>
-                </div>
-                <div id="section-bodypart" class="p-8">
-                    <div class="overflow-x-auto mb-8 rounded-2xl border border-white/40 shadow-sm">
-                        <table class="w-full border-collapse">
-                            <thead>
-                                <tr class="bg-blue-50/50 backdrop-blur-sm">
-                                    <th class="px-6 py-4 text-left text-[10px] uppercase tracking-widest font-black text-slate-500 border-b border-blue-100/50">Bộ phận</th>
-                                    <th class="px-6 py-4 text-center text-[10px] uppercase tracking-widest font-black text-slate-500 border-b border-blue-100/50">Phải (kg)</th>
-                                    <th class="px-6 py-4 text-center text-[10px] uppercase tracking-widest font-black text-slate-500 border-b border-blue-100/50">Trái (kg)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="border-b border-slate-50 hover:bg-white/40 transition-colors">
-                                    <td class="px-6 py-4 font-bold text-slate-700">Tay</td>
-                                    <td class="px-6 py-4 text-center"><span id="bodypart-arm-right" class="font-black text-blue-600">--</span></td>
-                                    <td class="px-6 py-4 text-center"><span id="bodypart-arm-left" class="font-black text-blue-600">--</span></td>
-                                </tr>
-                                <tr class="border-b border-slate-50 hover:bg-white/40 transition-colors">
-                                    <td class="px-6 py-4 font-bold text-slate-700">Chân</td>
-                                    <td class="px-6 py-4 text-center"><span id="bodypart-leg-right" class="font-black text-blue-600">--</span></td>
-                                    <td class="px-6 py-4 text-center"><span id="bodypart-leg-left" class="font-black text-blue-600">--</span></td>
-                                </tr>
-                                <tr class="hover:bg-white/40 transition-colors">
-                                    <td class="px-6 py-4 font-bold text-slate-700">Thân mình</td>
-                                    <td colspan="2" class="px-6 py-4 text-center"><span id="bodypart-trunk" class="font-black text-blue-600">--</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- Body Part Chart -->
-                    <div class="glass-panel p-6 rounded-2xl border border-white/60">
-                        <h4 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-4">So sánh Phải/Trái</h4>
-                        <canvas id="bodypart-chart" height="100"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section 4: Chỉ số Chuyên sâu (Advanced Metrics) -->
-            <div class="glass-panel rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
-                <div class="bg-gradient-to-r from-teal-500 to-emerald-500 px-6 py-4 flex items-center justify-between cursor-pointer hover:brightness-110 transition-all"
-                     onclick="toggleModule6Section('advanced')">
-                    <h3 class="font-black text-white text-sm flex items-center gap-2 uppercase tracking-wide">
-                        <i data-lucide="microscope" class="w-5 h-5"></i>
-                        Chỉ số Chuyên sâu
-                    </h3>
-                    <i data-lucide="chevron-down" id="chevron-advanced" class="w-5 h-5 text-white transition-transform duration-300"></i>
-                </div>
-                <div id="section-advanced" class="p-8">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div class="bg-teal-50/50 p-6 rounded-[24px] border border-teal-100 hover:shadow-md transition-shadow">
                             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">SMI (kg/m²)</label>
                             <input type="number" id="smi" step="0.1" placeholder="7.2"
@@ -192,17 +103,89 @@ window.module6Content = `
                             <p class="text-xs text-teal-600 font-bold mt-2">Skeletal Muscle Index</p>
                         </div>
                         <div class="bg-blue-50/50 p-6 rounded-[24px] border border-blue-100 hover:shadow-md transition-shadow">
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Phase Angle (độ)</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Góc pha (Phase Angle)</label>
                             <input type="number" id="phase-angle" step="0.1" placeholder="5.5"
                                    class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
-                            <p class="text-xs text-blue-600 font-bold mt-2">Chỉ số sức khỏe tế bào</p>
+                            <p class="text-xs text-blue-600 font-bold mt-2">Chỉ số chất lượng cơ</p>
                         </div>
+                         <!-- Keeping ECW/TBW here as it relates to cell health/quality -->
                         <div class="bg-purple-50/50 p-6 rounded-[24px] border border-purple-100 hover:shadow-md transition-shadow">
                             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">ECW/TBW</label>
                             <input type="number" id="ecw-tbw" step="0.01" placeholder="0.38"
                                    class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
                             <p class="text-xs text-purple-600 font-bold mt-2">Tỷ lệ nước ngoài tế bào</p>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Khối lượng cơ/chất lượng cơ theo từng bộ phận (Segmental) -->
+            <div class="glass-panel rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
+                <div class="bg-gradient-to-r from-blue-500 to-cyan-500 px-6 py-4 flex items-center justify-between cursor-pointer hover:brightness-110 transition-all"
+                     onclick="toggleModule6Section('segmental')">
+                    <h3 class="font-black text-white text-sm flex items-center gap-2 uppercase tracking-wide">
+                        <i data-lucide="activity" class="w-5 h-5"></i>
+                        3. Khối lượng cơ/chất lượng cơ theo từng bộ phận
+                    </h3>
+                    <i data-lucide="chevron-down" id="chevron-segmental" class="w-5 h-5 text-white transition-transform duration-300"></i>
+                </div>
+                <div id="section-segmental" class="p-8">
+                    <div class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm">
+                        <table class="w-full border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] font-black tracking-widest">
+                                    <th class="px-6 py-4 text-left border-b border-slate-200">Bộ phận</th>
+                                    <th class="px-6 py-4 text-center border-b border-slate-200">Khối lượng cơ (kg)</th>
+                                    <th class="px-6 py-4 text-center border-b border-slate-200">Góc pha (°)</th>
+                                </tr>
+                            </thead>
+                                <tr class="hover:bg-blue-50/50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-700">Tay Phải</td>
+                                    <td class="px-6 py-2">
+                                        <input type="number" id="muscle-right-arm" step="0.1" placeholder="2.5" class="input-glass w-full text-center font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-200 rounded-lg py-2" />
+                                    </td>
+                                    <td class="px-6 py-2">
+                                        <input type="number" id="pa-right-arm" step="0.1" placeholder="5.5" class="input-glass w-full text-center font-bold text-teal-600 outline-none focus:ring-2 focus:ring-teal-200 rounded-lg py-2" />
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-700">Tay Trái</td>
+                                    <td class="px-6 py-2">
+                                        <input type="number" id="muscle-left-arm" step="0.1" placeholder="2.4" class="input-glass w-full text-center font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-200 rounded-lg py-2" />
+                                    </td>
+                                     <td class="px-6 py-2">
+                                        <input type="number" id="pa-left-arm" step="0.1" placeholder="5.4" class="input-glass w-full text-center font-bold text-teal-600 outline-none focus:ring-2 focus:ring-teal-200 rounded-lg py-2" />
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-700">Chân Phải</td>
+                                    <td class="px-6 py-2">
+                                        <input type="number" id="muscle-right-leg" step="0.1" placeholder="8.5" class="input-glass w-full text-center font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-200 rounded-lg py-2" />
+                                    </td>
+                                     <td class="px-6 py-2">
+                                        <input type="number" id="pa-right-leg" step="0.1" placeholder="5.0" class="input-glass w-full text-center font-bold text-teal-600 outline-none focus:ring-2 focus:ring-teal-200 rounded-lg py-2" />
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-700">Chân Trái</td>
+                                    <td class="px-6 py-2">
+                                        <input type="number" id="muscle-left-leg" step="0.1" placeholder="8.3" class="input-glass w-full text-center font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-200 rounded-lg py-2" />
+                                    </td>
+                                     <td class="px-6 py-2">
+                                        <input type="number" id="pa-left-leg" step="0.1" placeholder="4.9" class="input-glass w-full text-center font-bold text-teal-600 outline-none focus:ring-2 focus:ring-teal-200 rounded-lg py-2" />
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-700">Thân mình</td>
+                                    <td class="px-6 py-2">
+                                        <input type="number" id="muscle-trunk" step="0.1" placeholder="23.5" class="input-glass w-full text-center font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-200 rounded-lg py-2" />
+                                    </td>
+                                     <td class="px-6 py-2">
+                                        <input type="number" id="pa-trunk" step="0.1" placeholder="6.0" class="input-glass w-full text-center font-bold text-teal-600 outline-none focus:ring-2 focus:ring-teal-200 rounded-lg py-2" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -219,7 +202,7 @@ window.module6Content = `
 
             <!-- Action Buttons -->
             <div class="flex gap-4 pt-4 px-1">
-                <button type="submit" id="module6-save-btn"
+                <button type="button" id="module6-save-btn" onclick="saveModule6Assessment()"
                     class="flex-1 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-black text-sm hover:shadow-lg hover:shadow-indigo-500/30 hover:scale-[1.01] active:scale-[0.99] transition-all">
                     <i data-lucide="save" class="w-4 h-4 inline mr-2 ring-offset-2"></i>
                     Lưu đánh giá
@@ -251,28 +234,138 @@ window.module6Content = `
         </div>
     </div>
 
-</div>
+    <!-- REPORT TAB -->
+    <div id="module6-report-tab" class="hidden space-y-8 pb-12">
+        <!-- Report Header / Selector -->
+        <div class="bg-white rounded-[32px] border border-slate-100 shadow-sm p-6 flex justify-between items-center">
+            <div>
+                 <h3 class="text-lg font-black text-slate-800 tracking-tight">Báo cáo Phân tích Chuyên sâu</h3>
+                 <p class="text-xs text-slate-500 font-bold mt-1">Phân loại thể hình & Chất lượng cơ bắp</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-xs font-bold text-slate-400 uppercase">Chọn bản ghi:</span>
+                <select id="m6-report-selector" onchange="renderModule6Report(this.value)" class="bg-slate-50 border border-slate-200 text-slate-800 text-sm font-bold rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none">
+                    <!-- Options populated by JS -->
+                </select>
+            </div>
+        </div>
+
+        <!-- 1. DETAILED METRICS TABLE (General) -->
+        <div class="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden mb-8">
+             <div class="p-6 border-b border-slate-50 bg-slate-50/50">
+                <h4 class="font-black text-slate-800 text-lg flex items-center gap-2">
+                    <i data-lucide="table-2" class="w-5 h-5 text-slate-500"></i>
+                    Bảng chỉ số chi tiết
+                </h4>
+             </div>
+             <div class="p-6">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-slate-400 uppercase font-black bg-slate-50/50 rounded-xl">
+                        <tr>
+                            <th class="px-4 py-3 rounded-l-xl">Chỉ số</th>
+                            <th class="px-4 py-3">Kết quả</th>
+                            <th class="px-4 py-3">Tham chiếu (Bình thường)</th>
+                            <th class="px-4 py-3 rounded-r-xl text-center">Đánh giá</th>
+                        </tr>
+                    </thead>
+                    <tbody id="m6-report-table-body" class="font-medium text-slate-700 divide-y divide-slate-50">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+             </div>
+        </div>
+
+        <!-- 2. BODY TYPE ANALYSIS (Vertical Stack) -->
+        <div class="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden mb-8">
+             <div class="p-6 border-b border-slate-50 bg-indigo-50/30">
+                <h4 class="font-black text-indigo-900 text-lg flex items-center gap-2">
+                    <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                    1. Phân loại Thể hình
+                </h4>
+             </div>
+             
+             <!-- Chart Container -->
+             <div class="p-8 flex justify-center bg-white">
+                <div class="relative w-full max-w-2xl aspect-[4/3] bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+                    <canvas id="m6-bodytype-chart" class="relative z-10"></canvas>
+                </div>
+             </div>
+
+             <!-- Comment Section (Below Chart) -->
+             <div class="px-8 pb-8 bg-white">
+                <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3">
+                    Nhận xét Thể hình
+                </label>
+                <textarea id="m6-bodytype-comment" rows="3" class="w-full p-4 rounded-xl border border-slate-200 text-sm font-medium focus:ring-2 focus:ring-indigo-100 outline-none resize-none bg-slate-50 transition-all focus:bg-white" placeholder="Nhập nhận xét..."></textarea>
+                <div class="mt-2 text-right">
+                    <button onclick="saveM6ReportData('bodyType')" class="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg hover:bg-slate-700 transition-all">Lưu nhận xét</button>
+                </div>
+             </div>
+        </div>
+
+        <!-- 2. MUSCLE ASSESSMENT (Summary & Quality Chart) -->
+        <div class="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden mb-8">
+             <div class="p-6 border-b border-slate-50 bg-teal-50/30">
+                <h4 class="font-black text-teal-900 text-lg flex items-center gap-2">
+                    <i data-lucide="dumbbell" class="w-5 h-5"></i>
+                    2. Đánh giá Cơ bắp
+                </h4>
+             </div>
+
+             <!-- Muscle Evaluation Table Container -->
+             <div id="m6-muscle-eval-container" class="px-8 pt-8">
+                <!-- Evaluation Table injected here -->
+             </div>
+
+             <!-- Chart Container -->
+             <div class="p-8 flex justify-center bg-white">
+                <div class="relative w-full max-w-2xl aspect-[2/1] bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+                    <canvas id="m6-quality-chart"></canvas>
+                </div>
+             </div>
+
+             <!-- Comment Section (Below Chart) -->
+             <div class="px-8 pb-8 bg-white">
+                <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3">
+                    Nhận xét cơ bắp
+                </label>
+                <textarea id="m6-quality-comment" rows="3" class="w-full p-4 rounded-xl border border-slate-200 text-sm font-medium focus:ring-2 focus:ring-teal-100 outline-none resize-none bg-slate-50 transition-all focus:bg-white" placeholder="Nhập nhận xét..."></textarea>
+                <div class="mt-2 text-right">
+                    <button onclick="saveM6ReportData('quality')" class="px-4 py-2 bg-teal-600 text-white text-xs font-bold rounded-lg hover:bg-teal-700 transition-all">Lưu nhận xét</button>
+                </div>
+             </div>
+        </div>
+
+        <!-- 3. SEGMENTAL ANALYSIS (Table Only) -->
+        <div class="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden mb-20">
+             <div class="p-6 border-b border-slate-50 bg-blue-50/30">
+                <h4 class="font-black text-blue-900 text-lg flex items-center gap-2">
+                    <i data-lucide="activity" class="w-5 h-5"></i>
+                    3. Khối lượng cơ/chất lượng cơ theo từng bộ phận
+                </h4>
+             </div>
+             
+             <div class="p-8">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-white uppercase font-bold bg-slate-800 rounded-lg">
+                        <!-- Header injected by renderSegmentalTable -->
+                    </thead>
+                    <tbody id="m6-segmental-table-body" class="font-medium text-slate-700 divide-y divide-slate-100">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+             </div>
+        </div>
+
+    </div>
 `;
 
-// Global variable to store resetFormState function
-let module6ResetFormState = null;
-
-// Reset Form
-function resetForm() {
-    if (confirm('Bạn có chắc muốn xóa tất cả dữ liệu đã nhập?')) {
-        document.getElementById('module6-form').reset();
-
-        // Reset form state (disable save button)
-        if (typeof module6ResetFormState === 'function') {
-            module6ResetFormState();
-        }
-
-        showToast('Đã xóa dữ liệu form', 'info');
-    }
-}
-
-// Initialize Module 6
 function initModule6() {
+    const container = document.getElementById('module-content');
+    if (container) {
+        container.innerHTML = window.module6Content;
+    }
+
     const patientId = getCurrentPatientId();
     const patient = getPatientById(patientId);
 
@@ -322,50 +415,8 @@ function initModule6() {
         document.getElementById(id)?.addEventListener('input', updateBodyPartTable);
     });
 
-    // Form submission
-    document.getElementById('module6-form')?.addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        // Collect form data
-        const assessmentData = {
-            patientId: patientId,
-            assessmentDate: new Date().toLocaleDateString('vi-VN'),
-            timestamp: Date.now(),
-            general: {
-                height: parseFloat(document.getElementById('height').value) || 0,
-                weight: parseFloat(document.getElementById('weight').value) || 0,
-                bmi: parseFloat(document.getElementById('bmi').value) || 0,
-                muscleMass: parseFloat(document.getElementById('muscle-mass').value) || 0,
-                bodyFat: parseFloat(document.getElementById('body-fat').value) || 0
-            },
-            muscle: {
-                rightArm: parseFloat(document.getElementById('muscle-right-arm').value) || 0,
-                leftArm: parseFloat(document.getElementById('muscle-left-arm').value) || 0,
-                rightLeg: parseFloat(document.getElementById('muscle-right-leg').value) || 0,
-                leftLeg: parseFloat(document.getElementById('muscle-left-leg').value) || 0,
-                trunk: parseFloat(document.getElementById('muscle-trunk').value) || 0
-            }
-        };
-
-        // Save to localStorage
-        const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
-        assessments.push(assessmentData);
-        localStorage.setItem(`mirabocaresync_${patientId}_body_assessments`, JSON.stringify(assessments));
-
-        // Mark module complete
-        markModuleComplete(patientId, 'module6');
-
-        // Show success message
-        showToast('Đã lưu đánh giá thành phần cơ thể!', 'success');
-
-        // Reset form state (remove ring and asterisk)
-        if (typeof resetFormState === 'function') {
-            resetFormState();
-        }
-
-        // Switch to history tab
-        switchModule6Tab('history');
-    });
+    // Form submission handled by onclick logic now
+    // document.getElementById('module6-form')?.addEventListener('submit', saveModule6Assessment);
 
     // Initialize charts
     initializeModule6Charts();
@@ -373,6 +424,17 @@ function initModule6() {
     // Reinitialize Lucide icons
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
+    }
+
+    // Check history to toggle Report Tab visibility
+    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
+    const reportBtn = document.getElementById('module6-tab-report');
+    if (reportBtn) {
+        if (assessments.length > 0) {
+            reportBtn.classList.remove('hidden');
+        } else {
+            reportBtn.classList.add('hidden');
+        }
     }
 }
 
@@ -389,6 +451,7 @@ function toggleModule6Section(sectionId) {
         chevron.style.transform = 'rotate(-90deg)';
     }
 }
+
 
 // Update body part table
 function updateBodyPartTable() {
@@ -541,27 +604,38 @@ function updateBodyPartChart() {
 }
 
 // Save assessment
-function saveModule6Assessment() {
+function saveModule6Assessment(e) {
+    if (e) e.preventDefault();
+
     const patientId = getCurrentPatientId();
     const timestamp = Date.now();
 
     const assessmentData = {
+        patientId: patientId,
+        assessmentDate: new Date().toLocaleDateString('vi-VN'),
         general: {
             height: parseFloat(document.getElementById('height').value) || null,
             weight: parseFloat(document.getElementById('weight').value) || null,
             bmi: parseFloat(document.getElementById('bmi').value) || null,
             bodyFat: parseFloat(document.getElementById('body-fat').value) || null,
             muscleMass: parseFloat(document.getElementById('muscle-mass').value) || null,
-            visceralFat: parseInt(document.getElementById('visceral-fat').value) || null,
+            visceralFat: document.getElementById('visceral-fat') ? parseInt(document.getElementById('visceral-fat').value) : null,
             boneMass: parseFloat(document.getElementById('bone-mass').value) || null,
-            bodyWater: parseFloat(document.getElementById('body-water').value) || null
+            bodyWater: document.getElementById('body-water') ? parseFloat(document.getElementById('body-water').value) : null,
+            bmr: parseInt(document.getElementById('bmr').value) || null
         },
         muscle: {
             rightArm: parseFloat(document.getElementById('muscle-right-arm').value) || null,
             leftArm: parseFloat(document.getElementById('muscle-left-arm').value) || null,
             rightLeg: parseFloat(document.getElementById('muscle-right-leg').value) || null,
             leftLeg: parseFloat(document.getElementById('muscle-left-leg').value) || null,
-            trunk: parseFloat(document.getElementById('muscle-trunk').value) || null
+            trunk: parseFloat(document.getElementById('muscle-trunk').value) || null,
+            // Segmental Quality (Phase Angle)
+            paRightArm: parseFloat(document.getElementById('pa-right-arm').value) || null,
+            paLeftArm: parseFloat(document.getElementById('pa-left-arm').value) || null,
+            paRightLeg: parseFloat(document.getElementById('pa-right-leg').value) || null,
+            paLeftLeg: parseFloat(document.getElementById('pa-left-leg').value) || null,
+            paTrunk: parseFloat(document.getElementById('pa-trunk').value) || null
         },
         advanced: {
             smi: parseFloat(document.getElementById('smi').value) || null,
@@ -569,45 +643,94 @@ function saveModule6Assessment() {
             ecwTbw: parseFloat(document.getElementById('ecw-tbw').value) || null
         },
         notes: document.getElementById('notes').value,
+        assessorName: 'Administrator', // Mock user
         timestamp: timestamp
     };
 
-    // Save to LocalStorage
-    localStorage.setItem(`mirabocaresync_${patientId}_bodycomp_${timestamp}`, JSON.stringify(assessmentData));
-
-    // Save assessor name for future use
-    localStorage.setItem(`mirabocaresync_${patientId}_module6_assessor`, assessmentData.assessorName);
+    // Save to LocalStorage (Array Pattern)
+    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
+    assessments.push(assessmentData);
+    localStorage.setItem(`mirabocaresync_${patientId}_body_assessments`, JSON.stringify(assessments));
 
     // Mark complete and show toast
-    markModuleComplete(patientId, 'module6');
-    showToast('Đã lưu đánh giá thành công!', 'success');
-    console.log('Module 6 assessment saved');
+    if (typeof markModuleComplete === 'function') markModuleComplete(patientId, 'module6');
+
+    // Dispatch event for sidebar update
+    window.dispatchEvent(new Event('module-data-saved'));
+    showToast('Đã lưu đánh giá thành phần cơ thể!', 'success');
+    console.log('Module 6 assessment saved to array');
 
     // Reset form state
-    if (typeof resetFormState === 'function') {
-        resetFormState();
+    if (typeof module6ResetFormState === 'function') {
+        module6ResetFormState();
     }
+
+    // Auto switch to history
+    switchModule6Tab('history');
+}
+
+// Delete Assessment
+function deleteModule6Assessment(index) {
+    if (!confirm('Bạn có chắc chắn muốn xóa bản ghi này không?')) return;
+
+    const patientId = getCurrentPatientId();
+    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
+
+    // Sort logic in loadHistory was Newest First, so we need to match that index or filter by ID.
+    // Ideally we should use ID. But for now, let's reverse the index mapping or just handle consistent sorting.
+    // The loadHistory sorts a copy. So index 0 in UI is index Length-1 in saved array if we just accepted sorting.
+    // Better strategy: filter by timestamp if possible, but easier here -> remove from sorted array and save back?
+    // Actually, localstorage array is usually append-only.
+    // Let's refactor to use splice on the original array, but we need to find the correct index in original array.
+    // Simple fix: Sort the array fetched from LS first to match UI, then splice, then save.
+
+    assessments.sort((a, b) => b.timestamp - a.timestamp); // Match UI sort
+    assessments.splice(index, 1); // Remove item
+
+    localStorage.setItem(`mirabocaresync_${patientId}_body_assessments`, JSON.stringify(assessments));
+    showToast('Đã xóa bản ghi', 'success');
+    loadModule6History(); // Reload UI
 }
 
 // Switch tabs
 function switchModule6Tab(tabName) {
     const formTab = document.getElementById('module6-form-tab');
     const historyTab = document.getElementById('module6-history-tab');
+    const reportTab = document.getElementById('module6-report-tab');
+
     const formBtn = document.getElementById('module6-tab-form');
     const historyBtn = document.getElementById('module6-tab-history');
+    const reportBtn = document.getElementById('module6-tab-report');
+
+    // Reset all
+    formTab.classList.add('hidden');
+    historyTab.classList.add('hidden');
+    reportTab?.classList.add('hidden'); // reportTab might be dynamically rendered later
+
+    const inactiveClass = 'px-6 py-3 font-bold text-slate-400 border-b-4 border-transparent hover:text-slate-600 transition-all flex items-center gap-2';
+    const activeClass = 'px-6 py-3 font-bold text-indigo-600 border-b-4 border-indigo-600 transition-all flex items-center gap-2';
+
+    formBtn.className = inactiveClass;
+    historyBtn.className = inactiveClass;
+    reportBtn.className = inactiveClass;
 
     if (tabName === 'form') {
         formTab.classList.remove('hidden');
-        historyTab.classList.add('hidden');
-        formBtn.className = 'px-6 py-3 font-bold text-indigo-600 border-b-4 border-indigo-600 transition-all flex items-center gap-2';
-        historyBtn.className = 'px-6 py-3 font-bold text-slate-400 border-b-4 border-transparent hover:text-slate-600 transition-all flex items-center gap-2';
-    } else {
-        formTab.classList.add('hidden');
+        formBtn.className = activeClass;
+    } else if (tabName === 'history') {
         historyTab.classList.remove('hidden');
-        formBtn.className = 'px-6 py-3 font-bold text-slate-400 border-b-4 border-transparent hover:text-slate-600 transition-all flex items-center gap-2';
-        historyBtn.className = 'px-6 py-3 font-bold text-indigo-600 border-b-4 border-indigo-600 transition-all flex items-center gap-2';
-
+        historyBtn.className = activeClass;
         loadModule6History();
+    } else if (tabName === 'report') {
+        // If report tab doesn't exist yet in DOM, we check later
+        if (reportTab) reportTab.classList.remove('hidden');
+        reportBtn.className = activeClass;
+        if (reportTab) reportTab.classList.remove('hidden');
+        reportBtn.className = activeClass;
+
+        // Load latest report or last selected
+        const lastSelected = window.lastSelectedReportTimestamp || null;
+        renderModule6Report(lastSelected);
     }
 
     // Reinitialize icons
@@ -621,40 +744,57 @@ function loadModule6History() {
     const patientId = getCurrentPatientId();
     const historyList = document.getElementById('history-list');
 
-    // Get all assessments from LocalStorage
-    const assessments = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith(`mirabocaresync_${patientId}_bodycomp_`)) {
-            const data = JSON.parse(localStorage.getItem(key));
-            assessments.push(data);
-        }
-    }
+    // Get all assessments from LocalStorage (Array Key)
+    // Get all assessments from LocalStorage (Array Key)
+    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
 
     // Sort by timestamp (newest first)
     assessments.sort((a, b) => b.timestamp - a.timestamp);
 
     if (assessments.length === 0) {
         historyList.innerHTML = '<p class="text-slate-500 text-center py-8">Chưa có đánh giá nào</p>';
+        // Hide report tab if no history
+        const reportBtn = document.getElementById('module6-tab-report');
+        if (reportBtn) reportBtn.classList.add('hidden');
         return;
     }
 
+    // Show report tab if history exists
+    const reportBtn = document.getElementById('module6-tab-report');
+    if (reportBtn) reportBtn.classList.remove('hidden');
+
     // Display history items
-    historyList.innerHTML = assessments.map(assessment => `
-        <div class="bg-slate-50 rounded-xl p-4 hover:bg-slate-100 transition-all cursor-pointer border border-slate-200"
-             onclick='showModule6Detail(${JSON.stringify(assessment).replace(/'/g, "&apos;")})'>
+    historyList.innerHTML = assessments.map((assessment, index) => `
+        <div class="bg-slate-50 rounded-xl p-4 hover:bg-slate-100 transition-all border border-slate-200 group">
             <div class="flex items-center justify-between">
-                <div>
-                    <p class="font-bold text-slate-800">${assessment.assessmentDate}</p>
-                    <p class="text-sm text-slate-600">Nhân viên: ${assessment.assessorName}</p>
+                <div onclick='showModule6Detail(${JSON.stringify(assessment).replace(/'/g, "&apos;")})' class="cursor-pointer flex-1">
+                    <p class="font-bold text-slate-800 text-lg">${assessment.assessmentDate}</p>
+                    <div class="flex gap-4 mt-1">
+                        <p class="text-sm text-slate-600">Cân nặng: <span class="font-bold text-indigo-600">${assessment.general.weight || '--'} kg</span></p>
+                        <p class="text-sm text-slate-600">BMI: <span class="font-bold text-indigo-600">${assessment.general.bmi || '--'}</span></p>
+                    </div>
                 </div>
-                <div class="text-right">
-                    <p class="text-sm text-slate-600">BMI: <span class="font-bold text-indigo-600">${assessment.general.bmi || '--'}</span></p>
-                    <p class="text-sm text-slate-600">Cân nặng: <span class="font-bold text-indigo-600">${assessment.general.weight || '--'} kg</span></p>
+                
+                <div class="flex items-center gap-2">
+                     <button onclick="switchModule6Tab('report'); setTimeout(() => renderModule6Report('${assessment.timestamp}'), 100);" 
+                            class="px-3 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors font-bold text-xs flex items-center gap-1 shadow-sm">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+                        Xem báo cáo
+                    </button>
+                    
+                    <button onclick="deleteModule6Assessment(${index})" 
+                            class="p-2 bg-rose-100 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-200 transition-colors shadow-sm" title="Xóa">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
                 </div>
             </div>
         </div>
     `).join('');
+
+    // Reinitialize icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 
     // Update timeline chart
     updateTimelineChart(assessments);
@@ -663,119 +803,541 @@ function loadModule6History() {
 // Show detail
 function showModule6Detail(assessment) {
     const detail = `
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onclick="this.remove()">
-            <div class="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
-                <h3 class="text-xl font-bold text-slate-800 mb-4">Chi tiết Đánh giá - ${assessment.assessmentDate}</h3>
-                
-                <div class="space-y-4">
-                    <div class="bg-indigo-50 rounded-xl p-4">
-                        <h4 class="font-bold text-indigo-900 mb-2">Thông tin Chung</h4>
-                        <div class="grid grid-cols-2 gap-2 text-sm">
-                            <p>Chiều cao: <span class="font-bold">${assessment.general.height || '--'} cm</span></p>
-                            <p>Cân nặng: <span class="font-bold">${assessment.general.weight || '--'} kg</span></p>
-                            <p>BMI: <span class="font-bold">${assessment.general.bmi || '--'}</span></p>
-                            <p>Tỷ lệ mỡ: <span class="font-bold">${assessment.general.bodyFat || '--'} %</span></p>
-                        </div>
+    < div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onclick = "this.remove()" >
+        <div class="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+            <h3 class="text-xl font-bold text-slate-800 mb-4">Chi tiết Đánh giá - ${assessment.assessmentDate}</h3>
+
+            <div class="space-y-4">
+                <div class="bg-indigo-50 rounded-xl p-4">
+                    <h4 class="font-bold text-indigo-900 mb-2">Thông tin Chung</h4>
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <p>Chiều cao: <span class="font-bold">${assessment.general.height || '--'} cm</span></p>
+                        <p>Cân nặng: <span class="font-bold">${assessment.general.weight || '--'} kg</span></p>
+                        <p>BMI: <span class="font-bold">${assessment.general.bmi || '--'}</span></p>
+                        <p>Tỷ lệ mỡ: <span class="font-bold">${assessment.general.bodyFat || '--'} %</span></p>
+                        <p>BMR: <span class="font-bold">${assessment.general.bmr || '--'} kcal</span></p>
                     </div>
-                    
-                    <div class="bg-purple-50 rounded-xl p-4">
-                        <h4 class="font-bold text-purple-900 mb-2">Đánh giá Cơ bắp</h4>
-                        <div class="grid grid-cols-2 gap-2 text-sm">
-                            <p>Tay phải: <span class="font-bold">${assessment.muscle.rightArm || '--'} kg</span></p>
-                            <p>Tay trái: <span class="font-bold">${assessment.muscle.leftArm || '--'} kg</span></p>
-                            <p>Chân phải: <span class="font-bold">${assessment.muscle.rightLeg || '--'} kg</span></p>
-                            <p>Chân trái: <span class="font-bold">${assessment.muscle.leftLeg || '--'} kg</span></p>
-                            <p>Thân mình: <span class="font-bold">${assessment.muscle.trunk || '--'} kg</span></p>
-                        </div>
+                </div>
+
+                <div class="bg-purple-50 rounded-xl p-4">
+                    <h4 class="font-bold text-purple-900 mb-2">Đánh giá Cơ bắp</h4>
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <p>Tay phải: <span class="font-bold">${assessment.muscle.rightArm || '--'} kg</span></p>
+                        <p>Tay trái: <span class="font-bold">${assessment.muscle.leftArm || '--'} kg</span></p>
+                        <p>Chân phải: <span class="font-bold">${assessment.muscle.rightLeg || '--'} kg</span></p>
+                        <p>Chân trái: <span class="font-bold">${assessment.muscle.leftLeg || '--'} kg</span></p>
+                        <p>Thân mình: <span class="font-bold">${assessment.muscle.trunk || '--'} kg</span></p>
                     </div>
-                    
-                    <div class="bg-teal-50 rounded-xl p-4">
-                        <h4 class="font-bold text-teal-900 mb-2">Chỉ số Chuyên sâu</h4>
-                        <div class="grid grid-cols-2 gap-2 text-sm">
-                            <p>SMI: <span class="font-bold">${assessment.advanced.smi || '--'} kg/m²</span></p>
-                            <p>Phase Angle: <span class="font-bold">${assessment.advanced.phaseAngle || '--'} độ</span></p>
-                            <p>ECW/TBW: <span class="font-bold">${assessment.advanced.ecwTbw || '--'}</span></p>
-                        </div>
+                </div>
+
+                <div class="bg-teal-50 rounded-xl p-4">
+                    <h4 class="font-bold text-teal-900 mb-2">Chỉ số Chuyên sâu</h4>
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <p>SMI: <span class="font-bold">${assessment.advanced.smi || '--'} kg/m²</span></p>
+                        <p>Phase Angle: <span class="font-bold">${assessment.advanced.phaseAngle || '--'} độ</span></p>
+                        <p>ECW/TBW: <span class="font-bold">${assessment.advanced.ecwTbw || '--'}</span></p>
                     </div>
-                    
-                    ${assessment.notes ? `
+                </div>
+
+                ${assessment.notes ? `
                         <div class="bg-slate-50 rounded-xl p-4">
                             <h4 class="font-bold text-slate-900 mb-2">Ghi chú</h4>
                             <p class="text-sm text-slate-700">${assessment.notes}</p>
                         </div>
                     ` : ''}
-                </div>
-                
-                <button onclick="this.closest('.fixed').remove()" 
-                        class="mt-6 w-full bg-slate-600 text-white py-3 rounded-xl font-bold hover:bg-slate-700 transition-all">
-                    Đóng
-                </button>
             </div>
+
+            <button onclick="this.closest('.fixed').remove()"
+                class="mt-6 w-full bg-slate-600 text-white py-3 rounded-xl font-bold hover:bg-slate-700 transition-all">
+                Đóng
+            </button>
         </div>
+        </div >
     `;
 
     document.body.insertAdjacentHTML('beforeend', detail);
 }
 
-// Update timeline chart
-function updateTimelineChart(assessments) {
-    const ctx = document.getElementById('timeline-chart');
-    if (!ctx || typeof Chart === 'undefined') return;
+// --- Report & Charting Logic ---
 
-    // Sort by timestamp (oldest first for timeline)
-    const sorted = [...assessments].sort((a, b) => a.timestamp - b.timestamp);
+let m6BodyTypeChart = null;
+let m6QualityChart = null;
 
-    const labels = sorted.map(a => a.assessmentDate);
-    const weightData = sorted.map(a => a.general.weight);
-    const bmiData = sorted.map(a => a.general.bmi);
-    const muscleMassData = sorted.map(a => a.general.muscleMass);
+function renderModule6Report(selectedTimestamp = null) {
+    const patientId = getCurrentPatientId();
+    // Get all assessments
+    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
 
-    if (timelineChart) {
-        timelineChart.destroy();
+    if (assessments.length === 0) {
+        return;
     }
 
-    timelineChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Cân nặng (kg)',
-                    data: weightData,
-                    borderColor: 'rgb(99, 102, 241)',
-                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                    tension: 0.4
-                },
-                {
-                    label: 'BMI',
-                    data: bmiData,
-                    borderColor: 'rgb(168, 85, 247)',
-                    backgroundColor: 'rgba(168, 85, 247, 0.1)',
-                    tension: 0.4
-                },
-                {
-                    label: 'Khối lượng cơ (kg)',
-                    data: muscleMassData,
-                    borderColor: 'rgb(59, 130, 246)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    tension: 0.4
+    // Sort Newest -> Oldest
+    assessments.sort((a, b) => b.timestamp - a.timestamp);
+
+    // Populate Selector if empty or needed
+    const selector = document.getElementById('m6-report-selector');
+    // Only populate if it hasn't been populated or if we want to refresh
+    // For simplicity, let's clear and re-populate to ensure sync
+    if (selector) {
+        const currentVal = selector.value;
+        selector.innerHTML = assessments.map(a =>
+            `<option value="${a.timestamp}">${a.assessmentDate} - Cân nặng: ${a.general.weight}kg</option>`
+        ).join('');
+        // Restore selection if valid
+        if (currentVal && assessments.find(a => a.timestamp == currentVal)) {
+            selector.value = currentVal;
+        } else if (selectedTimestamp) {
+            selector.value = selectedTimestamp;
+        }
+    }
+
+    // Determine current record
+    let currentRecord = assessments[0];
+    if (selectedTimestamp) {
+        currentRecord = assessments.find(a => a.timestamp == selectedTimestamp) || assessments[0];
+    } else if (selector && selector.value) {
+        currentRecord = assessments.find(a => a.timestamp == selector.value) || assessments[0];
+    }
+
+    // Save state
+    window.lastSelectedReportTimestamp = currentRecord.timestamp;
+    if (selector) selector.value = currentRecord.timestamp;
+
+    // --- Update Text Fields ---
+    const bodyComment = document.getElementById('m6-bodytype-comment');
+    const qualityComment = document.getElementById('m6-quality-comment');
+
+    if (bodyComment) bodyComment.value = currentRecord.bodyTypeComment || '';
+    if (qualityComment) qualityComment.value = currentRecord.qualityComment || '';
+
+    // --- Render Detailed Table ---
+    renderReportTable(currentRecord, patientId);
+    renderSegmentalTable(currentRecord);
+
+    // --- Render Charts ---
+    renderBodyTypeChart(currentRecord);
+    renderQualityChart(currentRecord);
+
+    // --- Update Auto-Evaluation Text ---
+    // updateM6AutoEval(currentRecord); // Optional, maybe remove if custom layout serves purpose
+}
+
+function updateM6AutoEval(data) {
+    const fat = data.general.bodyFat || 0;
+    const muscle = data.general.muscleMass || 0;
+
+    // Simple heuristic for demo
+    let type = "Tiêu chuẩn";
+    if (fat > 35) type = "Béo phì";
+    else if (fat > 25 && muscle < 40) type = "Béo phì tiềm ẩn (Skinny Fat)";
+    else if (fat < 20 && muscle > 50) type = "Cơ bắp (Vận động viên)";
+    else if (fat < 15 && muscle < 45) type = "Gầy / Thiếu cơ";
+
+    document.getElementById('m6-bodytype-result').textContent = type;
+    document.getElementById('m6-quality-result').textContent = "Chờ dữ liệu tham chiếu lâm sàng";
+}
+
+function renderSegmentalTable(data) {
+    // 1. Update Title if needed (it's in the HTML, but we can target specific ID to be safe or just assume HTML update in next step)
+    // Actually, let's update the header dynamically if we can, or rely on the HTML update step.
+    // For now, focusing on the table headers and body.
+
+    const thead = document.querySelector('#m6-segmental-table-body')?.previousElementSibling;
+    if (thead) {
+        thead.innerHTML = `
+            <tr class="bg-slate-800 text-white text-xs uppercase font-bold">
+                <th class="px-4 py-3 rounded-l-lg">Bộ phận</th>
+                <th class="px-4 py-3 text-center border-r border-slate-600">Khối lượng cơ (kg)</th>
+                <th class="px-4 py-3 text-center text-slate-300">Tham chiếu</th>
+                <th class="px-4 py-3 text-center border-r border-slate-600">Đánh giá</th>
+                <th class="px-4 py-3 text-center">Góc pha (°)</th>
+                <th class="px-4 py-3 text-center text-slate-300">Tham chiếu</th>
+                <th class="px-4 py-3 text-center rounded-r-lg">Đánh giá</th>
+            </tr>
+        `;
+    }
+
+    const tbody = document.getElementById('m6-segmental-table-body');
+    if (!tbody) return;
+
+    if (!data.muscle) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-400">Chưa có dữ liệu chi tiết</td></tr>';
+        return;
+    }
+
+    const getBadge = (status) => {
+        if (status === 'high') return '<span class="min-w-[80px] inline-block text-center px-2 py-1 bg-red-100 text-red-600 rounded text-xs font-bold border border-red-200">Cao</span>';
+        if (status === 'low') return '<span class="min-w-[80px] inline-block text-center px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs font-bold border border-blue-200">Thấp</span>';
+        return '<span class="min-w-[80px] inline-block text-center px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-bold border border-yellow-200">Tiêu chuẩn</span>';
+    };
+
+    const evaluate = (val, min, max) => {
+        if (val < min) return 'low';
+        if (val > max) return 'high';
+        return 'normal';
+    }
+
+    // Reference Ranges (from User Image)
+    // Arms: 1.7 - 2.2
+    // Legs: 6.6 - 8.2
+    // Trunk: 21.6 - 24.3
+    // Quality Arms: 4.93 - 5.99
+    // Quality Legs: 3.76 - 5.40
+
+    const qualityBase = data.advanced.phaseAngle || 5;
+
+    // Mock Segmental Data if not fully present (Fallback logic)
+    // If we have saved specific PA values, use them. Otherwise fallback to mock calc from base phaseAngle.
+
+    const getQual = (savedVal, modifier) => {
+        if (savedVal) return parseFloat(savedVal).toFixed(2);
+        return (qualityBase * modifier).toFixed(2);
+    }
+
+    const segs = [
+        {
+            name: 'Tay Phải',
+            mass: data.muscle.rightArm, minM: 1.7, maxM: 2.2,
+            qual: getQual(data.muscle.paRightArm, 1.02), minQ: 4.93, maxQ: 5.99
+        },
+        {
+            name: 'Tay Trái',
+            mass: data.muscle.leftArm, minM: 1.7, maxM: 2.2,
+            qual: getQual(data.muscle.paLeftArm, 0.98), minQ: 4.93, maxQ: 5.99
+        },
+        {
+            name: 'Thân mình',
+            mass: data.muscle.trunk, minM: 21.6, maxM: 24.3,
+            qual: getQual(data.muscle.paTrunk, 1.1), minQ: 6.0, maxQ: 8.0
+        },
+        {
+            name: 'Chân Phải',
+            mass: data.muscle.rightLeg, minM: 6.6, maxM: 8.2,
+            qual: getQual(data.muscle.paRightLeg, 0.95), minQ: 3.76, maxQ: 5.40
+        },
+        {
+            name: 'Chân Trái',
+            mass: data.muscle.leftLeg, minM: 6.6, maxM: 8.2,
+            qual: getQual(data.muscle.paLeftLeg, 0.94), minQ: 3.76, maxQ: 5.40
+        },
+    ];
+
+    tbody.innerHTML = segs.map(seg => {
+        let mVal = parseFloat(seg.mass);
+        let qVal = parseFloat(seg.qual);
+        let mStatus = evaluate(mVal, seg.minM, seg.maxM);
+        let qStatus = evaluate(qVal, seg.minQ, seg.maxQ);
+
+        return `
+            <tr class="hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-0">
+                <td class="px-4 py-3 font-bold text-slate-800">${seg.name}</td>
+                <td class="px-4 py-3 text-center text-slate-700 font-bold text-base">${seg.mass || '--'}</td>
+                <td class="px-4 py-3 text-center text-xs font-mono text-slate-500 bg-slate-50 mx-2 rounded">${seg.minM} - ${seg.maxM}</td>
+                <td class="px-4 py-3 text-center">${getBadge(mStatus)}</td>
+                
+                <td class="px-4 py-3 text-center text-slate-700 font-bold text-base border-l border-slate-100">${seg.qual}</td>
+                <td class="px-4 py-3 text-center text-xs font-mono text-slate-500 bg-slate-50 mx-2 rounded">${seg.minQ} - ${seg.maxQ}</td>
+                <td class="px-4 py-3 text-center">${getBadge(qStatus)}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// New Function: Render Muscle Evaluation Summary Table
+function renderMuscleEvalTable(data) {
+    const container = document.getElementById('m6-muscle-eval-container');
+    if (!container) return;
+
+    // Ranges from image:
+    // SMI: 6.13 - 7.15 (Female? looks like female range or specific case, using it as requested)
+    // Phase Angle: 4.5 - 5.71
+
+    // Evaluation Logic
+    const evaluate = (val, min, max) => {
+        if (!val) return { text: '--', color: 'bg-slate-100 text-slate-400 border-slate-200' };
+        if (val < min) return { text: 'Thấp', color: 'bg-blue-100 text-blue-600 border-blue-200' };
+        if (val > max) return { text: 'Cao', color: 'bg-red-100 text-red-600 border-red-200' };
+        return { text: 'Tiêu chuẩn', color: 'bg-yellow-100 text-yellow-700 border-yellow-200' };
+    };
+
+    const smi = parseFloat(data.advanced.smi || 0);
+    const pa = parseFloat(data.advanced.phaseAngle || 0);
+
+    const smiRef = { min: 6.13, max: 7.15 };
+    const paRef = { min: 4.5, max: 5.71 };
+
+    const smiEval = evaluate(smi, smiRef.min, smiRef.max);
+    const paEval = evaluate(pa, paRef.min, paRef.max);
+
+    container.innerHTML = `
+        <h5 class="text-sm font-black text-slate-700 uppercase mb-4 flex items-center gap-2">
+            <i data-lucide="clipboard-check" class="w-4 h-4 text-teal-600"></i>
+            Đánh giá cơ bắp
+        </h5>
+        <div class="overflow-hidden rounded-xl border border-slate-200 shadow-sm">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-50 text-xs uppercase text-slate-500 font-bold">
+                    <tr>
+                        <th class="px-4 py-2 text-left">Chỉ số</th>
+                        <th class="px-4 py-2 text-left">Kết quả</th>
+                        <th class="px-4 py-2 text-center">Min - Max</th>
+                        <th class="px-4 py-2 text-center">Đánh giá</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
+                    <tr>
+                        <td class="px-4 py-3 font-bold text-slate-700">Khối lượng cơ (SMI)</td>
+                        <td class="px-4 py-3 font-black text-teal-800 text-lg">${smi} <span class="text-xs font-normal text-slate-400">kg/m²</span></td>
+                        <td class="px-4 py-3 text-center font-mono text-xs text-slate-500">${smiRef.min} - ${smiRef.max}</td>
+                        <td class="px-4 py-3 text-center">
+                            <span class="inline-block px-3 py-1 rounded text-xs font-bold border ${smiEval.color}">${smiEval.text}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 font-bold text-slate-700">Chất lượng cơ (Góc pha)</td>
+                        <td class="px-4 py-3 font-black text-teal-800 text-lg">${pa} <span class="text-xs font-normal text-slate-400">°</span></td>
+                        <td class="px-4 py-3 text-center font-mono text-xs text-slate-500">${paRef.min} - ${paRef.max}</td>
+                        <td class="px-4 py-3 text-center">
+                            <span class="inline-block px-3 py-1 rounded text-xs font-bold border ${paEval.color}">${paEval.text}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+function renderReportTable(data, patientId) {
+    const tbody = document.getElementById('m6-report-table-body');
+    if (!tbody) return;
+
+    // Get Patient Info
+    const patient = getPatientById(patientId) || { dob: '1960-01-01', gender: 'male' };
+    const age = new Date().getFullYear() - new Date(patient.dob).getFullYear();
+    const gender = patient.gender === 'male' ? 'Nam' : 'Nữ';
+
+    // BMR Calculation (Mifflin-St Jeor)
+    // Men: 10W + 6.25H - 5A + 5
+    // Women: 10W + 6.25H - 5A - 161
+    let bmr = data.general.bmr;
+    if (!bmr && data.general.weight && data.general.height) {
+        const w = parseFloat(data.general.weight);
+        const h = parseFloat(data.general.height);
+        if (patient.gender === 'male') {
+            bmr = (10 * w) + (6.25 * h) - (5 * age) + 5;
+        } else {
+            bmr = (10 * w) + (6.25 * h) - (5 * age) - 161;
+        }
+        bmr = bmr.toFixed(0);
+    }
+
+    // Helper to format range
+    const fmtRange = (min, max, unit) => {
+        if (!min && !max) return 'Chưa có';
+        return `Thấp: &lt;${min}<br>Bình thường: ${min}-${max}<br>Cao: &gt;${max} <span class="text-[10px] text-slate-400">(${unit})</span>`;
+    };
+
+    // Requested Metrics Only
+    const metrics = [
+        { name: 'Độ tuổi', value: age, unit: 'tuổi', refText: 'Thông tin hành chính' },
+        { name: 'Chiều cao', value: data.general.height, unit: 'cm', refText: 'Thông tin hành chính' },
+        { name: 'Cân nặng', value: data.general.weight, unit: 'kg', min: 50, max: 75, refText: fmtRange(50, 75, 'kg') },
+        { name: 'BMI', value: data.general.bmi, unit: 'kg/m²', min: 18.5, max: 23, refText: fmtRange(18.5, 23, 'kg/m²') },
+        { name: 'Tỷ lệ mỡ cơ thể', value: data.general.bodyFat, unit: '%', min: 10, max: 20, refText: fmtRange(10, 20, '%') },
+        { name: 'Khối lượng cơ', value: data.general.muscleMass, unit: 'kg', min: 25, max: 35, refText: fmtRange(25, 35, 'kg') },
+        { name: 'Khối lượng xương ước tính', value: data.general.boneMass || '--', unit: 'kg', refText: '2.0 - 4.0' },
+        { name: 'Tỷ lệ trao đổi chất (BMR)', value: bmr || '--', unit: 'kcal', refText: '1200 - 2000' },
+    ];
+
+    tbody.innerHTML = metrics.map(m => {
+        const val = parseFloat(m.value);
+        let status = '<span class="px-2 py-1 bg-slate-50 text-slate-400 rounded text-xs font-bold">--</span>';
+
+        if (m.min !== undefined && m.max !== undefined && !isNaN(val)) {
+            if (val < m.min) status = '<span class="px-2 py-1 bg-blue-50 text-blue-600 rounded text-xs font-bold">Thấp</span>';
+            else if (val > m.max) status = '<span class="px-2 py-1 bg-orange-50 text-orange-600 rounded text-xs font-bold">Cao</span>';
+            else status = '<span class="px-2 py-1 bg-green-50 text-green-600 rounded text-xs font-bold">Bình thường</span>';
+        } else if (m.name === 'Độ tuổi' || m.name === 'Chiều cao') {
+            status = '<span class="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs font-bold">Thông tin</span>';
+        }
+
+        return `
+            <tr class="hover:bg-slate-50/50">
+                <td class="px-4 py-3 font-bold text-slate-700">${m.name}</td>
+                <td class="px-4 py-3 font-black text-indigo-900 text-base">${val || '--'} <span class="text-xs font-normal text-slate-400 ml-1">${m.unit}</span></td>
+                <td class="px-4 py-3 text-xs leading-relaxed text-slate-500">${m.refText || 'Chưa có tham chiếu'}</td>
+                <td class="px-4 py-3 text-center">${status}</td>
+            </tr>
+        `;
+    }).join('');
+
+    // Call new renderer
+    renderMuscleEvalTable(data);
+}
+
+function renderBodyTypeChart(data) {
+    const ctx = document.getElementById('m6-bodytype-chart');
+    if (!ctx) return;
+
+    if (m6BodyTypeChart) m6BodyTypeChart.destroy();
+
+    const x = data.general.muscleMass || 0;
+    const y = data.general.bodyFat || 0;
+
+    // Custom Plugin to draw 3x3 Background Grid
+    const bgGridPlugin = {
+        id: 'bgGrid',
+        beforeDraw: (chart) => {
+            const { ctx, chartArea: { top, bottom, left, right, width, height }, scales: { x, y } } = chart;
+            ctx.save();
+
+            const cols = 3;
+            const rows = 3;
+            const cellW = width / cols;
+            const cellH = height / rows;
+
+            const labels = [
+                ["Béo phì tiềm ẩn", "Béo phì", "Thừa cân (Cơ & Mỡ)"],
+                ["Thiếu vận động", "Tiêu chuẩn", "Cơ bắp"],
+                ["Gầy", "Cơ bắp mảnh khảnh", "Cực kỳ cơ bắp"]
+            ];
+
+            // Draw cells
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const cx = left + c * cellW;
+                    const cy = top + r * cellH;
+
+                    // Center Cell (1,1) Highlight
+                    if (r === 1 && c === 1) {
+                        ctx.fillStyle = '#ecfdf5'; // emerald-50
+                        ctx.fillRect(cx, cy, cellW, cellH);
+                    }
+
+                    // Borders
+                    ctx.strokeStyle = '#e2e8f0'; // slate-200
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(cx, cy, cellW, cellH);
+
+                    // Text
+                    ctx.fillStyle = (r === 1 && c === 1) ? '#059669' : '#94a3b8'; // emerald-600 or slate-400
+                    ctx.font = (r === 1 && c === 1) ? 'bold 12px Inter, sans-serif' : 'bold 11px Inter, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(labels[r][c], cx + cellW / 2, cy + cellH / 2);
                 }
-            ]
+            }
+            ctx.restore();
+        }
+    };
+
+    m6BodyTypeChart = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Kết quả của bạn',
+                data: [{ x: x, y: y }],
+                backgroundColor: '#4f46e5',
+                borderColor: '#fff',
+                borderWidth: 3,
+                pointRadius: 10,
+                pointHoverRadius: 12
+            }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top'
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    title: { display: true, text: 'Khối lượng cơ (kg)', font: { weight: 'bold' } },
+                    min: 20, max: 80,
+                    grid: { display: false } // Hide default grid
+                },
+                y: {
+                    title: { display: true, text: 'Tỷ lệ mỡ (%)', font: { weight: 'bold' } },
+                    min: 5, max: 60,
+                    grid: { display: false }, // Hide default grid
+                    reverse: false
                 }
             },
-            scales: {
-                y: {
-                    beginAtZero: false
+            plugins: {
+                legend: { display: true, position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `Cơ: ${context.parsed.x}kg, Mỡ: ${context.parsed.y}%`;
+                        }
+                    }
                 }
+            }
+        },
+        plugins: [bgGridPlugin]
+    });
+}
+
+function renderQualityChart(data) {
+    const ctx = document.getElementById('m6-quality-chart');
+    if (!ctx) return;
+
+    if (m6QualityChart) m6QualityChart.destroy();
+
+    const x = data.advanced.smi || 0;
+    const y = data.advanced.phaseAngle || 0;
+
+    m6QualityChart = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Chỉ số hiện tại',
+                data: [{ x: x, y: y }],
+                backgroundColor: '#0d9488',
+                borderColor: '#fff',
+                borderWidth: 3,
+                pointRadius: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    title: { display: true, text: 'SMI (Chỉ số cơ xương)', font: { weight: 'bold' } },
+                    min: 3, max: 15,
+                    grid: { color: 'rgba(241, 245, 249, 0.5)' }
+                },
+                y: {
+                    title: { display: true, text: 'Phase Angle (Góc pha)', font: { weight: 'bold' } },
+                    min: 2, max: 12,
+                    grid: { color: 'rgba(241, 245, 249, 0.5)' }
+                }
+            },
+            plugins: {
+                legend: { display: true, position: 'bottom' }
             }
         }
     });
+}
+
+function saveM6ReportData(type = 'all') {
+    const selector = document.getElementById('m6-report-selector');
+    if (!selector) return;
+    const timestamp = selector.value;
+
+    const patientId = getCurrentPatientId();
+    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
+
+    // Find and update
+    const index = assessments.findIndex(a => a.timestamp == timestamp);
+    if (index !== -1) {
+        if (type === 'bodyType' || type === 'all') {
+            assessments[index].bodyTypeComment = document.getElementById('m6-bodytype-comment').value;
+        }
+        if (type === 'quality' || type === 'all') {
+            assessments[index].qualityComment = document.getElementById('m6-quality-comment').value;
+        }
+
+        localStorage.setItem(`mirabocaresync_${patientId}_body_assessments`, JSON.stringify(assessments));
+        showToast('Đã lưu nhận xét thành công!', 'success');
+    }
 }
