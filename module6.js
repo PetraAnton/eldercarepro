@@ -803,7 +803,7 @@ function loadModule6History() {
 // Show detail
 function showModule6Detail(assessment) {
     const detail = `
-    < div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onclick = "this.remove()" >
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4 animate-fade-in" onclick="this.remove()">
         <div class="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
             <h3 class="text-xl font-bold text-slate-800 mb-4">Chi tiết Đánh giá - ${assessment.assessmentDate}</h3>
 
