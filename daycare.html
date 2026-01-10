@@ -738,6 +738,8 @@
     <script src="module4.js"></script>
     <script src="module6.js"></script>
     <script src="module7.js"></script>
+    <script src="module9.js"></script>
+    <script src="module8.js"></script>
 
     <script>
         // --- State ---
@@ -1469,11 +1471,19 @@
 
             container.innerHTML = modules.map(m => {
                 const isComplete = status[`module${m.id}`];
+                const isActive = m.id === currentModuleId;
+
+                const activeClasses = 'active-module border-blue-400 ring-[6px] ring-blue-50';
+                const inactiveClasses = 'border-slate-100 hover:border-blue-300';
+
+                const iconActiveClasses = 'bg-blue-600 text-white';
+                const iconInactiveClasses = 'bg-slate-100 text-slate-500';
+
                 return `
                 <button onclick="setActiveModule(${m.id})" id="module-btn-${m.id}" 
-                    class="w-full flex items-center justify-between p-5 rounded-3xl border transition-all text-left bg-white border-slate-100 hover:border-blue-300 group shadow-sm relative overflow-hidden">
+                    class="w-full flex items-center justify-between p-5 rounded-3xl border transition-all text-left bg-white group shadow-sm relative overflow-hidden ${isActive ? activeClasses : inactiveClasses}">
                     <div class="flex items-center gap-5 z-10">
-                        <div class="module-icon-box p-3 rounded-2xl bg-slate-100 text-slate-500 transition-all">
+                        <div class="module-icon-box p-3 rounded-2xl transition-all ${isActive ? iconActiveClasses : iconInactiveClasses}">
                             <i data-lucide="${m.icon}" class="w-5 h-5"></i>
                         </div>
                         <div>
@@ -1517,10 +1527,22 @@
 
             // Check for modern render function first (e.g., renderModule7(content))
             const renderFuncName = 'renderModule' + id;
+            console.log(`[Loader] Attempting to render module ${id}`);
+            console.log(`[Loader] Checking for function: ${renderFuncName}`, typeof window[renderFuncName]);
+
             if (typeof window[renderFuncName] === 'function') {
+                console.log(`[Loader] Function ${renderFuncName} found. Executing...`);
                 content.innerHTML = ''; // Clear previous content
-                window[renderFuncName](content);
+                try {
+                    window[renderFuncName](content);
+                    console.log(`[Loader] ${renderFuncName} executed successfully.`);
+                } catch (e) {
+                    console.error(`[Loader] Error executing ${renderFuncName}:`, e);
+                    content.innerHTML = `<div class="p-4 text-red-500">Lỗi tải module: ${e.message}</div>`;
+                }
                 return;
+            } else {
+                console.warn(`[Loader] Function ${renderFuncName} NOT found directly on window.`);
             }
 
             // Fallback to legacy string content variable (e.g., module1Content)
@@ -1550,6 +1572,18 @@
             // Placeholder for dashboard logic if needed
         }
     </script>
+
+    <!-- FAB Helper Module -->
+    <script src="fabHelper.js"></script>
+    <script src="module1.js"></script>
+    <script src="module2.js"></script>
+    <script src="module3.js"></script>
+    <script src="module4.js"></script>
+    <script src="module5.js"></script>
+    <script src="module6.js"></script>
+    <script src="module7.js"></script>
+    <script src="module8.js"></script>
+    <script src="module9.js"></script>
 </body>
 
 </html>

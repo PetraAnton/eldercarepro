@@ -578,3 +578,44 @@ function markModuleComplete(patientId, moduleKey) {
     // (This would require the side bar to re-render or check status)
     console.log(`Module ${moduleKey} marked as complete for ${patientId}`);
 }
+
+// --- Image Utils ---
+
+/**
+ * Compress Image using Canvas
+ * @param {File} file 
+ * @param {number} maxWidth 
+ * @param {number} quality (0 to 1)
+ * @param {function} callback 
+ */
+function compressImage(file, maxWidth, quality, callback) {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = event => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxWidth) {
+                height = Math.round((height * maxWidth) / width);
+                width = maxWidth;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Returns base64 string
+            const dataUrl = canvas.toDataURL('image/jpeg', quality);
+            callback(dataUrl);
+        };
+        img.onerror = (err) => {
+            console.error("Image load error", err);
+            callback(event.target.result);
+        };
+    };
+}

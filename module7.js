@@ -10,7 +10,9 @@ let m7ChartBenchmark = null;
 let m7EditingRecordId = null; // If editing a specific past record
 
 function renderModule7(container) {
+    console.log('[Module7] renderModule7 triggered');
     const patientId = getCurrentPatientId();
+    console.log('[Module7] Patient ID:', patientId);
     if (!patientId) {
         container.innerHTML = '<div class="p-8 text-center text-slate-500">Vui lòng chọn bệnh nhân.</div>';
         return;
@@ -49,6 +51,8 @@ function renderModule7(container) {
                 <!-- Content injected by switchM7Tab -->
             </div>
         </div>
+        <!-- Dedicated FAB Container (Outside Animation) -->
+        <div id="m7-fab-container"></div>
     `;
 
     // Render Initial Active Tab
@@ -73,9 +77,11 @@ function switchM7Tab(tabName, reRenderContainer = true) {
     }
 
     const contentDiv = document.getElementById('m7-tab-content');
+    const fabContainer = document.getElementById('m7-fab-container');
     if (!contentDiv) return;
 
     contentDiv.innerHTML = '';
+    if (fabContainer) fabContainer.innerHTML = ''; // Clear FABs
 
     // Cleanup Charts
     if (m7ChartHistory) { m7ChartHistory.destroy(); m7ChartHistory = null; }
@@ -85,6 +91,32 @@ function switchM7Tab(tabName, reRenderContainer = true) {
 
     if (tabName === 'create') {
         contentDiv.innerHTML = renderM7CreateTab();
+        // Inject Create FABs
+        if (fabContainer) {
+            fabContainer.innerHTML = `
+                <div id="m7-fab-buttons" class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none hidden">
+                    <!-- SAVE (Submit) -->
+                    <button type="button" id="module7-fab-save" onclick="document.getElementById('m7-create-form').requestSubmit()" 
+                        class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+                        <i data-lucide="save" class="w-7 h-7"></i>
+                        <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                            Lưu kết quả
+                        </span>
+                    </button>
+
+                    <!-- CANCEL (Reset) -->
+                    <button type="button" id="module7-fab-cancel" onclick="resetModule7Form()" 
+                        class="pointer-events-auto hidden w-12 h-12 bg-white text-rose-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-rose-100 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-rose-50 ring-2 ring-white">
+                        <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+                        <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                            Nhập lại
+                        </span>
+                    </button>
+                </div>`;
+
+            // Init Logic for dynamic content
+            setTimeout(initModule7FabLogic, 50);
+        }
     } else if (tabName === 'history') {
         contentDiv.innerHTML = renderM7HistoryTab(records);
     } else if (tabName === 'report') {
@@ -207,14 +239,19 @@ function renderM7CreateTab() {
                     </div>
                 </div>
 
-                <div class="flex justify-end pt-4">
-                    <button type="submit" class="px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg shadow-blue-500/30 hover:bg-blue-700 hover:scale-105 transition-all flex items-center gap-2">
-                        <i data-lucide="save" class="w-5 h-5"></i> Lưu kết quả đo
-                    </button>
-                </div>
-            </form>
+        </div>
+
         </div>
     `;
+}
+
+function resetModule7Form() {
+    if (confirm('Bạn có chắc chắn muốn xóa dữ liệu nhập không?')) {
+        document.getElementById('m7-create-form').reset();
+        // Reset default date to today if needed, or leave blank?
+        // Let's reset date to today
+        document.getElementById('m7-date').value = new Date().toISOString().split('T')[0];
+    }
 }
 
 function handleM7CreateSubmit(e) {
@@ -459,7 +496,7 @@ function renderM7ReportTab(data, records) {
             </div>
 
             <!-- Export/Print Button Group -->
-            <div class="fixed bottom-32 right-8 z-40 animate-fade-in flex flex-col gap-4 pointer-events-none">
+            <div class="fixed bottom-48 right-8 z-40 animate-fade-in flex flex-col gap-4 pointer-events-none">
                  <button type="button" onclick="printModule7Report()" 
                     class="pointer-events-auto w-14 h-14 bg-blue-600 text-white rounded-full shadow-[0_8px_25px_rgb(37,99,235,0.4)] hover:shadow-blue-200 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
                     <i data-lucide="printer" class="w-6 h-6"></i>
@@ -748,3 +785,30 @@ function printModule7Report() {
         printWindow.close();
     }, 1000);
 }
+
+// --- Helper for FAB ---
+// --- Helper for FAB ---
+function initModule7FabLogic() {
+    console.log('[Module7] Initializing FAB logic');
+    // Force show container
+    const container = document.getElementById('m7-fab-container');
+    if (container) {
+        container.innerHTML = `
+            <div id="m7-fab-buttons" class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
+                <!-- SAVE (Submit) -->
+                <button type="button" onclick="document.getElementById('m7-create-form').requestSubmit()" 
+                    class="pointer-events-auto w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+                    <i data-lucide="save" class="w-7 h-7"></i>
+                </button>
+
+                <!-- CANCEL (Reset) -->
+                <button type="button" onclick="resetModule7Form()" 
+                    class="pointer-events-auto w-12 h-12 bg-white text-rose-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-rose-100 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-rose-50 ring-2 ring-white">
+                    <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+                </button>
+            </div>
+        `;
+        lucide.createIcons();
+    }
+}
+

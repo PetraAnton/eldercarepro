@@ -466,46 +466,11 @@ window.module1Content = `
 
     </form>
     
-    <!-- FLOATING ACTION BUTTONS (FAB) -->
-    <div class="fixed bottom-40 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
-        
-        <!-- SAVE (Update) -->
-        <button type="button" id="fab-save-btn" onclick="document.getElementById('module1-form').requestSubmit()" 
-            class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-            <i data-lucide="save" class="w-7 h-7"></i>
-            <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Lưu hồ sơ
-            </span>
-        </button>
+</div>
 
-        <!-- EDIT (View Mode) -->
-        <button type="button" id="fab-edit-btn" onclick="toggleModule1EditMode(true)" 
-            class="pointer-events-auto w-14 h-14 bg-amber-500 text-white rounded-full shadow-[0_8px_25px_rgb(245,158,11,0.5)] hover:bg-amber-400 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-            <i data-lucide="edit-2" class="w-6 h-6"></i>
-             <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Chỉnh sửa
-            </span>
-        </button>
-
-        <!-- CANCEL (Edit Mode) -->
-        <button type="button" id="fab-cancel-btn" onclick="cancelModule1Edit()" 
-            class="pointer-events-auto hidden w-12 h-12 bg-white text-rose-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-rose-100 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-rose-50 ring-2 ring-white">
-            <i data-lucide="x" class="w-6 h-6"></i>
-             <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Hủy bỏ
-            </span>
-        </button>
-
-        <!-- RESET (Edit Mode) -->
-        <button type="button" id="fab-reset-btn" onclick="resetModule1Form()" 
-            class="pointer-events-auto w-10 h-10 bg-white text-slate-400 rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.05)] hover:shadow-slate-200 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-slate-100 ring-2 ring-white">
-            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-             <span class="absolute right-14 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Nhập lại
-            </span>
-        </button>
-    </div>
-
+<!-- FAB Container (managed by FAB Helper) -->
+<div id="module1-fab-container" class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none hidden">
+    <!-- FABs will be injected here by FAB Manager -->
 </div>
 `;
 
@@ -541,6 +506,22 @@ function addContactPerson(data = null) {
 // Global variable to store resetFormState function
 let module1ResetFormState = null;
 let originalFormData = null; // Store original data for discard
+let m1IsDirty = false; // Dirty check flag
+
+// Init FAB Logic
+function initModule1FabLogic() {
+    const form = document.getElementById('module1-form');
+    // Dirty Check Listener
+    form.addEventListener('input', () => {
+        if (!m1IsDirty) {
+            m1IsDirty = true;
+            updateModule1FabState('edit'); // Assuming generic input happens in edit mode
+        }
+    });
+
+    // Also listen for contact additions (DOM changes not caught by input)
+    // We can manually set dirty in addContactPerson
+}
 
 // Reset Form (Create Mode)
 function resetModule1Form() {
@@ -548,77 +529,19 @@ function resetModule1Form() {
         document.getElementById('module1-form').reset();
         document.getElementById('contact-list').innerHTML = '';
         addContactPerson(); // Add empty first item
-
-        // Reset form state (disable save button)
-        if (typeof module1ResetFormState === 'function') {
-            module1ResetFormState();
-        }
-
+        m1IsDirty = false;
+        // Hide FABs in Create Mode until input?
+        // Actually, Reset should stay if we want to confirm clear.
+        // Or if clear, hide save/reset?
+        // User rule: "nếu chưa có bản ghi thì có thay đổi sẽ hiển thị button lưu và button hủy"
+        // So upon reset (clearing), we go back to 'clean create' state -> Hide Save/Reset.
+        updateModule1FabState('create');
         showToast('Đã xóa dữ liệu form', 'info');
     }
 }
-
-// Cancel Edit (Update Mode)
-function cancelModule1Edit() {
-    if (confirm('Hủy bỏ thay đổi? Dữ liệu sẽ quay về trạng thái cũ.')) {
-        if (originalFormData) {
-            loadFacesheetData(originalFormData); // Revert data
-            toggleModule1EditMode(false); // Switch to view mode
-            showToast('Đã hủy bỏ thay đổi', 'info');
-        } else {
-            // Fallback if no original data (shouldn't happen in edit mode)
-            location.reload();
-        }
-    }
-}
-
-// Toggle Edit/View Mode
-// Toggle Edit/View Mode
-// Toggle Edit/View Mode
-function toggleModule1EditMode(isEdit) {
-    const form = document.getElementById('module1-form');
-    // FABs
-    const fabEdit = document.getElementById('fab-edit-btn');
-    const fabSave = document.getElementById('fab-save-btn');
-    const fabCancel = document.getElementById('fab-cancel-btn');
-    const fabReset = document.getElementById('fab-reset-btn');
-
-    const inputs = form.querySelectorAll('input, select, textarea, button[onclick="addContactPerson()"]');
-    const deleteBtns = form.querySelectorAll('.contact-item button');
-
-    if (isEdit) {
-        // Enable Form
-        inputs.forEach(input => input.disabled = false);
-        deleteBtns.forEach(btn => btn.disabled = false);
-
-        // UI State: Edit Mode
-        // UI State: Edit Mode
-        if (fabEdit) fabEdit.classList.add('hidden');
-        // Save Button: Hidden initially, shown only on change (handled by setupFormChangeDetection callback)
-        if (fabSave) fabSave.classList.add('hidden');
-        if (fabCancel) fabCancel.classList.remove('hidden');
-        if (fabReset) fabReset.classList.add('hidden'); // Optional: show if needed
-
-    } else {
-        // Disable Form (View Mode)
-        inputs.forEach(input => input.disabled = true);
-        deleteBtns.forEach(btn => btn.disabled = true);
-
-        // UI State: View Mode
-        if (fabEdit) fabEdit.classList.remove('hidden');
-        if (fabSave) fabSave.classList.add('hidden');
-        if (fabCancel) fabCancel.classList.add('hidden');
-        if (fabReset) fabReset.classList.add('hidden');
-    }
-
-    // Create new icons if needed
-    lucide.createIcons();
-}
-
 // Load Data into Form
-function loadFacesheetData(data) {
+function loadModule1Data(data) {
     if (!data) return;
-    originalFormData = data; // Cache for revert
 
     // Helper to safely set value
     const setVal = (id, val) => {
@@ -716,90 +639,13 @@ function loadFacesheetData(data) {
     }
 }
 
-// Initialize Module
-function initModule1() {
-    const patientId = getCurrentPatientId();
-    const savedData = localStorage.getItem(`mirabocaresync_${patientId}_facesheet`);
-
-    // 1. Check for existing data
-    if (savedData) {
-        try {
-            const data = JSON.parse(savedData);
-            loadFacesheetData(data);
-            toggleModule1EditMode(false); // Default to View Mode
-        } catch (e) {
-            console.error('Error loading facesheet data:', e);
-        }
-    } else {
-        // 2. Auto-populate from patient creation data (New Record)
-        const patient = getPatientById(patientId);
-        if (patient) {
-            if (patient.fullName && document.getElementById('fullName')) {
-                document.getElementById('fullName').value = patient.fullName;
-            }
-            if (patient.dateOfBirth && document.getElementById('dob')) {
-                document.getElementById('dob').value = patient.dateOfBirth;
-                // Auto-calculate age
-                const age = new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear();
-                if (document.getElementById('age')) {
-                    document.getElementById('age').value = age + ' tuổi';
-                }
-            }
-            if (patient.gender && document.getElementById('gender')) {
-                document.getElementById('gender').value = patient.gender;
-            }
-        }
-    }
-
-    // Setup form change detection and store in global variable
-    const resetFormState = setupFormChangeDetection('module1-form', 'fab-save-btn', (isDirty) => {
-        const fabSave = document.getElementById('fab-save-btn');
-        if (!fabSave) return;
-
-        // Only toggle visibility if we are in Edit Mode
-        const fabEdit = document.getElementById('fab-edit-btn');
-        const isEditMode = fabEdit && fabEdit.classList.contains('hidden');
-
-        if (isEditMode) {
-            if (isDirty) {
-                fabSave.classList.remove('hidden');
-            } else {
-                fabSave.classList.add('hidden');
-            }
-        } else {
-            fabSave.classList.add('hidden');
-        }
-    });
-    module1ResetFormState = resetFormState; // Make accessible to resetForm()
-
-    // Add initial contact if empty
-    if (document.getElementById('contact-list') && document.getElementById('contact-list').children.length === 0) {
-        addContactPerson();
-    }
-
-    // Auto calculate age
-    document.getElementById('dob')?.addEventListener('change', function () {
-        if (this.value) {
-            const age = new Date().getFullYear() - new Date(this.value).getFullYear();
-            document.getElementById('age').value = age + ' tuổi';
-        }
-    });
-
-    // Handle Form Submit
-    document.getElementById('module1-form')?.addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        // Check if updating an existing record (Edit Mode) logic
-        // We rely on originalFormData existence to determine if it's an update
-
-        // Confirmation for Update
-        // Logic: If view-mode is hidden and edit-mode is shown, we are in edit mode. 
-        // But actually, toggleEditMode handles visibility. 
-        // Regardless, 'submit' is the action to Save/Update.
-
-        // Confirmation for Update
-        if (originalFormData && !confirm('Ban có chắc muốn cập nhật thông tin hồ sơ này?')) {
-            return;
+// Save Module 1 Data
+function saveModule1Data() {
+    try {
+        const patientId = getCurrentPatientId();
+        if (!patientId) {
+            showToast('Vui lòng chọn bệnh nhân trước!', 'error');
+            return false;
         }
 
         // 1. Collect Data
@@ -863,11 +709,12 @@ function initModule1() {
         };
 
         // 2. Save to LocalStorage
-        const patientId = getCurrentPatientId();
         localStorage.setItem(`mirabocaresync_${patientId}_facesheet`, JSON.stringify(formData));
 
         // 3. Mark module as complete
-        markModuleComplete(patientId, 'module1');
+        if (typeof markModuleComplete === 'function') {
+            markModuleComplete(patientId, 'module1');
+        }
 
         // 4. Feedback & UI Update
         showToast('Đã lưu hồ sơ thành công!', 'success');
@@ -877,13 +724,88 @@ function initModule1() {
 
         console.log('Face Sheet Saved:', formData);
 
-        // Update original data cache and switch to view mode
-        originalFormData = formData;
-        toggleModule1EditMode(false);
+        return true; // Return success
+    } catch (e) {
+        console.error('Error saving module 1:', e);
+        showToast('Lỗi khi lưu: ' + e.message, 'error');
+        return false;
+    }
+}
 
-        // Reset save button state
-        if (typeof module1ResetFormState === 'function') {
-            module1ResetFormState();
+// Initialize Module 1
+function initModule1() {
+    const patientId = getCurrentPatientId();
+    const savedData = localStorage.getItem(`mirabocaresync_${patientId}_facesheet`);
+
+    // Create FAB Manager
+    window.module1FAB = createFABManager({
+        moduleId: 'module1',
+        formId: 'module1-form',
+
+        // Check if data exists
+        hasExistingData: () => {
+            const pid = getCurrentPatientId();
+            const data = localStorage.getItem(`mirabocaresync_${pid}_facesheet`);
+            return !!data;
+        },
+
+        // Load original data (for cancel/revert)
+        loadOriginalData: () => {
+            const pid = getCurrentPatientId();
+            const data = localStorage.getItem(`mirabocaresync_${pid}_facesheet`);
+            if (data) {
+                const parsed = JSON.parse(data);
+                loadModule1Data(parsed);
+                return parsed;
+            }
+            return null;
+        },
+
+        // Save callback
+        onSave: () => {
+            return saveModule1Data();
+        },
+
+        // Reset callback
+        onReset: () => {
+            console.log('Module 1 form reset');
+        },
+
+        enableEdit: true
+    });
+
+    // Initialize FAB
+    window.module1FAB.init();
+
+    // Load existing data if available
+    if (savedData) {
+        try {
+            const data = JSON.parse(savedData);
+            loadModule1Data(data);
+        } catch (e) {
+            console.error('Error loading module 1 data:', e);
+        }
+    } else {
+        // Add initial contact if empty
+        if (document.getElementById('contact-list')?.children.length === 0) {
+            addContactPerson();
+        }
+    }
+
+    // Auto calculate age
+    document.getElementById('dob')?.addEventListener('change', function () {
+        if (this.value) {
+            const age = new Date().getFullYear() - new Date(this.value).getFullYear();
+            const ageField = document.getElementById('age');
+            if (ageField) ageField.value = age + ' tuổi';
         }
     });
+
+    // Form submission handler
+    document.getElementById('module1-form')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        window.module1FAB.save();
+    });
+
+    lucide.createIcons();
 }

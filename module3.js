@@ -459,10 +459,13 @@ window.module3Content = `
         
     </form>
 
-    <!-- FLOATING ACTION BUTTONS (FAB) -->
-    <div class="fixed bottom-40 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
+</div>
+
+
+    <!-- FLOATING ACTION BUTTONS (FAB) - Moved Outside -->
+    <div id="module3-fab-container" class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
         
-        <!-- SAVE (Update) -->
+        <!-- SAVE (Create Mode) -->
         <button type="button" id="module3-fab-save" onclick="saveModule3Assessment()" 
             class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
             <i data-lucide="save" class="w-7 h-7"></i>
@@ -471,21 +474,30 @@ window.module3Content = `
             </span>
         </button>
 
+        <!-- UPDATE (Edit Mode) -->
+        <button type="button" id="module3-fab-update" onclick="saveModule3Assessment()" 
+            class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+            <i data-lucide="save" class="w-7 h-7"></i>
+            <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                Lưu thay đổi
+            </span>
+        </button>
+
         <!-- EDIT (View Mode) -->
         <button type="button" id="module3-fab-edit" onclick="toggleModule3EditMode(true)" 
             class="pointer-events-auto w-14 h-14 bg-amber-500 text-white rounded-full shadow-[0_8px_25px_rgb(245,158,11,0.5)] hover:bg-amber-400 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
             <i data-lucide="edit-2" class="w-6 h-6"></i>
-             <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+            <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
                 Chỉnh sửa
             </span>
         </button>
 
-        <!-- CANCEL (Edit Mode) -->
-        <button type="button" id="module3-fab-cancel" onclick="cancelModule3Edit()" 
-            class="pointer-events-auto hidden w-12 h-12 bg-white text-rose-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-rose-100 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-rose-50 ring-2 ring-white">
+        <!-- CLOSE (Cancel Edit) -->
+        <button type="button" id="module3-fab-close" onclick="cancelModule3Edit()" 
+            class="pointer-events-auto hidden w-12 h-12 bg-white text-slate-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-slate-200 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-slate-100 ring-2 ring-white">
             <i data-lucide="x" class="w-6 h-6"></i>
-             <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Hủy bỏ
+            <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                Đóng / Hủy
             </span>
         </button>
     </div>
@@ -515,15 +527,62 @@ function updateADLScore() {
 // Global state
 let module3ResetFormState = null;
 let module3OriginalData = null;
+let m3IsDirty = false;
+
+// Init FAB Logic
+function initModule3FabLogic() {
+    const form = document.getElementById('module3-form');
+    // Listen for changes
+    form.addEventListener('input', () => {
+        if (!m3IsDirty) {
+            m3IsDirty = true;
+            updateModule3FabState('edit'); // Assume edit if inputting? 
+            // Better to check current mode. But inputs are disabled in view mode.
+        }
+    });
+    // Also change event for radios
+    form.addEventListener('change', () => {
+        if (!m3IsDirty) {
+            m3IsDirty = true;
+            updateModule3FabState('edit');
+        }
+    });
+}
+
+// Update FAB State
+function updateModule3FabState(mode) {
+    const editBtn = document.getElementById('module3-fab-edit');
+    const saveBtn = document.getElementById('module3-fab-save');
+    const updateBtn = document.getElementById('module3-fab-update');
+    const closeBtn = document.getElementById('module3-fab-close');
+
+    // Hide all
+    if (editBtn) editBtn.classList.add('hidden');
+    if (saveBtn) saveBtn.classList.add('hidden');
+    if (updateBtn) updateBtn.classList.add('hidden');
+    if (closeBtn) closeBtn.classList.add('hidden');
+
+    if (mode === 'view') {
+        if (editBtn) editBtn.classList.remove('hidden');
+    } else if (mode === 'edit') {
+        if (closeBtn) closeBtn.classList.remove('hidden'); // Always show Close
+        if (m3IsDirty) {
+            if (updateBtn) updateBtn.classList.remove('hidden'); // Show Update
+        }
+    } else if (mode === 'create') {
+        // Not explicitly used in M3 (it loads data or empty), but if empty -> Is Create?
+        // Let's assume M3 is always Edit if data exists, or Create if not.
+        // For simplicity, M3 uses 'edit' mode for both dirty checking.
+        if (m3IsDirty) {
+            if (saveBtn) saveBtn.classList.remove('hidden');
+            if (closeBtn) closeBtn.classList.remove('hidden'); // Or Reset?
+        }
+    }
+}
 
 // Toggle Edit/View Mode
 function toggleModule3EditMode(isEdit) {
     const form = document.getElementById('module3-form');
-    // FABs
-    const fabEdit = document.getElementById('module3-fab-edit');
-    const fabSave = document.getElementById('module3-fab-save');
-    const fabCancel = document.getElementById('module3-fab-cancel');
-
     // Select inputs (excluding read-only displays if any)
     const inputs = form.querySelectorAll('input, textarea');
 
@@ -531,29 +590,46 @@ function toggleModule3EditMode(isEdit) {
         // Enable Form
         inputs.forEach(input => input.disabled = false);
 
-        // UI State: Edit Mode
-        if (fabEdit) fabEdit.classList.add('hidden');
-        // Save Button: Hidden initially, shown only on change (handled by setupFormChangeDetection callback)
-        if (fabSave) fabSave.classList.add('hidden');
-        if (fabCancel) fabCancel.classList.remove('hidden');
-
         // Show validation styling or hints if needed
         form.classList.remove('opacity-80', 'pointer-events-none');
+
+        // If we have data, it's Edit mode. If not, Create?
+        // Simple heuristic: If originalData is set, it's Edit.
+        const mode = module3OriginalData ? 'edit' : 'create';
+        updateModule3FabState(mode);
+
     } else {
         // Disable Form (View Mode)
         inputs.forEach(input => input.disabled = true);
 
-        // UI State: View Mode
-        if (fabEdit) fabEdit.classList.remove('hidden');
-        if (fabSave) fabSave.classList.add('hidden');
-        if (fabCancel) fabCancel.classList.add('hidden');
-
         // Visual indicator for Read-Only
         form.classList.add('opacity-80');
+
+        m3IsDirty = false;
+        updateModule3FabState('view');
     }
 
     // Create new icons if needed
     lucide.createIcons();
+}
+
+// Cancel Edit
+function cancelModule3Edit() {
+    if (m3IsDirty) {
+        if (confirm('Hủy bỏ thay đổi? Dữ liệu sẽ quay về trạng thái cũ.')) {
+            if (module3OriginalData) {
+                loadModule3Data(module3OriginalData);
+                toggleModule3EditMode(false);
+                showToast('Đã hủy bỏ thay đổi', 'info');
+            } else {
+                // Clear form?
+                document.getElementById('module3-form').reset();
+                toggleModule3EditMode(false); // Go to view (empty)
+            }
+        }
+    } else {
+        toggleModule3EditMode(false);
+    }
 }
 
 
@@ -561,6 +637,7 @@ function toggleModule3EditMode(isEdit) {
 function loadModule3Data(data) {
     if (!data) return;
     module3OriginalData = data; // Cache for revert
+    m3IsDirty = false;
 
     // Helper to safely set value
     const setVal = (id, val) => {

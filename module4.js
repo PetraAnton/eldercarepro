@@ -223,36 +223,56 @@ window.module4Content = `
         
     </form>
 
-    <!-- FLOATING ACTION BUTTONS (FAB) -->
-    <div class="fixed bottom-40 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
-        
-        <!-- SAVE (Update) -->
-        <button type="button" id="module4-fab-save" onclick="saveModule4Assessment()" 
-            class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-pink-600 to-rose-500 text-white rounded-full shadow-[0_8px_30px_rgb(219,39,119,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-            <i data-lucide="save" class="w-7 h-7"></i>
-            <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Lưu đánh giá
-            </span>
-        </button>
+</div>
 
-        <!-- EDIT (View Mode) -->
-        <button type="button" id="module4-fab-edit" onclick="toggleModule4EditMode(true)" 
-            class="pointer-events-auto w-14 h-14 bg-amber-500 text-white rounded-full shadow-[0_8px_25px_rgb(245,158,11,0.5)] hover:bg-amber-400 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-            <i data-lucide="edit-2" class="w-6 h-6"></i>
-             <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Chỉnh sửa
-            </span>
-        </button>
+<!-- FLOATING ACTION BUTTONS (FAB) - Moved Outside -->
+<!-- FABs for Module 4 -->
+<div id="module4-fab-container" class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
+    
+    <!-- SAVE (Create Mode) -->
+    <button type="button" id="module4-fab-save" onclick="saveModule4Assessment()" 
+        class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-pink-600 to-rose-500 text-white rounded-full shadow-[0_8px_30px_rgb(219,39,119,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+        <i data-lucide="save" class="w-7 h-7"></i>
+        <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+            Lưu đánh giá
+        </span>
+    </button>
 
-        <!-- CANCEL (Edit Mode) -->
-        <button type="button" id="module4-fab-cancel" onclick="cancelModule4Edit()" 
-            class="pointer-events-auto hidden w-12 h-12 bg-white text-rose-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-rose-100 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-rose-50 ring-2 ring-white">
-            <i data-lucide="x" class="w-6 h-6"></i>
-             <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Hủy bỏ
-            </span>
-        </button>
-    </div>
+    <!-- UPDATE (Edit Mode) -->
+    <button type="button" id="module4-fab-update" onclick="saveModule4Assessment()" 
+        class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+        <i data-lucide="save" class="w-7 h-7"></i>
+        <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+            Lưu thay đổi
+        </span>
+    </button>
+
+    <!-- EDIT (View Mode) -->
+    <button type="button" id="module4-fab-edit" onclick="toggleModule4EditMode(true)" 
+        class="pointer-events-auto w-14 h-14 bg-amber-500 text-white rounded-full shadow-[0_8px_25px_rgb(245,158,11,0.5)] hover:bg-amber-400 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+        <i data-lucide="edit-2" class="w-6 h-6"></i>
+        <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+            Chỉnh sửa
+        </span>
+    </button>
+
+    <!-- CLOSE (Cancel Edit) -->
+    <button type="button" id="module4-fab-close" onclick="cancelModule4Edit()" 
+        class="pointer-events-auto hidden w-12 h-12 bg-white text-slate-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-slate-200 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-slate-100 ring-2 ring-white">
+        <i data-lucide="x" class="w-6 h-6"></i>
+        <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+            Đóng / Hủy
+        </span>
+    </button>
+
+    <!-- RESET (Create Mode) -->
+    <button type="button" id="module4-fab-reset" onclick="resetModule4Form()" 
+        class="pointer-events-auto hidden w-12 h-12 bg-white text-rose-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-rose-100 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-rose-50 ring-2 ring-white">
+        <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+        <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+            Nhập lại
+        </span>
+    </button>
 </div>
 `;
 
@@ -335,45 +355,89 @@ function toggleCategory(categoryId) {
 // Global state
 let module4ResetFormState = null;
 let module4OriginalData = null;
+let m4IsDirty = false;
+
+// Init FAB Logic
+function initModule4FabLogic() {
+    const form = document.getElementById('module4-form');
+    // Listen for changes
+    form.addEventListener('input', () => {
+        if (!m4IsDirty) {
+            m4IsDirty = true;
+            updateModule4FabState('edit');
+        }
+    });
+    // Checkbox changes
+    form.addEventListener('change', () => {
+        if (!m4IsDirty) {
+            m4IsDirty = true;
+            updateModule4FabState('edit');
+        }
+        // Also update recommendations on change
+        updateRecommendations();
+    });
+}
+
+// Update FAB State
+function updateModule4FabState(mode) {
+    const editBtn = document.getElementById('module4-fab-edit');
+    const saveBtn = document.getElementById('module4-fab-save');
+    const updateBtn = document.getElementById('module4-fab-update');
+    const closeBtn = document.getElementById('module4-fab-close');
+    const resetBtn = document.getElementById('module4-fab-reset');
+
+    // Hide all
+    if (editBtn) editBtn.classList.add('hidden');
+    if (saveBtn) saveBtn.classList.add('hidden');
+    if (updateBtn) updateBtn.classList.add('hidden');
+    if (closeBtn) closeBtn.classList.add('hidden');
+    if (resetBtn) resetBtn.classList.add('hidden');
+
+    if (mode === 'view') {
+        if (editBtn) editBtn.classList.remove('hidden');
+    } else if (mode === 'edit') {
+        if (closeBtn) closeBtn.classList.remove('hidden');
+        if (m4IsDirty) {
+            if (updateBtn) updateBtn.classList.remove('hidden');
+        }
+    } else if (mode === 'create') {
+        if (m4IsDirty) {
+            if (saveBtn) saveBtn.classList.remove('hidden');
+            if (resetBtn) resetBtn.classList.remove('hidden');
+        }
+    }
+}
 
 // Toggle Edit/View Mode
 function toggleModule4EditMode(isEdit) {
     const form = document.getElementById('module4-form');
-    // FABs
-    const fabEdit = document.getElementById('module4-fab-edit');
-    const fabSave = document.getElementById('module4-fab-save');
-    const fabCancel = document.getElementById('module4-fab-cancel');
-
-    // Select inputs (excluding read-only displays if any)
+    // Select inputs
     const inputs = form.querySelectorAll('input, textarea');
 
     if (isEdit) {
         // Enable Form
         inputs.forEach(input => input.disabled = false);
 
-        // UI State: Edit Mode
-        if (fabEdit) fabEdit.classList.add('hidden');
-        if (fabSave) fabSave.classList.add('hidden');
-        if (fabCancel) fabCancel.classList.remove('hidden');
-
         // Show validation styling or hints if needed
         form.classList.remove('opacity-80', 'pointer-events-none');
+
+        const mode = module4OriginalData ? 'edit' : 'create';
+        updateModule4FabState(mode);
+
     } else {
         // Disable Form (View Mode)
         inputs.forEach(input => input.disabled = true);
 
-        // UI State: View Mode
-        if (fabEdit) fabEdit.classList.remove('hidden');
-        if (fabSave) fabSave.classList.add('hidden');
-        if (fabCancel) fabCancel.classList.add('hidden');
-
         // Visual indicator for Read-Only
         form.classList.add('opacity-80');
+
+        m4IsDirty = false;
+        updateModule4FabState('view');
     }
 
-    // Create new icons if needed
     lucide.createIcons();
 }
+
 
 // Load Data into Form
 function loadModule4Data(data) {
@@ -417,19 +481,25 @@ function loadModule4Data(data) {
 
 // Cancel Edit
 function cancelModule4Edit() {
-    if (confirm('Hủy bỏ thay đổi? Dữ liệu sẽ quay về trạng thái cũ.')) {
-        if (module4OriginalData) {
-            loadModule4Data(module4OriginalData); // Revert data
-            toggleModule4EditMode(false); // Switch to view mode
-            showToast('Đã hủy bỏ thay đổi', 'info');
-        } else {
-            // If no data existed, clear form
-            document.getElementById('module4-form').reset();
-            updateRecommendations();
-            toggleModule4EditMode(true); // Stay in edit mode as "New"
+    if (m4IsDirty) {
+        if (confirm('Hủy bỏ thay đổi? Dữ liệu sẽ quay về trạng thái cũ.')) {
+            if (module4OriginalData) {
+                loadModule4Data(module4OriginalData); // Revert data
+                toggleModule4EditMode(false); // Switch to view mode
+                showToast('Đã hủy bỏ thay đổi', 'info');
+            } else {
+                // If no data existed, clear form
+                document.getElementById('module4-form').reset();
+                updateRecommendations();
+                m4IsDirty = false;
+                updateModule4FabState('create');
+            }
         }
+    } else {
+        toggleModule4EditMode(false);
     }
 }
+
 
 // Reset Form
 function resetModule4Form() {
@@ -486,29 +556,9 @@ function initModule4() {
         }
     }
 
-    // Setup form change detection
-    // Note: 'module4-fab-save' is the ID of the FAB save button
-    const resetFormState = setupFormChangeDetection('module4-form', 'module4-fab-save', (isDirty) => {
-        const fabSave = document.getElementById('module4-fab-save');
-        if (!fabSave) return;
+    // Default mode: Edit if new, View if exists
+    initModule4FabLogic();
 
-        // Only toggle visibility if we are in Edit Mode (inputs not disabled)
-        // Check generic input state or check if fabEdit is hidden
-        const fabEdit = document.getElementById('module4-fab-edit');
-        const isEditMode = fabEdit && fabEdit.classList.contains('hidden');
-
-        if (isEditMode) {
-            if (isDirty) {
-                fabSave.classList.remove('hidden');
-            } else {
-                fabSave.classList.add('hidden');
-            }
-        } else {
-            // In View Mode, Save is always hidden
-            fabSave.classList.add('hidden');
-        }
-    });
-    module4ResetFormState = resetFormState;
 
 
     // Global Save Function for Module 4
@@ -571,6 +621,7 @@ function initModule4() {
 
         // Update State
         module4OriginalData = assessmentData;
+        m4IsDirty = false;
         toggleModule4EditMode(false); // Switch to View Mode
 
         // Reset form state

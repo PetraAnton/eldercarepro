@@ -3,12 +3,12 @@ window.module2Content = `
 <div class="animate-fade-in">
     <!-- Tab Navigation -->
     <div class="flex gap-4 mb-6 border-b-2 border-slate-100">
-        <button onclick="switchModule2Tab('form')" id="tab-form" 
+        <button onclick="switchModule2Tab('form'); toggleM2Fab(true)" id="tab-form" 
             class="tab-button px-6 py-3 font-bold text-sm rounded-t-xl transition-all border-b-4 border-emerald-600 text-emerald-600 bg-emerald-50">
             <i data-lucide="file-edit" class="w-4 h-4 inline mr-2"></i>
             Tạo biên bản mới
         </button>
-        <button onclick="switchModule2Tab('history')" id="tab-history"
+        <button onclick="switchModule2Tab('history'); toggleM2Fab(false)" id="tab-history"
             class="tab-button px-6 py-3 font-bold text-sm rounded-t-xl transition-all border-b-4 border-transparent text-slate-400 hover:text-slate-600 hover:bg-slate-50">
             <i data-lucide="history" class="w-4 h-4 inline mr-2"></i>
             Lịch sử họp
@@ -234,19 +234,7 @@ window.module2Content = `
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t-2 border-slate-100">
-                <button type="submit" id="module2-save-btn"
-                    class="flex-1 px-8 py-4 bg-emerald-600 text-white rounded-2xl font-black text-sm hover:bg-emerald-700 shadow-xl shadow-emerald-500/20 transition-all">
-                    <i data-lucide="save" class="w-4 h-4 inline mr-2"></i>
-                    Lưu biên bản họp
-                </button>
-                <button type="button" onclick="resetModule2Form()"
-                    class="px-8 py-4 bg-slate-100 text-slate-600 rounded-2xl font-black text-sm hover:bg-slate-200 transition-all">
-                    <i data-lucide="x" class="w-4 h-4 inline mr-2"></i>
-                    Hủy
-                </button>
-            </div>
+            <!-- FAB moved to m2-fab-container -->
             
         </form>
     </div>
@@ -276,11 +264,75 @@ window.module2Content = `
             </div>
         </div>
     </div>
+
+    <!-- FAB Container (managed by FAB Helper) -->
+    <div id="module2-fab-container" class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none hidden">
+        <!-- FABs will be injected here by FAB Manager -->
+    </div>
 </div>
 `;
 
 // Global State for Module 2
 let m2EditingIndex = null;
+
+// Initialize Module 2
+function initModule2() {
+    // Create FAB Manager
+    window.module2FAB = createFABManager({
+        moduleId: 'module2',
+        formId: 'module2-form',
+
+        // Module 2 is always in create mode unless editing from history
+        hasExistingData: () => {
+            const hasData = m2EditingIndex !== null;
+            console.log('[Module2 FAB] hasExistingData check:', hasData, 'm2EditingIndex:', m2EditingIndex);
+            return hasData;
+        },
+
+        // Load original data (for cancel/revert when editing)
+        loadOriginalData: () => {
+            if (m2EditingIndex !== null) {
+                const patientId = getCurrentPatientId();
+                const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_meetings`) || '[]');
+                if (m2EditingIndex >= 0 && m2EditingIndex < meetings.length) {
+                    const meeting = meetings[m2EditingIndex];
+                    loadModule2MeetingData(meeting);
+                    return meeting;
+                }
+            }
+            return null;
+        },
+
+        // Save callback
+        onSave: () => {
+            return saveModule2Meeting();
+        },
+
+        // Reset callback
+        onReset: () => {
+            resetModule2Form();
+        },
+
+        // Revert callback (when cancel edit)
+        onRevert: (data) => {
+            console.log('[Module2 FAB] onRevert called - resetting state');
+            // Reset editing state
+            m2EditingIndex = null;
+            console.log('[Module2 FAB] m2EditingIndex set to null');
+
+            // Clear form completely
+            resetModule2Form(true); // Pass true to skip confirmation
+            console.log('[Module2 FAB] Form reset complete');
+        },
+
+        enableEdit: true
+    });
+
+    // Initialize FAB
+    window.module2FAB.init();
+
+    lucide.createIcons();
+}
 
 // Module 2 JavaScript Functions
 function switchModule2Tab(tabName) {
@@ -304,6 +356,12 @@ function switchModule2Tab(tabName) {
     // Load history if switching to history tab
     if (tabName === 'history') {
         loadMeetingHistory();
+        // Force hide FAB container
+        const fab = document.getElementById('m2-fab-container');
+        if (fab) fab.classList.add('hidden');
+    } else {
+        // If switching to form, update state to show (if applicable)
+        updateModule2FabState();
     }
 
     lucide.createIcons();
@@ -488,6 +546,7 @@ function showMeetingDetail(index) {
                 </div>
             </div>
         </div>
+        </div>
     `;
 
     lucide.createIcons();
@@ -531,28 +590,120 @@ function addParticipant() {
 
 // Global variable to store resetFormState function
 let module2ResetFormState = null;
+let m2IsDirty = false;
+
+// Init FAB Logic
+// Init FAB Logic
+function initModule2FabLogic() {
+    const form = document.getElementById('module2-form');
+    if (!form) return;
+
+    form.addEventListener('input', () => {
+        if (!m2IsDirty) {
+            m2IsDirty = true;
+            // Determine mode
+            const mode = m2EditingIndex !== null ? 'edit' : 'create';
+            updateModule2FabState(mode);
+        }
+    });
+
+    // Also listen for change
+    form.addEventListener('change', () => {
+        if (!m2IsDirty) {
+            m2IsDirty = true;
+            const mode = m2EditingIndex !== null ? 'edit' : 'create';
+            updateModule2FabState(mode);
+        }
+    });
+}
+
+// Update FAB State
+function updateModule2FabState(mode) {
+    const fabContainer = document.getElementById('m2-fab-container');
+    const formTab = document.getElementById('content-form');
+
+    // Safety check: if Form Tab is hidden (e.g. History tab), hide container and return
+    if (!formTab || formTab.classList.contains('hidden')) {
+        if (fabContainer) fabContainer.classList.add('hidden');
+        return;
+    }
+
+    if (fabContainer) fabContainer.classList.remove('hidden');
+
+    const saveBtn = document.getElementById('m2-fab-save-btn');
+    const updateBtn = document.getElementById('m2-fab-update-btn');
+    const closeBtn = document.getElementById('m2-fab-close-btn');
+    const cancelBtn = document.getElementById('m2-fab-cancel-btn');
+
+    // Hide all
+    if (saveBtn) saveBtn.classList.add('hidden');
+    if (updateBtn) updateBtn.classList.add('hidden');
+    if (closeBtn) closeBtn.classList.add('hidden');
+    if (cancelBtn) cancelBtn.classList.add('hidden');
+
+    if (mode === 'edit') {
+        if (closeBtn) closeBtn.classList.remove('hidden');
+        if (m2IsDirty) {
+            if (updateBtn) updateBtn.classList.remove('hidden');
+        }
+    } else if (mode === 'create') {
+        if (m2IsDirty) {
+            if (saveBtn) saveBtn.classList.remove('hidden');
+            if (cancelBtn) cancelBtn.classList.remove('hidden');
+        }
+    }
+}
+
+// Check Tab Switch (Optional safety)
+function checkModule2Dirty() {
+    if (m2IsDirty) {
+        return confirm('Bạn có thay đổi chưa lưu. Bạn có chắc muốn rời đi?');
+    }
+    return true;
+}
 
 // Reset Form
-function resetModule2Form() {
-    if (confirm('Bạn có chắc muốn xóa tất cả dữ liệu đã nhập?')) {
+function resetModule2Form(skipConfirm = false) {
+    const shouldReset = skipConfirm || confirm('Bạn có chắc muốn xóa tất cả dữ liệu đã nhập?');
+
+    if (shouldReset) {
         document.getElementById('module2-form').reset();
+
         // Reset other textareas
         document.getElementById('basicInfoOtherText').value = '';
         document.getElementById('basicInfoOtherText').disabled = true;
         document.getElementById('riskOtherText').value = '';
         document.getElementById('riskOtherText').disabled = true;
 
-        // Reset form state (disable save button)
-        if (typeof module2ResetFormState === 'function') {
-            module2ResetFormState();
+        // Reset participants list to one empty item
+        const pContainer = document.getElementById('participants-list');
+        if (pContainer) {
+            pContainer.innerHTML = '';
+            addParticipant(); // Add one empty participant
         }
 
-        showToast('Đã xóa dữ liệu form', 'info');
+        m2IsDirty = false;
+        m2EditingIndex = null;
+
+        if (!skipConfirm) {
+            showToast('Đã xóa dữ liệu form', 'info');
+        }
     }
-    m2EditingIndex = null;
-    const saveBtn = document.getElementById('module2-save-btn');
-    if (saveBtn) {
-        saveBtn.innerHTML = '<i data-lucide="save" class="w-4 h-4 inline mr-2"></i> Lưu biên bản họp';
+}
+
+// Cancel Edit (Close)
+function cancelModule2Edit() {
+    if (m2IsDirty) {
+        if (confirm('Hủy bỏ thay đổi? Dữ liệu sẽ không được lưu.')) {
+            m2IsDirty = false;
+            m2EditingIndex = null;
+            switchModule2Tab('history');
+            showToast('Đã hủy bỏ thay đổi', 'info');
+        }
+    } else {
+        m2IsDirty = false;
+        m2EditingIndex = null;
+        switchModule2Tab('history');
     }
 }
 
@@ -565,15 +716,14 @@ function editMeeting(index) {
 
     // Set State
     m2EditingIndex = index;
+    m2IsDirty = false; // Clean start
 
     // Switch to Form
     switchModule2Tab('form');
 
-    // Update Button Text
-    const saveBtn = document.getElementById('module2-save-btn');
-    if (saveBtn) {
-        saveBtn.innerHTML = '<i data-lucide="edit" class="w-4 h-4 inline mr-2"></i> Cập nhật biên bản';
-    }
+    // Make sure container is visible
+    toggleM2Fab(true);
+    updateModule2FabState(); // Set initial Edit state (Close visible)
 
     // Populate Fields
     document.getElementById('meetingDate').value = meeting.meetingDate || '';
@@ -830,15 +980,108 @@ function toggleOtherInput(textareaId, isEnabled) {
     }
 }
 
-function initModule2() {
-    // Setup form change detection and store in global variable
-    const resetFormState = setupFormChangeDetection('module2-form', 'module2-save-btn');
-    module2ResetFormState = resetFormState; // Make accessible to resetForm()
+// Load Meeting Data into Form
+function loadModule2MeetingData(meeting) {
+    if (!meeting) return;
 
-    // Form Submission
-    document.getElementById('module2-form')?.addEventListener('submit', function (e) {
-        e.preventDefault();
+    // Populate Fields
+    document.getElementById('meetingDate').value = meeting.meetingDate || '';
+    document.getElementById('meetingTime').value = meeting.meetingTime || '';
+    document.getElementById('meetingLocation').value = meeting.meetingLocation || '';
+    document.getElementById('recorder').value = meeting.recorder || '';
 
+    // Participants: Clear and Rebuild
+    const pContainer = document.getElementById('participants-list');
+    pContainer.innerHTML = '';
+    if (meeting.participants && meeting.participants.length > 0) {
+        meeting.participants.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'participant-item bg-white rounded-2xl p-4 border border-blue-100 relative';
+            div.innerHTML = `
+                <button type="button" onclick="this.parentElement.remove(); lucide.createIcons();"
+                    class="absolute top-2 right-2 p-2 text-red-500 hover:bg-red-100 rounded-lg transition-all">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-2">Họ tên</label>
+                        <input type="text" class="participant-name w-full px-3 py-2 rounded-lg border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none text-sm font-semibold"
+                            value="${p.name || ''}" placeholder="Họ tên">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-2">Đơn vị / Chức danh</label>
+                        <input type="text" class="participant-role w-full px-3 py-2 rounded-lg border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all outline-none text-sm font-semibold"
+                            value="${p.role || ''}" placeholder="Chức danh">
+                    </div>
+                </div>
+           `;
+            pContainer.appendChild(div);
+        });
+    } else {
+        addParticipant();
+    }
+
+    // Textareas
+    document.getElementById('familyWishes').value = meeting.discussion?.familyWishes || '';
+    document.getElementById('additionalNotes').value = meeting.discussion?.additionalNotes || '';
+    document.getElementById('serviceStartDate').value = meeting.conclusions?.serviceStartDate || '';
+    document.getElementById('transportSchedule').value = meeting.conclusions?.transportSchedule || '';
+    document.getElementById('invoiceAddress').value = meeting.conclusions?.invoiceAddress || '';
+    document.getElementById('carePlanContent').value = meeting.conclusions?.carePlanContent || '';
+
+    // Radio: Payment
+    if (meeting.conclusions?.paymentMethod) {
+        const radio = document.querySelector(`input[name="paymentMethod"][value="${meeting.conclusions.paymentMethod}"]`);
+        if (radio) radio.checked = true;
+    }
+
+    // Checkboxes (Basic Info & Risks)
+    document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+
+    if (meeting.discussion?.basicInfoConfirmed) {
+        document.querySelectorAll('input[type="checkbox"]').forEach(c => {
+            const text = c.nextElementSibling?.textContent?.trim();
+            if (text && meeting.discussion.basicInfoConfirmed.includes(text)) {
+                c.checked = true;
+            }
+        });
+    }
+
+    if (meeting.discussion?.risksConfirmed) {
+        document.querySelectorAll('input[type="checkbox"]').forEach(c => {
+            const text = c.nextElementSibling?.textContent?.trim();
+            if (text && meeting.discussion.risksConfirmed.includes(text)) {
+                c.checked = true;
+            }
+        });
+    }
+
+    // Other inputs
+    if (meeting.discussion?.basicInfoOther) {
+        const chk = document.getElementById('basicInfoOther');
+        const txt = document.getElementById('basicInfoOtherText');
+        if (chk && txt) {
+            chk.checked = true;
+            txt.disabled = false;
+            txt.value = meeting.discussion.basicInfoOther;
+        }
+    }
+    if (meeting.discussion?.riskOther) {
+        const chk = document.getElementById('riskOther');
+        const txt = document.getElementById('riskOtherText');
+        if (chk && txt) {
+            chk.checked = true;
+            txt.disabled = false;
+            txt.value = meeting.discussion.riskOther;
+        }
+    }
+
+    lucide.createIcons();
+}
+
+// Save Module 2 Meeting
+function saveModule2Meeting() {
+    try {
         // Collect participants
         const participants = [];
         document.querySelectorAll('.participant-item').forEach(item => {
@@ -908,10 +1151,6 @@ function initModule2() {
 
         // Reset Edit State
         m2EditingIndex = null;
-        const saveBtn = document.getElementById('module2-save-btn');
-        if (saveBtn) {
-            saveBtn.innerHTML = '<i data-lucide="save" class="w-4 h-4 inline mr-2"></i> Lưu biên bản họp';
-        }
 
         // Mark module as complete
         if (typeof markModuleComplete === 'function') markModuleComplete(patientId, 'module2');
@@ -922,8 +1161,64 @@ function initModule2() {
 
         // Switch to history tab to show the new meeting
         switchModule2Tab('history');
-    });
 
-    // Initialize icons
-    setTimeout(() => lucide.createIcons(), 100);
+        return true; // Success
+    } catch (e) {
+        console.error('Error saving meeting:', e);
+        showToast('Lỗi khi lưu: ' + e.message, 'error');
+        return false;
+    }
+}
+
+// Edit Meeting (called from history)
+function editMeeting(index) {
+    const patientId = getCurrentPatientId();
+    const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_meetings`) || '[]');
+    const meeting = meetings[index];
+    if (!meeting) return;
+
+    // Set editing state FIRST
+    m2EditingIndex = index;
+
+    // Switch to Form tab
+    switchModule2Tab('form');
+
+    // Load data
+    loadModule2MeetingData(meeting);
+
+    // Ensure FAB Manager is initialized
+    if (!window.module2FAB) {
+        console.warn('FAB Manager not initialized, initializing now...');
+        initModule2();
+    }
+
+    // Enter edit mode via FAB Manager
+    if (window.module2FAB) {
+        // Force enter edit mode
+        window.module2FAB.enterEditMode();
+
+        // Force update FABs to ensure they show
+        setTimeout(() => {
+            if (window.module2FAB) {
+                window.module2FAB.updateFABs();
+            }
+        }, 100);
+    }
+
+    showToast('Đã tải dữ liệu để chỉnh sửa', 'info');
+}
+
+function toggleM2Fab(show) {
+    const fab = document.getElementById('module2-fab-container');
+    if (fab) {
+        if (show) {
+            fab.classList.remove('hidden');
+            // Update FAB state when showing
+            if (window.module2FAB) {
+                window.module2FAB.updateFABs();
+            }
+        } else {
+            fab.classList.add('hidden');
+        }
+    }
 }

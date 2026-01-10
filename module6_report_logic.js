@@ -15,17 +15,39 @@ function renderModule6Report(selectedTimestamp = null) {
     // Get all assessments
     const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
 
+    // Log refresh confirmation
+    console.log('[Module 6 Report] Đã làm mới báo cáo từ dữ liệu mới nhất (Refreshed from latest data).');
+
     if (assessments.length === 0) {
-        // Show empty state in report tab?
+        console.log('[Module 6 Report] Không có dữ liệu đánh giá. Xóa trắng form.');
+
+        // Clear Selector
+        const selector = document.getElementById('m6-report-selector');
+        if (selector) selector.innerHTML = '<option value="">Chưa có dữ liệu</option>';
+
+        // Clear Results
+        const resultType = document.getElementById('m6-bodytype-result');
+        const resultQuality = document.getElementById('m6-quality-result');
+        if (resultType) resultType.textContent = '--';
+        if (resultQuality) resultQuality.textContent = '--';
+
+        // Clear Comment
+        const evalComment = document.getElementById('m6-eval-comment');
+        if (evalComment) evalComment.value = '';
+
+        // Destroy Charts
+        if (m6BodyTypeChart) { m6BodyTypeChart.destroy(); m6BodyTypeChart = null; }
+        if (m6QualityChart) { m6QualityChart.destroy(); m6QualityChart = null; }
+
         return;
     }
 
     // Sort Newest -> Oldest
     assessments.sort((a, b) => b.timestamp - a.timestamp);
 
-    // Populate Selector if empty or needed
+    // Populate Selector (Always rebuild to ensure sync with deletions)
     const selector = document.getElementById('m6-report-selector');
-    if (selector && selector.options.length === 0) {
+    if (selector) {
         selector.innerHTML = assessments.map(a =>
             `<option value="${a.timestamp}">${a.assessmentDate} - ${a.general.weight}kg</option>`
         ).join('');

@@ -200,14 +200,7 @@ window.module6Content = `
                           class="input-glass w-full px-4 py-3 rounded-2xl outline-none text-sm font-medium resize-none shadow-inner"></textarea>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex gap-4 pt-4 px-1">
-                <button type="button" id="module6-save-btn" onclick="saveModule6Assessment()"
-                    class="flex-1 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-black text-sm hover:shadow-lg hover:shadow-indigo-500/30 hover:scale-[1.01] active:scale-[0.99] transition-all">
-                    <i data-lucide="save" class="w-4 h-4 inline mr-2 ring-offset-2"></i>
-                    Lưu đánh giá
-                </button>
-            </div>
+            <!-- FAB moved to m6-fab-container -->
 
         </form>
     </div>
@@ -232,6 +225,8 @@ window.module6Content = `
             </h3>
             <canvas id="timeline-chart" height="80"></canvas>
         </div>
+    
+
     </div>
 
     <!-- REPORT TAB -->
@@ -362,6 +357,11 @@ window.module6Content = `
         </div>
 
     </div>
+
+    <!-- FAB Container (Moved to Root Level for Visibility) -->
+    <div id="module6-fab-container" class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-[50] pointer-events-none hidden">
+        <!-- FABs will be injected here by FAB Manager -->
+    </div>
 `;
 
 function initModule6() {
@@ -383,9 +383,12 @@ function initModule6() {
     }
 
     // Setup form change detection
-    // Setup form change detection and store in global variable
-    const resetFormState = setupFormChangeDetection('module6-form', 'module6-save-btn');
-    module6ResetFormState = resetFormState; // Make accessible to resetForm()
+    // Setup form change detection
+    // const resetFormState = setupFormChangeDetection('module6-form', 'module6-save-btn');
+    // module6ResetFormState = resetFormState; // Make accessible to resetForm()
+
+    // Init FAB Logic
+    initModule6FabLogic();
 
     // BMI Auto-calculation
     const heightInput = document.getElementById('height');
@@ -430,15 +433,11 @@ function initModule6() {
         lucide.createIcons();
     }
 
-    // Check history to toggle Report Tab visibility
+    // Check history (Optional: can use to show count or similar, but tab stays visible)
     const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
     const reportBtn = document.getElementById('module6-tab-report');
     if (reportBtn) {
-        if (assessments.length > 0) {
-            reportBtn.classList.remove('hidden');
-        } else {
-            reportBtn.classList.add('hidden');
-        }
+        reportBtn.classList.remove('hidden'); // Always show
     }
 }
 
@@ -604,8 +603,34 @@ function updateBodyPartChart() {
 
     bodyPartChart.data.datasets[0].data = [armRight, legRight];
     bodyPartChart.data.datasets[1].data = [armLeft, legLeft];
+    bodyPartChart.data.datasets[1].data = [armLeft, legLeft];
     bodyPartChart.update();
 }
+
+// Reset Form
+// Reset Form
+// Reset Form
+function resetModule6Form() {
+    // Confirm handled by FAB Helper
+    const form = document.getElementById('module6-form');
+    if (form) form.reset();
+
+    // Reset calculated fields (Safe check)
+    const safeSetText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    const safeSetValue = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+
+    safeSetValue('bmi', '');
+    safeSetText('bodypart-arm-right', '--');
+    safeSetText('bodypart-arm-left', '--');
+    safeSetText('bodypart-leg-right', '--');
+    safeSetText('bodypart-leg-left', '--');
+    safeSetText('bodypart-trunk', '--');
+
+    // Update charts to zero
+    if (typeof updateMuscleChart === 'function') updateMuscleChart();
+    if (typeof updateBodyPartChart === 'function') updateBodyPartChart();
+}
+
 
 // Save assessment
 function saveModule6Assessment(e) {
@@ -664,13 +689,18 @@ function saveModule6Assessment(e) {
     showToast('Đã lưu đánh giá thành phần cơ thể!', 'success');
     console.log('Module 6 assessment saved to array');
 
-    // Reset form state
-    if (typeof module6ResetFormState === 'function') {
-        module6ResetFormState();
+    // Reset form state (Clean up inputs immediately after save)
+    // Reset form state (Clean up inputs immediately after save)
+    try {
+        if (typeof resetModule6Form === 'function') resetModule6Form();
+    } catch (error) {
+        console.error('Error resetting form after save:', error);
     }
 
-    // Auto switch to history
-    switchModule6Tab('history');
+    // Auto switch to report
+    switchModule6Tab('report');
+
+    return true; // Return true for FAB Manager
 }
 
 // Delete Assessment
@@ -692,6 +722,10 @@ function deleteModule6Assessment(index) {
     assessments.splice(index, 1); // Remove item
 
     localStorage.setItem(`mirabocaresync_${patientId}_body_assessments`, JSON.stringify(assessments));
+
+    // Clear last selected report state to prevent showing deleted data
+    window.lastSelectedReportTimestamp = null;
+
     showToast('Đã xóa bản ghi', 'success');
     loadModule6History(); // Reload UI
 }
@@ -721,16 +755,38 @@ function switchModule6Tab(tabName) {
     if (tabName === 'form') {
         formTab.classList.remove('hidden');
         formBtn.className = activeClass;
+
+        // Auto-reset form for fresh start (Silent)
+        if (typeof resetModule6Form === 'function') {
+            document.getElementById('module6-form').reset();
+            // Reset calculated UI fields manually since form.reset doesn't cover them all
+            // Reset calculated fields logic duplicated here or ensure resetModule6Form is clean
+            // Since resetModule6Form calls confirm() which we removed, effectively making it just reset logic.
+            // But wait, resetModule6Form calls confirm() in older version, but I removed it in step 3178.
+            // However, fabHelper calls onReset inside confirm.
+            // Here we just want the logic.
+            resetModule6Form();
+
+            // Force FAB update
+            if (window.module6FAB && window.module6FAB.updateFABs) {
+                window.module6FAB.isDirty = false; // We just cleaned it
+                window.module6FAB.updateFABs();
+            }
+        }
+
+        updateModule6FabState(); // Check dirty state
     } else if (tabName === 'history') {
         historyTab.classList.remove('hidden');
         historyBtn.className = activeClass;
         loadModule6History();
+        document.getElementById('module6-fab-container')?.classList.add('hidden');
     } else if (tabName === 'report') {
         // If report tab doesn't exist yet in DOM, we check later
         if (reportTab) reportTab.classList.remove('hidden');
         reportBtn.className = activeClass;
-        if (reportTab) reportTab.classList.remove('hidden');
-        reportBtn.className = activeClass;
+
+        // Force hide FAB again just in case
+        document.getElementById('module6-fab-container')?.classList.add('hidden');
 
         // Load latest report or last selected
         const lastSelected = window.lastSelectedReportTimestamp || null;
@@ -749,23 +805,19 @@ function loadModule6History() {
     const historyList = document.getElementById('history-list');
 
     // Get all assessments from LocalStorage (Array Key)
-    // Get all assessments from LocalStorage (Array Key)
     const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
 
     // Sort by timestamp (newest first)
     assessments.sort((a, b) => b.timestamp - a.timestamp);
 
-    if (assessments.length === 0) {
-        historyList.innerHTML = '<p class="text-slate-500 text-center py-8">Chưa có đánh giá nào</p>';
-        // Hide report tab if no history
-        const reportBtn = document.getElementById('module6-tab-report');
-        if (reportBtn) reportBtn.classList.add('hidden');
-        return;
-    }
-
-    // Show report tab if history exists
+    // Ensure Report Tab is visible (Safety check)
     const reportBtn = document.getElementById('module6-tab-report');
     if (reportBtn) reportBtn.classList.remove('hidden');
+
+    if (assessments.length === 0) {
+        historyList.innerHTML = '<p class="text-slate-500 text-center py-8">Chưa có đánh giá nào</p>';
+        return;
+    }
 
     // Display history items
     historyList.innerHTML = assessments.map((assessment, index) => `
@@ -806,7 +858,9 @@ function loadModule6History() {
     }
 
     // Update timeline chart
-    updateTimelineChart(assessments);
+    if (typeof updateTimelineChart === 'function') {
+        updateTimelineChart(assessments);
+    }
 }
 
 // Show detail
@@ -1539,3 +1593,34 @@ function printModule6Report() {
         printWindow.close();
     }, 1000);
 }
+
+// ==========================================
+// FAB Logic for Module 6 (Standardized)
+// ==========================================
+
+// Init FAB Logic
+function initModule6FabLogic() {
+    console.log('[Module6] initModule6FabLogic called');
+    window.module6FAB = createFABManager({
+        moduleId: 'module6',
+        formId: 'module6-form',
+
+        // Module 6 Currently Create-Only/Append-Only in this version
+        hasExistingData: () => false,
+
+        onSave: () => saveModule6Assessment(),
+        onReset: () => resetModule6Form(),
+        enableEdit: false, // Not supporting Edit yet, just Create
+        alwaysShowSave: false // Only show when dirty (User confirmed inputs trigger logs)
+    });
+
+    window.module6FAB.init();
+}
+
+// Update FAB State (kept for compatibility if called elsewhere, but delegates to FAB Manager)
+function updateModule6FabState() {
+    if (window.module6FAB) {
+        window.module6FAB.updateFABs();
+    }
+}
+
