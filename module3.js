@@ -617,15 +617,17 @@ function toggleModule3EditMode(isEdit) {
 function cancelModule3Edit() {
     if (m3IsDirty) {
         if (confirm('Hủy bỏ thay đổi? Dữ liệu sẽ quay về trạng thái cũ.')) {
+            // Always reset the form first to clear any 'dirty' states that might not be overwritten by null values
+            document.getElementById('module3-form').reset();
+
             if (module3OriginalData) {
                 loadModule3Data(module3OriginalData);
-                toggleModule3EditMode(false);
-                showToast('Đã hủy bỏ thay đổi', 'info');
             } else {
-                // Clear form?
-                document.getElementById('module3-form').reset();
-                toggleModule3EditMode(false); // Go to view (empty)
+                updateADLScore(); // Just in case
             }
+
+            toggleModule3EditMode(false);
+            showToast('Đã hủy bỏ thay đổi', 'info');
         }
     } else {
         toggleModule3EditMode(false);
@@ -694,52 +696,14 @@ function loadModule3Data(data) {
     updateADLScore();
 }
 
-// Cancel Edit
-function cancelModule3Edit() {
-    if (confirm('Hủy bỏ thay đổi? Dữ liệu sẽ quay về trạng thái cũ.')) {
-        if (module3OriginalData) {
-            loadModule3Data(module3OriginalData); // Revert data
-            toggleModule3EditMode(false); // Switch to view mode
-            showToast('Đã hủy bỏ thay đổi', 'info');
-        } else {
-            // If no data existed, clear form
-            document.getElementById('module3-form').reset();
-            updateADLScore();
-            toggleModule3EditMode(true); // Stay in edit mode as "New"
-        }
-    }
-}
-
-// Global variable to store resetFormState function used above or below
-// Note: We already defined module3ResetFormState at the top of this block in previous step, 
-// so we don't redefine it here to avoid error. 
-// But wait, the previous step added it at line ~515. The original one is at 706. 
-// This replacement removes line 706, so we are safe.
-
-// Reset Form
-function resetModule3Form() {
-    if (confirm('Bạn có chắc muốn xóa tất cả dữ liệu đã nhập?')) {
-        document.getElementById('module3-form').reset();
-        document.getElementById('adl-total-score').textContent = '0';
-
-        // Reset form state (disable save button)
-        if (typeof module3ResetFormState === 'function') {
-            module3ResetFormState();
-        }
-
-        showToast('Đã xóa dữ liệu form', 'info');
-    }
-}
-
-// ============================================
-// STEP 5: Initialize Module
-// ============================================
-// Initialize Module 3
-// Initialize Module 3
+// ----------------------------------------------------
+// INITIALIZATION
+// ----------------------------------------------------
 function initModule3() {
     const patientId = getCurrentPatientId();
+    console.log('[Module3] Initializing for patient:', patientId);
 
-    // Load existing data
+    // 1. Load Data
     // Use singular key for Single Record pattern
     const savedData = localStorage.getItem(`mirabocaresync_${patientId}_adl_assessment`);
 
@@ -762,8 +726,6 @@ function initModule3() {
                     const latest = arr[arr.length - 1]; // Take latest
                     loadModule3Data(latest);
                     toggleModule3EditMode(false);
-                    // Optionally save as new format immediately or wait for explicit save
-                    // We just load it for now.
                 } else {
                     toggleModule3EditMode(true); // New record
                 }
@@ -778,7 +740,11 @@ function initModule3() {
     // Setup form change detection
     // Note: 'module3-fab-save' is the ID of the FAB save button
     const resetFormState = setupFormChangeDetection('module3-form', 'module3-fab-save', (isDirty) => {
+        m3IsDirty = isDirty; // Sync global dirty state
+
         const fabSave = document.getElementById('module3-fab-save');
+        const fabUpdate = document.getElementById('module3-fab-update');
+
         if (!fabSave) return;
 
         // Only toggle visibility if we are in Edit Mode
@@ -787,12 +753,23 @@ function initModule3() {
 
         if (isEditMode) {
             if (isDirty) {
-                fabSave.classList.remove('hidden');
+                // Determine if we are updating or saving new
+                if (module3OriginalData) {
+                    // Updating existing
+                    if (fabUpdate) fabUpdate.classList.remove('hidden');
+                    if (fabSave) fabSave.classList.add('hidden');
+                } else {
+                    // Creating new
+                    if (fabSave) fabSave.classList.remove('hidden');
+                    if (fabUpdate) fabUpdate.classList.add('hidden');
+                }
             } else {
-                fabSave.classList.add('hidden');
+                if (fabSave) fabSave.classList.add('hidden');
+                if (fabUpdate) fabUpdate.classList.add('hidden');
             }
         } else {
-            fabSave.classList.add('hidden');
+            if (fabSave) fabSave.classList.add('hidden');
+            if (fabUpdate) fabUpdate.classList.add('hidden');
         }
     });
     module3ResetFormState = resetFormState;

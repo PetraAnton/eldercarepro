@@ -799,12 +799,18 @@ function initModule7FabLogic() {
                 <button type="button" onclick="document.getElementById('m7-create-form').requestSubmit()" 
                     class="pointer-events-auto w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
                     <i data-lucide="save" class="w-7 h-7"></i>
+                     <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                        Lưu kết quả
+                    </span>
                 </button>
 
                 <!-- CANCEL (Reset) -->
                 <button type="button" onclick="resetModule7Form()" 
                     class="pointer-events-auto w-12 h-12 bg-white text-rose-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-rose-100 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-rose-50 ring-2 ring-white">
                     <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+                    <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                        Nhập lại
+                    </span>
                 </button>
             </div>
         `;

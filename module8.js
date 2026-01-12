@@ -11,6 +11,8 @@ function renderModule8(container) {
 
     // Load Data
     const savedData = loadModule8Data(patientId);
+    m8OriginalData = savedData; // Global state init
+
     const data = savedData || {
         notes: '',
         scannedImages: []
@@ -112,7 +114,7 @@ function renderModule8(container) {
         </div>
 
         <!-- FABs -->
-        <div class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in">
+        <div class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
              <!-- SAVE -->
             <button type="button" onclick="saveModule8()" 
                 class="w-16 h-16 bg-gradient-to-br from-indigo-600 to-violet-700 text-white rounded-full shadow-[0_8px_30px_rgb(79,70,229,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
@@ -186,6 +188,7 @@ function saveModule8(e) {
 
 // Global state for dirty tracking
 let m8IsDirty = false;
+let m8OriginalData = null;
 
 // Init FAB Logic
 function initModule8FabLogic() {
@@ -206,33 +209,88 @@ function updateModule8FabState() {
     if (!fabContainer) return;
 
     const notes = document.getElementById('m8-notes');
+    // Determine mode based on readonly attribute or m8OriginalData logic
+    // But toggleModule8EditMode toggles the readonly attribute.
     const isEditMode = notes && !notes.hasAttribute('readonly');
 
-    if (isEditMode && m8IsDirty) {
-        // Show Save button
-        fabContainer.innerHTML = `
-        <button type="button" onclick="saveModule8()" 
-            class="w-16 h-16 bg-gradient-to-br from-indigo-600 to-violet-700 text-white rounded-full shadow-[0_8px_30px_rgb(79,70,229,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-            <i data-lucide="save" class="w-7 h-7"></i>
-            <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Lưu hồ sơ
-            </span>
-        </button>`;
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-    } else if (isEditMode && !m8IsDirty) {
-        // Hide Save button (edit mode but not dirty)
-        fabContainer.innerHTML = '';
-    } else if (!isEditMode) {
-        // Show Edit button
-        fabContainer.innerHTML = `
+    let html = '';
+
+    if (isEditMode) {
+        // EDIT MODE
+        html += `<div id="m8-fab-group" class="flex flex-col-reverse items-end gap-5">`;
+
+        // 1. Save/Update Button (Only if dirty)
+        if (m8IsDirty) {
+            if (m8OriginalData) {
+                // UPDATE Button (Blue)
+                html += `
+                <button type="button" onclick="saveModule8()" 
+                    class="pointer-events-auto w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+                    <i data-lucide="save" class="w-7 h-7"></i>
+                    <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                        Lưu thay đổi
+                    </span>
+                </button>`;
+            } else {
+                // SAVE Button (Indigo/Violet) - Create Mode
+                html += `
+                <button type="button" onclick="saveModule8()" 
+                    class="pointer-events-auto w-16 h-16 bg-gradient-to-br from-indigo-600 to-violet-700 text-white rounded-full shadow-[0_8px_30px_rgb(79,70,229,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+                    <i data-lucide="save" class="w-7 h-7"></i>
+                    <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                        Lưu hồ sơ
+                    </span>
+                </button>`;
+            }
+        }
+
+        // 2. Cancel/Close Button
+        html += `
+            <button type="button" onclick="cancelModule8Edit()" 
+                class="pointer-events-auto w-12 h-12 bg-white text-slate-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-slate-200 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-slate-100 ring-2 ring-white">
+                <i data-lucide="x" class="w-6 h-6"></i>
+                <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                    ${m8OriginalData ? 'Đóng / Hủy' : 'Hủy bỏ'}
+                </span>
+            </button>
+        </div>`;
+
+    } else {
+        // VIEW MODE: Show Edit Button (Amber)
+        html = `
         <button type="button" onclick="toggleModule8EditMode(true)" 
-            class="w-14 h-14 bg-amber-500 text-white rounded-full shadow-[0_8px_25px_rgb(245,158,11,0.5)] hover:bg-amber-400 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+            class="pointer-events-auto w-14 h-14 bg-amber-500 text-white rounded-full shadow-[0_8px_25px_rgb(245,158,11,0.5)] hover:bg-amber-400 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
             <i data-lucide="edit-2" class="w-6 h-6"></i>
-            <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+             <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
                 Chỉnh sửa
             </span>
         </button>`;
-        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    fabContainer.innerHTML = html;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function cancelModule8Edit() {
+    if (m8IsDirty) {
+        if (confirm('Hủy bỏ các thay đổi? Dữ liệu chưa lưu sẽ bị mất.')) {
+            // Revert Data
+            const patientId = getCurrentPatientId();
+            const savedData = loadModule8Data(patientId) || { notes: '', scannedImages: [] };
+
+            // Revert UI fields
+            const notes = document.getElementById('m8-notes');
+            if (notes) notes.value = savedData.notes || '';
+
+            // Revert Images
+            window.currentM8Images = [...(savedData.scannedImages || [])]; // clone array
+            refreshM8ImageGrid();
+
+            toggleModule8EditMode(false);
+            showToast('Đã hủy thay đổi', 'info');
+        }
+    } else {
+        toggleModule8EditMode(false);
     }
 }
 
@@ -274,21 +332,13 @@ function toggleModule8EditMode(isEdit) {
         // Hide delete buttons
         document.querySelectorAll('#m8-image-grid button.bg-red-500\\/80').forEach(b => b.classList.add('hidden'));
 
-        // Update FAB to Edit
-        if (fabContainer) {
-            fabContainer.innerHTML = `
-            <button type="button" onclick="toggleModule8EditMode(true)" 
-                class="w-16 h-16 bg-white text-indigo-600 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-indigo-50 border border-indigo-100">
-                <i data-lucide="pencil" class="w-7 h-7"></i>
-                <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                    Chỉnh sửa
-                </span>
-            </button>`;
-        }
+        // Update FAB to Edit -- DELEGATED
+        // if (fabContainer) { ... }
+        updateModule8FabState();
     }
-
-    if (typeof lucide !== 'undefined') lucide.createIcons();
 }
+
+
 
 // --- Image Handling ---
 
@@ -303,9 +353,9 @@ function handleM8ImageUpload(input) {
                     try {
                         window.currentM8Images.push(compressedDataUrl);
                         refreshM8ImageGrid();
-                        // Refresh edit mode to ensure delete buttons show if we are in edit mode
-                        // Actually, we are definitely in edit mode if we are uploading
-                        toggleModule8EditMode(true);
+                        // Fix: Set dirty and update FAB instead of toggling mode
+                        m8IsDirty = true;
+                        updateModule8FabState();
                     } catch (e) {
                         showToast('Không thể thêm ảnh: Bộ nhớ đầy', 'error');
                     }
@@ -316,7 +366,9 @@ function handleM8ImageUpload(input) {
                 reader.onload = e => {
                     window.currentM8Images.push(e.target.result);
                     refreshM8ImageGrid();
-                    toggleModule8EditMode(true);
+                    // Fix: Set dirty and update FAB instead of toggling mode (which resets dirty)
+                    m8IsDirty = true;
+                    updateModule8FabState();
                     processed++;
                 };
                 reader.readAsDataURL(file);
@@ -358,11 +410,18 @@ function removeM8Image(index) {
     if (confirm('Xóa tài liệu này?')) {
         window.currentM8Images.splice(index, 1);
         refreshM8ImageGrid();
-        toggleModule8EditMode(true); // Re-apply edit mode styles (like showing delete buttons)
+
+        // Fix: Set dirty and update FAB
+        m8IsDirty = true;
+        updateModule8FabState();
     }
 }
 
+// --- Slideshow Viewer ---
+let currentM8ImageIndex = 0;
+
 function viewM8Image(index) {
+    currentM8ImageIndex = index;
     const imgs = window.currentM8Images;
     if (!imgs || imgs.length === 0) return;
 
@@ -370,26 +429,90 @@ function viewM8Image(index) {
     viewer.id = 'm8-image-viewer';
     viewer.className = 'fixed inset-0 z-[9999] bg-black/95 flex flex-col items-center justify-center p-4 animate-fade-in backdrop-blur-sm select-none';
 
-    window.closeM8ImageViewer = () => {
-        viewer.remove();
-    };
-
-    viewer.innerHTML = `
-         <div class="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-10 text-white/80">
-            <div class="bg-black/40 px-3 py-1 rounded-full backdrop-blur-md text-xs font-bold font-mono">
-                Xem Tài Liệu
-            </div>
-            <button onclick="closeM8ImageViewer()" class="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-all text-white">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
-        </div>
-        <div class="relative w-full h-full flex items-center justify-center max-w-6xl mx-auto">
-            <img src="${imgs[index]}" class="max-w-full max-h-[90vh] object-contain rounded-sm shadow-2xl">
-        </div>
-    `;
+    // Render Viewer Content
+    viewer.innerHTML = getM8ViewerHTML(imgs, currentM8ImageIndex);
 
     document.body.appendChild(viewer);
     lucide.createIcons();
+
+    // Keyboard Navigation
+    document.addEventListener('keydown', handleM8ViewerKeys);
+}
+
+function navigateM8Image(direction) {
+    const imgs = window.currentM8Images;
+    currentM8ImageIndex += direction;
+
+    // Loop
+    if (currentM8ImageIndex < 0) currentM8ImageIndex = imgs.length - 1;
+    if (currentM8ImageIndex >= imgs.length) currentM8ImageIndex = 0;
+
+    const viewer = document.getElementById('m8-image-viewer');
+    if (viewer) {
+        viewer.innerHTML = getM8ViewerHTML(imgs, currentM8ImageIndex);
+        lucide.createIcons();
+    }
+}
+
+function jumpToM8Image(index) {
+    currentM8ImageIndex = index;
+    const viewer = document.getElementById('m8-image-viewer');
+    if (viewer) {
+        viewer.innerHTML = getM8ViewerHTML(window.currentM8Images, currentM8ImageIndex);
+        lucide.createIcons();
+    }
+}
+
+function getM8ViewerHTML(imgs, index) {
+    const hasMultiple = imgs.length > 1;
+    return `
+            <!-- Top Bar -->
+            <div class="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-10 text-white/80">
+                <div class="bg-black/40 px-3 py-1 rounded-full backdrop-blur-md text-xs font-bold font-mono">
+                    ${index + 1} / ${imgs.length}
+                </div>
+                <button onclick="closeM8ImageViewer()" class="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-all text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- Image Area -->
+            <div class="relative w-full h-full flex items-center justify-center max-w-6xl mx-auto">
+                <img src="${imgs[index]}" class="max-w-full max-h-[85vh] object-contain rounded-sm shadow-2xl animate-fade-in" id="m8-viewer-img">
+            </div>
+
+            <!-- Controls -->
+            ${hasMultiple ? `
+                <button onclick="navigateM8Image(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white backdrop-blur-md transition-all">
+                    <i data-lucide="chevron-left" class="w-8 h-8"></i>
+                </button>
+                <button onclick="navigateM8Image(1)" class="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white backdrop-blur-md transition-all">
+                    <i data-lucide="chevron-right" class="w-8 h-8"></i>
+                </button>
+                 
+                 <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 overflow-x-auto max-w-full px-4 scrollbar-hide py-2">
+                    ${imgs.map((_, i) => `
+                        <button onclick="jumpToM8Image(${i})" class="w-2 h-2 rounded-full transition-all ${i === index ? 'bg-white scale-150 shadow-glow' : 'bg-white/30 hover:bg-white/50'}"></button>
+                    `).join('')}
+                 </div>
+            ` : ''}
+        `;
+}
+
+function closeM8ImageViewer() {
+    const viewer = document.getElementById('m8-image-viewer');
+    if (viewer) viewer.remove();
+    document.removeEventListener('keydown', handleM8ViewerKeys);
+}
+
+function handleM8ViewerKeys(e) {
+    if (e.key === 'Escape') closeM8ImageViewer();
+    if (e.key === 'ArrowLeft') navigateM8Image(-1);
+    if (e.key === 'ArrowRight') navigateM8Image(1);
+    if (e.key === ' ') {
+        e.preventDefault();
+        navigateM8Image(1);
+    }
 }
 
 

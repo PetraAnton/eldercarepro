@@ -18,6 +18,7 @@ function renderModule9(container) {
 
     // Initialize Image Cache
     window.currentM9Images = savedData?.images || [];
+    m9OriginalData = savedData; // Fix: Initialize global state
 
     const survey = savedData || {
         address: (typeof getPatientById === 'function' ? getPatientById(patientId)?.address : '') || '',
@@ -136,18 +137,6 @@ function renderModule9(container) {
     </div>
 
     <!-- FABs for Module 9 -->
-    <div class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
-        
-        <!-- EDIT -->
-        <button type="button" id="module9-fab-edit" onclick="toggleModule9EditMode(true)" 
-            class="hidden pointer-events-auto w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full shadow-[0_8px_30px_rgb(59,130,246,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-            <i data-lucide="pencil" class="w-7 h-7"></i>
-            <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Chỉnh sửa
-            </span>
-        </button>
-
-    <!-- FABs for Module 9 -->
     <div id="module9-fab-container" class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
         
         <!-- SAVE (Create Mode) -->
@@ -258,7 +247,13 @@ function updateModule9FabState(forceMode) {
     } else if (mode === 'edit') {
         if (closeBtn) closeBtn.classList.remove('hidden');
         if (m9IsDirty) {
-            if (updateBtn) updateBtn.classList.remove('hidden');
+            if (m9OriginalData) {
+                if (updateBtn) updateBtn.classList.remove('hidden');
+                if (saveBtn) saveBtn.classList.add('hidden');
+            } else {
+                if (saveBtn) saveBtn.classList.remove('hidden');
+                if (updateBtn) updateBtn.classList.add('hidden');
+            }
         }
     } else if (mode === 'create') {
         if (m9IsDirty) {
@@ -331,15 +326,17 @@ function toggleModule9EditMode(isEdit) {
 function cancelModule9Edit() {
     if (m9IsDirty) {
         if (confirm('Hủy bỏ thay đổi?')) {
+            // Always reset the form first to clear any 'dirty' states
+            document.getElementById('m9-survey-form').reset();
+
             // Revert
             const patientId = getCurrentPatientId();
             const data = loadModule9Data(patientId);
             if (data) {
-                // Determine how to reload? renderModule9Survey(data) rerenders entire block.
-                // Simpler: reload page or call renderModule9Survey again?
-                // `renderModule9Survey` is the main entry.
+                m9OriginalData = data; // Ensure cache is consistent
+                // Re-render M9 correctly
                 const container = document.getElementById('module-content');
-                container.innerHTML = renderModule9Survey();
+                if (container) renderModule9(container);
             } else {
                 resetModule9Form();
             }
@@ -406,50 +403,26 @@ function toggleModule9EditMode(isEdit) {
     });
 
     // 2. Toggle FABs
-    const btnSave = document.getElementById('module9-fab-save');
-    const btnEdit = document.getElementById('module9-fab-edit');
-    const btnCancel = document.getElementById('module9-fab-cancel');
-    const txtCancel = document.getElementById('module9-cancel-text');
+    // 2. Toggle FABs - DELEGATE TO updateModule9FabState
     const uploadLabel = document.querySelector('label[for="m9-image-upload"]');
     const m9MapBtn = document.querySelector('button[onclick="m9LocateOnMap()"]');
 
     if (isEdit) {
         // EDIT MODE
-        if (btnSave) btnSave.classList.remove('hidden');
-        if (btnEdit) btnEdit.classList.add('hidden');
-
-        if (btnCancel) {
-            btnCancel.classList.remove('hidden');
-            // If data exists, Cancel acts as "Cancel Edit" (revert), else "Reset"
-            if (savedData && txtCancel) txtCancel.textContent = 'Hủy bỏ';
-            else if (txtCancel) txtCancel.textContent = 'Nhập lại';
-
-            // Update Cancel Action
-            btnCancel.onclick = () => {
-                if (savedData) {
-                    // Revert
-                    renderModule9(document.getElementById('content-area')); // Simplest revert
-                } else {
-                    // Reset
-                    resetModule9Form();
-                }
-            };
-        }
-
         if (uploadLabel) uploadLabel.classList.remove('pointer-events-none', 'opacity-50');
         if (m9MapBtn) m9MapBtn.classList.remove('pointer-events-none', 'opacity-50');
-
     } else {
         // VIEW MODE (Read Only)
-        if (btnSave) btnSave.classList.add('hidden');
-        if (btnEdit) btnEdit.classList.remove('hidden');
-
-        // Hide Cancel button in View mode? Or keep it? Usually hide it.
-        if (btnCancel) btnCancel.classList.add('hidden');
-
         if (uploadLabel) uploadLabel.classList.add('pointer-events-none', 'opacity-50');
         if (m9MapBtn) m9MapBtn.classList.add('pointer-events-none', 'opacity-50');
     }
+
+    // Ensure state is updated based on current dirty/data state
+    // We pass 'edit' or 'view' explicitly or let it derive?
+    // Let it derive from m9OriginalData + isEdit status logic in updateModule9FabState
+    // But updateModule9FabState derives 'isEdit' from analyzing inputs.disabled.
+    // We just toggled inputs.disabled above. So calling it with no args should work.
+    updateModule9FabState();
 
     // 3. Update Image Grid (Hide delete buttons)
     const delBtns = document.querySelectorAll('#m9-image-grid button.bg-red-500\\/80'); // Escape slash
@@ -484,6 +457,9 @@ function handleM9ImageUpload(input) {
                     }
                     window.currentM9Images.push(compressedDataUrl);
                     refreshM9ImageGrid();
+                    // Fix: Set dirty and update FAB
+                    m9IsDirty = true;
+                    updateModule9FabState();
                 } catch (e) {
                     showToast('Không thể thêm ảnh: Bộ nhớ đầy', 'error');
                 }
@@ -531,6 +507,10 @@ function removeM9Image(index) {
     if (confirm('Xóa hình ảnh này?')) {
         window.currentM9Images.splice(index, 1);
         refreshM9ImageGrid();
+
+        // Fix: Set dirty and update FAB
+        m9IsDirty = true;
+        updateModule9FabState();
     }
 }
 

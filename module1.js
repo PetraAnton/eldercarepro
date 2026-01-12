@@ -786,6 +786,24 @@ function initModule1() {
             console.error('Error loading module 1 data:', e);
         }
     } else {
+        // New Record: Try to pre-populate from Patient Registry
+        const patient = typeof getPatientById === 'function' ? getPatientById(patientId) : null;
+        if (patient) {
+            const fullNameInput = document.getElementById('fullName');
+            const dobInput = document.getElementById('dob');
+            const genderInput = document.getElementById('gender');
+
+            if (fullNameInput) fullNameInput.value = (patient.fullName || '').toUpperCase();
+            if (dobInput) {
+                dobInput.value = patient.dateOfBirth || '';
+                // Trigger age calculation
+                dobInput.dispatchEvent(new Event('change'));
+            }
+            if (genderInput && patient.gender) {
+                genderInput.value = patient.gender; // "male" or "female"
+            }
+        }
+
         // Add initial contact if empty
         if (document.getElementById('contact-list')?.children.length === 0) {
             addContactPerson();
@@ -800,6 +818,14 @@ function initModule1() {
             if (ageField) ageField.value = age + ' tuổi';
         }
     });
+
+    // Auto-uppercase Full Name
+    const fullNameInput = document.getElementById('fullName');
+    if (fullNameInput) {
+        fullNameInput.addEventListener('input', function () {
+            this.value = this.value.toUpperCase();
+        });
+    }
 
     // Form submission handler
     document.getElementById('module1-form')?.addEventListener('submit', (e) => {

@@ -398,7 +398,16 @@ function updateModule4FabState(mode) {
     } else if (mode === 'edit') {
         if (closeBtn) closeBtn.classList.remove('hidden');
         if (m4IsDirty) {
-            if (updateBtn) updateBtn.classList.remove('hidden');
+            // Determine if we are updating or saving new
+            if (module4OriginalData) {
+                // Updating existing
+                if (updateBtn) updateBtn.classList.remove('hidden');
+                if (saveBtn) saveBtn.classList.add('hidden');
+            } else {
+                // Creating new
+                if (saveBtn) saveBtn.classList.remove('hidden');
+                if (updateBtn) updateBtn.classList.add('hidden');
+            }
         }
     } else if (mode === 'create') {
         if (m4IsDirty) {
@@ -483,13 +492,15 @@ function loadModule4Data(data) {
 function cancelModule4Edit() {
     if (m4IsDirty) {
         if (confirm('Hủy bỏ thay đổi? Dữ liệu sẽ quay về trạng thái cũ.')) {
+            // Always reset the form first to clear any 'dirty' states
+            document.getElementById('module4-form').reset();
+
             if (module4OriginalData) {
                 loadModule4Data(module4OriginalData); // Revert data
                 toggleModule4EditMode(false); // Switch to view mode
                 showToast('Đã hủy bỏ thay đổi', 'info');
             } else {
                 // If no data existed, clear form
-                document.getElementById('module4-form').reset();
                 updateRecommendations();
                 m4IsDirty = false;
                 updateModule4FabState('create');

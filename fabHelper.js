@@ -63,12 +63,36 @@ function createFABManager(config) {
      * Xử lý khi form thay đổi
      */
     function handleFormChange(e) {
-        // console.log(`[FAB ${moduleId}] Form change detected`, e.target);
-        if (!isDirty) {
-            console.log(`[FAB ${moduleId}] MODIFICATION DETECTED`);
-            console.log(`[FAB ${moduleId}] State changed to DIRTY`);
-            isDirty = true;
-            updateFABs();
+        // Create Mode Check (When no existing data is locked in)
+        if (!hasExistingData() && !isEditMode) {
+            const form = document.getElementById(formId);
+            // Check if ANY field has value (ignoring buttons, hidden, readonly)
+            const hasValue = Array.from(form.querySelectorAll('input, textarea, select')).some(el => {
+                if (el.type === 'button' || el.type === 'submit' || el.type === 'hidden') return false;
+                if (el.readOnly || el.disabled) return false;
+                if (el.type === 'checkbox' || el.type === 'radio') return el.checked !== el.defaultChecked;
+                return el.value !== el.defaultValue; // Check against default value (usually empty)
+            });
+
+            if (hasValue) {
+                if (!isDirty) {
+                    isDirty = true;
+                    updateFABs();
+                }
+            } else {
+                if (isDirty) {
+                    isDirty = false;
+                    updateFABs();
+                }
+            }
+        } else {
+            // Edit Mode (Existing Logic: Sticky Dirty)
+            // Ideally should compared with originalData, but for now stick to sticky dirty to be safe
+            if (!isDirty) {
+                console.log(`[FAB ${moduleId}] MODIFICATION DETECTED`);
+                isDirty = true;
+                updateFABs();
+            }
         }
     }
 
@@ -172,59 +196,22 @@ function createFABManager(config) {
         container.innerHTML = `
             <!-- Save button (Indigo Gradient) -->
             <button id="${moduleId}-fab-save-btn" type="button" onclick="${moduleId}FAB.save()" style="pointer-events: auto; display: flex;"
-                class="w-16 h-16 bg-indigo-600 text-white rounded-full shadow-lg hover:scale-110 active:scale-95 transition-all flex items-center justify-center relative ring-4 ring-white/60">
+                class="w-16 h-16 bg-gradient-to-br from-indigo-600 to-violet-700 text-white rounded-full shadow-[0_8px_30px_rgb(79,70,229,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
                 <i data-lucide="save" class="w-7 h-7"></i>
-                <span class="absolute right-20 py-2 px-4 bg-slate-900 text-white text-xs font-bold rounded-xl whitespace-nowrap shadow-xl">
-                    LƯU DỮ LIỆU
+                <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                    Lưu dữ liệu
                 </span>
             </button>
 
             <!-- Reset button (White with Red Icon) -->
             <button type="button" onclick="${moduleId}FAB.reset()" style="pointer-events: auto; display: flex;"
-                class="w-12 h-12 bg-white text-rose-500 rounded-full shadow-md hover:scale-110 active:scale-95 transition-all flex items-center justify-center relative border border-rose-100 ring-2 ring-white ml-auto mr-2">
+                class="w-12 h-12 bg-white text-rose-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-rose-100 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-rose-50 ring-2 ring-white ml-auto mr-2">
                 <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+                <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                    Nhập lại
+                </span>
             </button>
         `;
-
-        // DEBUG: Trace position and visibility
-        setTimeout(() => {
-            const btn = document.getElementById(`${moduleId}-fab-save-btn`);
-            if (btn) {
-                const rect = btn.getBoundingClientRect();
-                const style = window.getComputedStyle(btn);
-                const containerStyle = window.getComputedStyle(container);
-
-                console.group(`[FAB ${moduleId}] UI INSPECTION REPORT`);
-                console.log('--- COORDINATES ---');
-                console.log(`X: ${rect.x}, Y: ${rect.y}`);
-                console.log(`Width: ${rect.width}, Height: ${rect.height}`);
-                console.log(`Top: ${rect.top}, Bottom: ${rect.bottom}`);
-                console.log(`Left: ${rect.left}, Right: ${rect.right}`);
-
-                console.log('--- VISIBILITY ---');
-                console.log(`Display: ${style.display}`);
-                console.log(`Visibility: ${style.visibility}`);
-                console.log(`Opacity: ${style.opacity}`);
-                console.log(`Z-Index: ${style.zIndex} (Container Z-Index: ${containerStyle.zIndex})`);
-
-                console.log('--- HIERARCHY ---');
-                let parent = container.parentElement;
-                while (parent && parent.tagName !== 'BODY') {
-                    const pRect = parent.getBoundingClientRect();
-                    const pStyle = window.getComputedStyle(parent);
-                    console.log(`PARENT: <${parent.tagName.toLowerCase()} id="${parent.id}" class="${parent.className}">`);
-                    console.log(`   - Pos: ${pRect.x}, ${pRect.y} | Overflow: ${pStyle.overflow}`);
-                    // Check if parent is hiding the child
-                    if (pStyle.display === 'none') console.error('   !!! PARENT IS HIDDEN (display: none) !!!');
-                    if (pStyle.visibility === 'hidden') console.error('   !!! PARENT IS HIDDEN (visibility: hidden) !!!');
-
-                    parent = parent.parentElement;
-                }
-                console.groupEnd();
-            } else {
-                console.error(`[FAB ${moduleId}] SAVE BUTTON NOT FOUND IN DOM AFTER RENDER! Container innerHTML length: ${container.innerHTML.length}`);
-            }
-        }, 100);
     }
 
     /**
