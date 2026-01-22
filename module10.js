@@ -6,27 +6,7 @@
 
 // 1. History View (Default)
 const historyViewTemplate = `
-<div class="h-screen flex flex-col bg-slate-50">
-    <!-- Header -->
-    <div class="px-8 py-6 border-b border-slate-200 bg-white flex items-center justify-between shadow-sm z-10">
-        <div class="flex items-center gap-4">
-            <button onclick="loadModule('home')" class="text-slate-400 hover:text-slate-800 transition-colors">
-                <i data-lucide="arrow-left" class="w-6 h-6"></i>
-            </button>
-            <div class="w-px h-8 bg-slate-200"></div>
-            <div>
-                <h1 class="text-2xl font-black text-slate-900 tracking-tight">Posture Screen Analysis</h1>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Lịch sử đánh giá</p>
-            </div>
-        </div>
-        
-        <button onclick="openNewSession()" 
-                class="flex items-center gap-3 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-500/30 transform hover:scale-105">
-            <i data-lucide="plus-circle" class="w-5 h-5"></i>
-            Tạo đánh giá mới (New Session)
-        </button>
-    </div>
-
+<div class="h-full flex flex-col bg-slate-50">
     <!-- History List -->
     <div class="flex-1 overflow-y-auto p-8" id="posture-history-container">
         <!-- Content injected by JS -->
@@ -37,6 +17,29 @@ const historyViewTemplate = `
     </div>
 </div>
 `;
+
+function renderGalleryItem(view) {
+    return `
+    <div class="flex flex-col gap-2">
+        <div class="flex justify-between items-center">
+            <span class="text-slate-400 text-[10px] font-black tracking-widest uppercase">${view} VIEW</span>
+            <div id="${view.toLowerCase()}-actions" class="flex gap-2 hidden scale-90 origin-right">
+                <button onclick="clearCapture('${view}')" class="text-red-400 hover:text-white transition-colors p-1 rounded hover:bg-red-500/20">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+        <div id="${view.toLowerCase()}-slot" 
+             class="h-40 bg-slate-900 rounded-xl border-2 border-dashed border-slate-700 flex items-center justify-center overflow-hidden cursor-pointer hover:border-slate-500 transition-colors relative group"
+             onclick="previewCapture('${view}')">
+            <div class="text-center">
+                <i data-lucide="camera" class="w-6 h-6 text-slate-600 mx-auto mb-2 group-hover:text-slate-500 transition-colors"></i>
+                <span class="text-slate-600 text-xs font-bold group-hover:text-slate-500">Trống</span>
+            </div>
+        </div>
+    </div>
+    `;
+}
 
 // 2. Fullscreen Assessment View (Overlay)
 const assessmentViewTemplate = `
@@ -181,47 +184,6 @@ const measureModalTemplate = `
 </div>
 `;
 
-function renderGalleryItem(view) {
-    return `
-    <div class="flex flex-col gap-2">
-        <div class="flex justify-between items-center">
-            <span class="text-slate-400 text-[10px] font-black tracking-widest uppercase">${view} VIEW</span>
-            <div id="${view.toLowerCase()}-actions" class="flex gap-2 hidden scale-90 origin-right">
-                <button onclick="clearCapture('${view}')" class="text-red-400 hover:text-white transition-colors p-1 rounded hover:bg-red-500/20">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                </button>
-            </div>
-        </div>
-        <div id="${view.toLowerCase()}-slot" 
-             class="h-40 bg-slate-900 rounded-xl border-2 border-dashed border-slate-700 flex items-center justify-center overflow-hidden cursor-pointer hover:border-slate-500 transition-colors relative group"
-             onclick="previewCapture('${view}')">
-            <div class="text-center">
-                <i data-lucide="camera" class="w-6 h-6 text-slate-600 mx-auto mb-2 group-hover:text-slate-500 transition-colors"></i>
-                <span class="text-slate-600 text-xs font-bold group-hover:text-slate-500">Trống</span>
-            </div>
-        </div>
-    </div>
-    `;
-}
-
-// --- Logic ---
-
-const postureState = {
-    mode: 'HISTORY', // HISTORY | ASSESSMENT
-    viewMode: 'UNKNOWN',
-    captures: { FRONT: null, BACK: null, LEFT: null, RIGHT: null },
-    isCapturing: false,
-    countdown: null,
-    landmarker: null,
-    videoStream: null,
-    lastLandmarks: null,
-    gestureState: { startTime: null, hand: null, triggering: false },
-    lastCaptureTime: 0,
-    animationFrameId: null
-};
-
-const GESTURE_DURATION = 1000;
-
 // 1. Initialize Module
 window.renderModule10 = async function (container) {
     console.log('[Posture] Initializing Module 10...');
@@ -229,11 +191,30 @@ window.renderModule10 = async function (container) {
         container = document.getElementById('module-content');
     }
 
+    // Inject Create Button into Header Actions
+    const actionsContainer = document.getElementById('module-actions');
+    if (actionsContainer) {
+        actionsContainer.innerHTML = `
+        <button onclick="openNewSession()" 
+                class="flex items-center gap-3 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-500/30 transform hover:scale-105">
+            <i data-lucide="plus-circle" class="w-5 h-5"></i>
+            Tạo đánh giá mới
+        </button>
+        `;
+    }
+
     if (container) {
         // Inject History View
         container.innerHTML = historyViewTemplate;
 
         // Append Assessment View (Hidden Overlay)
+        // Check if overlay already exists to avoid duplication if re-rendering?
+        // Actually renderModuleView clears innerHTML, so we are safe.
+        // But the overlay is fixed, so multiple renders might be an issue if we don't clean up?
+        // No, container.innerHTML = '' clears it. But wait, overlay is usually appended to body or container?
+        // In previous code: container.insertAdjacentHTML('beforeend', assessmentViewTemplate);
+        // If container is cleared, overlay is gone. That's fine.
+
         container.insertAdjacentHTML('beforeend', assessmentViewTemplate);
         container.insertAdjacentHTML('beforeend', measureModalTemplate);
 
