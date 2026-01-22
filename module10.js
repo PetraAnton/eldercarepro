@@ -154,8 +154,9 @@ const assessmentViewTemplate = `
                 <p id="report-date" class="text-sm font-bold text-slate-400 mt-1">---</p>
             </div>
             <div class="flex gap-2">
-                <button onclick="printReport()" class="p-3 hover:bg-slate-100 rounded-xl transition-colors text-slate-600" title="Print">
-                   <i data-lucide="printer" class="w-6 h-6"></i>
+                <button onclick="openPdfPreview()" class="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors font-bold text-xs">
+                   <i data-lucide="file-text" class="w-4 h-4"></i>
+                   PDF View
                 </button>
                 <button onclick="closePostureReport()" class="p-3 hover:bg-red-50 rounded-xl transition-colors text-red-500" title="Close">
                     <i data-lucide="x" class="w-6 h-6"></i>
@@ -179,6 +180,52 @@ const measureModalTemplate = `
         <div class="relative">
             <img id="measure-modal-img" class="max-h-[85vh] rounded-lg shadow-2xl">
             <canvas id="measure-modal-canvas" class="absolute inset-0 pointer-events-none"></canvas>
+        </div>
+    </div>
+</div>
+`;
+
+const pdfPreviewModalTemplate = `
+<div id="pdf-preview-modal" class="fixed inset-0 bg-slate-200/95 z-[80] hidden flex flex-col backdrop-blur-sm animate-fade-in">
+    <!-- Toolbar -->
+    <div class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shadow-sm z-10 transition-colors">
+        <div class="flex items-center gap-4 text-slate-800">
+            <div class="bg-red-500 p-1.5 rounded-lg shadow-lg shadow-red-500/20">
+                <i data-lucide="file-text" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-sm">PDF Preview</h3>
+                <p class="text-[10px] text-slate-400 font-mono" id="pdf-preview-filename">Report.pdf</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="downloadReportPdf()" class="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold text-xs transition-colors shadow-lg shadow-red-500/20">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                Download PDF
+            </button>
+            <button onclick="printReport()" class="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg font-bold text-xs transition-colors">
+                <i data-lucide="printer" class="w-4 h-4"></i>
+                Print
+            </button>
+            <div class="w-px h-6 bg-slate-300 mx-2"></div>
+            <button onclick="closePdfPreview()" class="p-2 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Scrollable Area -->
+    <div class="flex-1 overflow-y-auto bg-slate-200 p-8 flex justify-center custom-scrollbar">
+        <!-- A4 Page Simulator -->
+        <div id="pdf-page-container" class="bg-white shadow-xl w-[210mm] min-h-[297mm] p-[10mm] relative section-to-print">
+             <div id="pdf-content" class="text-slate-900">
+                <!-- Content Injected Here -->
+             </div>
+             
+             <!-- Footer Watermark (Visual Only) -->
+             <div class="absolute bottom-4 right-6 text-slate-300 text-[10px] font-bold uppercase tracking-widest pointer-events-none select-none">
+                MCare System Generated
+             </div>
         </div>
     </div>
 </div>
@@ -217,6 +264,7 @@ window.renderModule10 = async function (container) {
 
         container.insertAdjacentHTML('beforeend', assessmentViewTemplate);
         container.insertAdjacentHTML('beforeend', measureModalTemplate);
+        container.insertAdjacentHTML('beforeend', pdfPreviewModalTemplate);
 
         // Load History Data
         renderHistoryList();
@@ -325,9 +373,16 @@ function renderHistoryCard(session) {
                 <div class="bg-blue-600 h-full rounded-full" style="width: ${completeness}%"></div>
             </div>
             
-            <button class="w-full py-2.5 bg-slate-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all">
-                Xem Báo cáo
-            </button>
+            <div class="flex gap-2">
+                <button onclick="event.stopPropagation(); viewReport('${session.id}')" 
+                        class="flex-1 py-2.5 bg-slate-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all">
+                    Xem
+                </button>
+                <button onclick="event.stopPropagation(); viewReport('${session.id}', true)" 
+                        class="flex-1 py-2.5 bg-slate-50 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1">
+                    <i data-lucide="file-text" class="w-3 h-3"></i> PDF
+                </button>
+            </div>
         </div>
     </div>
     `;
@@ -395,12 +450,11 @@ function deleteSession(sessionId) {
     let history = getPostureHistory(patientId);
     history = history.filter(s => s.id !== sessionId);
     savePostureHistory(patientId, history);
-
     showToast('Session deleted.', 'success');
     renderHistoryList();
 }
 
-function viewReport(sessionId) {
+function viewReport(sessionId, directPdf = false) {
     const patientId = getCurrentPatientId();
     const history = getPostureHistory(patientId);
     const session = history.find(s => s.id === sessionId);
@@ -409,6 +463,60 @@ function viewReport(sessionId) {
 
     // Reuse generate report logic but pass session data instead of global state
     generateReportForSession(session);
+
+    if (directPdf) {
+        openPdfPreview();
+    }
+}
+
+function openPdfPreview() {
+    const modal = document.getElementById('pdf-preview-modal');
+    const contentContainer = document.getElementById('pdf-content');
+    const reportContent = document.getElementById('report-content');
+    const filenameEl = document.getElementById('pdf-preview-filename');
+
+    // Clone content from main report
+    contentContainer.innerHTML = reportContent.innerHTML;
+
+    // Set Filename visual
+    const dateStr = new Date().toISOString().split('T')[0];
+    filenameEl.textContent = `Posture_Report_${dateStr}.pdf`;
+
+    modal.classList.remove('hidden');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function closePdfPreview() {
+    document.getElementById('pdf-preview-modal').classList.add('hidden');
+}
+
+function downloadReportPdf() {
+    const element = document.getElementById('pdf-page-container');
+    const filename = document.getElementById('pdf-preview-filename').textContent || 'Report.pdf';
+
+    const opt = {
+        margin: 0,
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    // Show loading state
+    const btn = document.querySelector('button[onclick="downloadReportPdf()"]');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Downloading...`;
+
+    html2pdf().set(opt).from(element).save().then(() => {
+        btn.innerHTML = originalText;
+        lucide.createIcons();
+        showToast('PDF downloaded successfully!', 'success');
+    }).catch(err => {
+        console.error(err);
+        btn.innerHTML = originalText;
+        lucide.createIcons();
+        showToast('Failed to download PDF', 'error');
+    });
 }
 
 // 5. Shared Logic (Camera, MediaPipe, etc.)
