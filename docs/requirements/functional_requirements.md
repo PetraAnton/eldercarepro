@@ -119,44 +119,75 @@ Tài liệu này mô tả chi tiết các yêu cầu chức năng cho hệ thố
 
 ---
 
-### Module 3: Đánh giá ADL/IADL
+### Module 3: Đánh giá ADL/IADL (Barthel Index)
 
-#### FR-M3-001: Đánh giá ADL
-**Mô tả:** Đo lường khả năng thực hiện 7 hoạt động sinh hoạt cơ bản  
-**Input:** Radio buttons cho mỗi hoạt động:
-1. Ăn uống
-2. Chuyển vị trí
-3. Vệ sinh cá nhân
-4. Đi vệ sinh
-5. Tắm rửa
-6. Di chuyển
-7. Thay đồ
+#### FR-M3-001: Đánh giá ADL theo Barthel Index
+**Mô tả:** Đo lường khả năng thực hiện 10 hoạt động sinh hoạt cơ bản theo tiêu chuẩn Barthel Index quốc tế  
+**Input:** Radio buttons cho mỗi hoạt động với mức điểm biến đổi:
 
-**Options:** Tự lập (100%) / Hỗ trợ một phần (50%) / Phụ thuộc hoàn toàn (0%)  
-**Output:** `assessment_{id}.adl_scores`
+1. **Feeding** (Ăn uống) - 0/5/10
+2. **Transfer** (Chuyển vị trí giường-ghế) - 0/5/10/15
+3. **Grooming** (Chải đầu, đánh răng, rửa mặt) - 0/5
+4. **Toilet Use** (Sử dụng toilet) - 0/5/10
+5. **Bathing** (Tắm rửa) - 0/5
+6. **Mobility** (Di chuyển trên mặt phẳng) - 0/5/10/15
+7. **Stairs** (Lên xuống cầu thang) - 0/5/10
+8. **Dressing** (Thay quần áo) - 0/5/10
+9. **Bowel Control** (Kiểm soát đại tiện) - 0/5/10
+10. **Bladder Control** (Kiểm soát tiểu tiện) - 0/5/10
 
-#### FR-M3-002: Đánh giá IADL
-**Mô tả:** Đo lường khả năng thực hiện 5 hoạt động công cụ  
+**Scoring System:** Tổng điểm từ 0-100  
+**Output:** `assessment_{id}.adl_scores` với `adlTotal` (0-100)
+
+#### FR-M3-002: Phân loại mức độ phụ thuộc
+**Mô tả:** Tự động phân loại mức độ phụ thuộc dựa trên tổng điểm Barthel Index  
+**Input:** Tổng điểm ADL (0-100)  
+**Logic:**
+- 100: Hoàn toàn độc lập
+- 91-99: Phụ thuộc nhẹ
+- 61-90: Phụ thuộc vừa
+- 21-60: Phụ thuộc nặng
+- 0-20: Phụ thuộc hoàn toàn
+
+**Output:** Badge hiển thị phân loại với màu sắc tương ứng
+
+#### FR-M3-003: Đánh giá IADL (Lawton-Brody Scale)
+**Mô tả:** Đo lường khả năng thực hiện 8 hoạt động công cụ theo thang Lawton-Brody  
 **Input:** Radio buttons cho:
-1. Nấu ăn
-2. Giặt giũ
-3. Mua sắm
-4. Sử dụng điện thoại
-5. Quản lý tài chính
+1. Sử dụng điện thoại
+2. Đi mua sắm
+3. Chuẩn bị bữa ăn
+4. Làm việc nhà
+5. Giặt giũ
+6. Phương tiện đi lại
+7. Quản lý thuốc
+8. Quản lý tài chính
 
-**Options:** Tự lập (100%) / Hỗ trợ một phần (50%) / Phụ thuộc hoàn toàn (0%)  
-**Output:** `assessment_{id}.iadl_scores`
+**Options:** Tự lập (2) / Giám sát (1.5) / Hỗ trợ (1) / Phụ thuộc (0)  
+**Scoring System:** Tổng điểm từ 0-16 (8 activities × 2 points)  
+**Output:** `assessment_{id}.iadl_scores` với `iadlTotal` (0-16)
 
-#### FR-M3-003: Hiển thị biểu đồ Radar
+#### FR-M3-004: Hiển thị biểu đồ Radar
 **Mô tả:** Trực quan hóa kết quả ADL  
 **Input:** Dữ liệu từ FR-M3-001  
 **Output:** Canvas với Chart.js Radar chart  
 **Requirement:** Tự động cập nhật khi dữ liệu thay đổi
 
-#### FR-M3-004: So sánh theo thời gian
+#### FR-M3-005: So sánh theo thời gian
 **Mô tả:** Timeline chart so sánh các lần đánh giá  
 **Input:** Array các lần đánh giá trước  
 **Output:** Line chart với trục X = thời gian, trục Y = điểm số
+
+#### FR-M3-006: Migration dữ liệu cũ
+**Mô tả:** Tự động chuyển đổi dữ liệu ADL cũ sang định dạng Barthel Index  
+**Input:** Dữ liệu ADL format cũ  
+**Logic:**
+- Map activity IDs: eating→feeding, hygiene→grooming
+- Điều chỉnh điểm số theo thang mới
+- Thêm activity 'stairs' với giá trị mặc định null
+- Xóa activity 'dining' (không có trong Barthel Index)
+
+**Output:** Dữ liệu đã được migrate với flag `migrated: true`
 
 ---
 
