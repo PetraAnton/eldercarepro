@@ -2,6 +2,23 @@
 // Vietnamese Localized
 // Refactored for History & Fullscreen Mode
 
+// --- Global State ---
+let postureState = {
+    mode: 'HISTORY', // HISTORY | ASSESSMENT
+    viewMode: 'UNKNOWN', // FRONT, BACK, LEFT, RIGHT, UNKNOWN
+    captures: { FRONT: null, BACK: null, LEFT: null, RIGHT: null },
+    landmarker: null,
+    videoStream: null,
+    animationFrameId: null,
+    lastLandmarks: null,
+    isCapturing: false,
+    countdown: null,
+    lastCaptureTime: 0,
+    gestureState: { startTime: null, hand: null, triggering: false }
+};
+
+const GESTURE_DURATION = 1500; // ms to hold gesture
+
 // --- HTML Templates ---
 
 // 1. History View (Default)
