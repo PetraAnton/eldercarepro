@@ -549,11 +549,19 @@ function loadModule1Data(data) {
         if (el) el.value = val || '';
     };
     const setChecked = (name, val) => {
+        // Clear selection first to handle case where val is null/empty (revert to unselected)
+        const radios = document.querySelectorAll(`input[name="${name}"]`);
+        radios.forEach(r => r.checked = false);
+
         if (!val) return;
         const radio = document.querySelector(`input[name="${name}"][value="${val}"]`);
         if (radio) radio.checked = true;
     };
     const setCheckbox = (name, vals) => {
+        // Clear all first
+        const allCbs = document.querySelectorAll(`input[name="${name}"]`);
+        allCbs.forEach(cb => cb.checked = false);
+
         if (!vals || !Array.isArray(vals)) return;
         vals.forEach(val => {
             const cb = document.querySelector(`input[name="${name}"][value="${val}"]`);
