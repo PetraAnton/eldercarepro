@@ -760,9 +760,9 @@
             { id: 3, title: 'Đánh giá ADL/IADL', icon: 'clipboard-list' },
             { id: 4, title: 'Sở thích & Quan tâm', icon: 'heart' },
             { id: 5, title: 'Kế hoạch (Plan)', icon: 'calendar-days' },
-            { id: 10, title: 'Đánh giá tư thế', icon: 'scan-line' },
-            { id: 6, title: 'Thành phần Cơ (SMI)', icon: 'bar-chart-3' },
-            { id: 7, title: 'Chức năng vận động', icon: 'zap' },
+            { id: 10, title: 'Đánh giá tư thế', icon: 'scan-line', code: '06-1' },
+            { id: 6, title: 'Thành phần Cơ (SMI)', icon: 'bar-chart-3', code: '06-2' },
+            { id: 7, title: 'Chức năng vận động', icon: 'zap', code: '06-3' },
             { id: 8, title: 'Bảo mật & Đồng ý', icon: 'shield-check' },
             { id: 9, title: 'Khảo sát Nhà ở', icon: 'home' }
         ];
@@ -1494,7 +1494,7 @@
                             <i data-lucide="${m.icon}" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-0.5">Nghiệp vụ 0${m.id}</p>
+                            <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-0.5">Nghiệp vụ ${m.code || '0' + m.id}</p>
                             <p class="text-sm font-bold text-slate-700">${m.title.split(' (')[0]}</p>
                         </div>
                     </div>
