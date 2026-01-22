@@ -13,6 +13,8 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- SheetJS -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <!-- MediaPipe Tasks Vision -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
@@ -732,6 +734,8 @@
     </div>
 
     <script src="common.js"></script>
+    <script src="geometryUtils.js"></script>
+    <script src="postureUtils.js"></script>
     <script src="module1.js"></script>
     <script src="module2.js"></script>
     <script src="module3.js"></script>
@@ -740,6 +744,7 @@
     <script src="module7.js"></script>
     <script src="module9.js"></script>
     <script src="module8.js"></script>
+    <script src="module10.js"></script>
 
     <script>
         // --- State ---
@@ -753,7 +758,7 @@
             { id: 2, title: 'Họp Phụ Trách', icon: 'message-square' },
             { id: 3, title: 'Đánh giá ADL/IADL', icon: 'clipboard-list' },
             { id: 4, title: 'Sở thích & Quan tâm', icon: 'heart' },
-            { id: 5, title: 'Phân tích Tư thế', icon: 'activity' },
+            { id: 10, title: 'Posture Screen', icon: 'scan-line' },
             { id: 6, title: 'Thành phần Cơ (SMI)', icon: 'bar-chart-3' },
             { id: 7, title: 'Chức năng vận động', icon: 'zap' },
             { id: 8, title: 'Bảo mật & Đồng ý', icon: 'shield-check' },

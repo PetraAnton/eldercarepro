@@ -4,120 +4,199 @@
 // STEP 1: Define Data Arrays FIRST
 // ============================================
 
-// ADL Items Data (10 activities with 3-level scoring: 10/5/0)
+// ADL Items Data - Barthel Index Standard (10 activities with variable scoring)
 const adlActivities = [
     {
-        id: 'eating',
+        id: 'feeding',
         name: 'Ăn uống',
+        maxScore: 10,
         levels: [
             { value: 10, label: 'Tự lập (10)' },
-            { value: 5, label: 'Hỗ trợ một phần (5)' },
+            { value: 5, label: 'Cần hỗ trợ cắt thức ăn (5)' },
             { value: 0, label: 'Phụ thuộc hoàn toàn (0)' }
         ]
     },
     {
         id: 'transfer',
         name: 'Chuyển vị trí giường - ghế',
+        maxScore: 15,
         levels: [
-            { value: 10, label: 'Tự lập (10)' },
-            { value: 5, label: 'Hỗ trợ một phần (5)' },
-            { value: 0, label: 'Phụ thuộc hoàn toàn (0)' }
+            { value: 15, label: 'Tự lập (15)' },
+            { value: 10, label: 'Hỗ trợ nhỏ hoặc giám sát (10)' },
+            { value: 5, label: 'Ngồi được nhưng cần hỗ trợ nhiều (5)' },
+            { value: 0, label: 'Không thể (0)' }
         ]
     },
     {
-        id: 'hygiene',
-        name: 'Vệ sinh cá nhân',
+        id: 'grooming',
+        name: 'Chải đầu, đánh răng, rửa mặt',
+        maxScore: 5,
         levels: [
-            { value: 10, label: 'Tự lập (10)' },
-            { value: 5, label: 'Hỗ trợ một phần (5)' },
-            { value: 0, label: 'Phụ thuộc hoàn toàn (0)' }
+            { value: 5, label: 'Tự lập (5)' },
+            { value: 0, label: 'Cần hỗ trợ (0)' }
         ]
     },
     {
         id: 'toilet',
-        name: 'Đi vệ sinh',
+        name: 'Sử dụng toilet',
+        maxScore: 10,
         levels: [
             { value: 10, label: 'Tự lập (10)' },
-            { value: 5, label: 'Hỗ trợ một phần (5)' },
+            { value: 5, label: 'Cần hỗ trợ một phần (5)' },
             { value: 0, label: 'Phụ thuộc hoàn toàn (0)' }
         ]
     },
     {
         id: 'bathing',
         name: 'Tắm rửa',
+        maxScore: 5,
         levels: [
-            { value: 10, label: 'Tự lập (10)' },
-            { value: 5, label: 'Hỗ trợ một phần (5)' },
-            { value: 0, label: 'Phụ thuộc hoàn toàn (0)' }
+            { value: 5, label: 'Tự lập (5)' },
+            { value: 0, label: 'Cần hỗ trợ (0)' }
         ]
     },
     {
         id: 'mobility',
-        name: 'Di chuyển trong nhà',
+        name: 'Di chuyển trên mặt phẳng',
+        maxScore: 15,
+        levels: [
+            { value: 15, label: 'Tự đi được 50m (15)' },
+            { value: 10, label: 'Đi được 50m với hỗ trợ (10)' },
+            { value: 5, label: 'Tự đẩy xe lăn 50m (5)' },
+            { value: 0, label: 'Không di chuyển được (0)' }
+        ]
+    },
+    {
+        id: 'stairs',
+        name: 'Lên xuống cầu thang',
+        maxScore: 10,
         levels: [
             { value: 10, label: 'Tự lập (10)' },
-            { value: 5, label: 'Hỗ trợ một phần (5)' },
-            { value: 0, label: 'Phụ thuộc hoàn toàn (0)' }
+            { value: 5, label: 'Cần hỗ trợ hoặc giám sát (5)' },
+            { value: 0, label: 'Không thể (0)' }
         ]
     },
     {
         id: 'dressing',
         name: 'Thay quần áo',
+        maxScore: 10,
         levels: [
             { value: 10, label: 'Tự lập (10)' },
-            { value: 5, label: 'Hỗ trợ một phần (5)' },
+            { value: 5, label: 'Cần hỗ trợ một phần (5)' },
             { value: 0, label: 'Phụ thuộc hoàn toàn (0)' }
         ]
     },
     {
         id: 'bowel',
         name: 'Kiểm soát đại tiện',
+        maxScore: 10,
         levels: [
-            { value: 10, label: 'Tự lập (10)' },
-            { value: 5, label: 'Hỗ trợ một phần (5)' },
-            { value: 0, label: 'Phụ thuộc hoàn toàn (0)' }
+            { value: 10, label: 'Không tai nạn (10)' },
+            { value: 5, label: 'Tai nạn thỉnh thoảng (5)' },
+            { value: 0, label: 'Không kiểm soát được (0)' }
         ]
     },
     {
         id: 'bladder',
         name: 'Kiểm soát tiểu tiện',
+        maxScore: 10,
         levels: [
-            { value: 10, label: 'Tự lập (10)' },
-            { value: 5, label: 'Hỗ trợ một phần (5)' },
-            { value: 0, label: 'Phụ thuộc hoàn toàn (0)' }
-        ]
-    },
-    {
-        id: 'dining',
-        name: 'Nhà ăn',
-        levels: [
-            { value: 10, label: 'Tự lập (10)' },
-            { value: 5, label: 'Giám sát (5)' },
-            { value: 0, label: 'Hỗ trợ (0)' }
+            { value: 10, label: 'Không tai nạn (10)' },
+            { value: 5, label: 'Tai nạn thỉnh thoảng, max 1/ngày (5)' },
+            { value: 0, label: 'Không kiểm soát được (0)' }
         ]
     }
 ];
 
-// IADL Items Data (2 activities with 4-level scoring)
+// IADL Items Data (8 activities with 4-level numerical scoring: 2/1.5/1/0)
+// Based on Lawton-Brody IADL Scale - Vietnamese clinical standard
 const iadlActivities = [
     {
-        id: 'cooking',
-        name: 'Nấu ăn',
+        id: 'phone',
+        name: 'Sử dụng điện thoại',
+        maxScore: 2,
         levels: [
-            { value: 'independent', label: 'Tự lập' },
-            { value: 'supervised', label: 'Giám sát' },
-            { value: 'assisted', label: 'Hỗ trợ' },
-            { value: 'dependent', label: 'Phụ thuộc' }
+            { value: 2, label: 'Tự lập (2)' },
+            { value: 1.5, label: 'Giám sát (1.5)' },
+            { value: 1, label: 'Hỗ trợ (1)' },
+            { value: 0, label: 'Phụ thuộc (0)' }
+        ]
+    },
+    {
+        id: 'shopping',
+        name: 'Đi mua sắm',
+        maxScore: 2,
+        levels: [
+            { value: 2, label: 'Tự lập (2)' },
+            { value: 1.5, label: 'Giám sát (1.5)' },
+            { value: 1, label: 'Hỗ trợ (1)' },
+            { value: 0, label: 'Phụ thuộc (0)' }
+        ]
+    },
+    {
+        id: 'meal_prep',
+        name: 'Chuẩn bị bữa ăn',
+        maxScore: 2,
+        levels: [
+            { value: 2, label: 'Tự lập (2)' },
+            { value: 1.5, label: 'Giám sát (1.5)' },
+            { value: 1, label: 'Hỗ trợ (1)' },
+            { value: 0, label: 'Phụ thuộc (0)' }
+        ]
+    },
+    {
+        id: 'housekeeping',
+        name: 'Làm việc nhà',
+        maxScore: 2,
+        levels: [
+            { value: 2, label: 'Tự lập (2)' },
+            { value: 1.5, label: 'Giám sát (1.5)' },
+            { value: 1, label: 'Hỗ trợ (1)' },
+            { value: 0, label: 'Phụ thuộc (0)' }
         ]
     },
     {
         id: 'laundry',
         name: 'Giặt giũ',
+        maxScore: 2,
         levels: [
-            { value: 'independent', label: 'Tự lập' },
-            { value: 'supervised', label: 'Giám sát' },
-            { value: 'assisted', label: 'Hỗ trợ' },
-            { value: 'dependent', label: 'Phụ thuộc' }
+            { value: 2, label: 'Tự lập (2)' },
+            { value: 1.5, label: 'Giám sát (1.5)' },
+            { value: 1, label: 'Hỗ trợ (1)' },
+            { value: 0, label: 'Phụ thuộc (0)' }
+        ]
+    },
+    {
+        id: 'transportation',
+        name: 'Phương tiện đi lại',
+        maxScore: 2,
+        levels: [
+            { value: 2, label: 'Tự lập (2)' },
+            { value: 1.5, label: 'Giám sát (1.5)' },
+            { value: 1, label: 'Hỗ trợ (1)' },
+            { value: 0, label: 'Phụ thuộc (0)' }
+        ]
+    },
+    {
+        id: 'medication',
+        name: 'Quản lý thuốc',
+        maxScore: 2,
+        levels: [
+            { value: 2, label: 'Tự lập (2)' },
+            { value: 1.5, label: 'Giám sát (1.5)' },
+            { value: 1, label: 'Hỗ trợ (1)' },
+            { value: 0, label: 'Phụ thuộc (0)' }
+        ]
+    },
+    {
+        id: 'finance',
+        name: 'Quản lý tài chính',
+        maxScore: 2,
+        levels: [
+            { value: 2, label: 'Tự lập (2)' },
+            { value: 1.5, label: 'Giám sát (1.5)' },
+            { value: 1, label: 'Hỗ trợ (1)' },
+            { value: 0, label: 'Phụ thuộc (0)' }
         ]
     }
 ];
@@ -196,30 +275,27 @@ function generateADLTableRows() {
             </td>
         ` : '';
 
-        return `
-        <tr class="border-b border-emerald-50 hover:bg-emerald-50/30 transition-colors group">
-            <td class="p-4 font-bold text-slate-700">${activity.name}</td>
+        // Generate radio buttons for each level
+        const levelCells = activity.levels.map(function (level) {
+            return `
             <td class="p-3 text-center">
                 <label class="relative flex items-center justify-center cursor-pointer">
-                    <input type="radio" name="adl-level-${activity.id}" value="10" 
+                    <input type="radio" name="adl-level-${activity.id}" value="${level.value}" 
                         onchange="updateADLScore()"
                         class="w-5 h-5 text-emerald-600 focus:ring-emerald-100">
                 </label>
-            </td>
-            <td class="p-3 text-center">
-                <label class="relative flex items-center justify-center cursor-pointer">
-                    <input type="radio" name="adl-level-${activity.id}" value="5" 
-                        onchange="updateADLScore()"
-                        class="w-5 h-5 text-blue-600 focus:ring-blue-100">
-                </label>
-            </td>
-            <td class="p-3 text-center">
-                <label class="relative flex items-center justify-center cursor-pointer">
-                    <input type="radio" name="adl-level-${activity.id}" value="0" 
-                        onchange="updateADLScore()"
-                        class="w-5 h-5 text-slate-600 focus:ring-slate-100">
-                </label>
-            </td>
+            </td>`;
+        }).join('');
+
+        // Add empty cells if activity has fewer than 4 levels (for table alignment)
+        const maxLevels = 4; // Maximum levels any activity can have
+        const emptyCells = Array(maxLevels - activity.levels.length).fill('<td class="p-3 bg-slate-50/30"></td>').join('');
+
+        return `
+        <tr class="border-b border-emerald-50 hover:bg-emerald-50/30 transition-colors group">
+            <td class="p-4 font-bold text-slate-700">${activity.name}</td>
+            ${levelCells}
+            ${emptyCells}
             <td class="p-3 text-center">
                 <label class="relative flex items-center justify-center cursor-pointer">
                     <input type="checkbox" id="adl-status-${activity.id}" 
@@ -253,25 +329,29 @@ function generateIADLTableRows() {
             <td class="p-4 font-bold text-slate-700">${activity.name}</td>
             <td class="p-3 text-center">
                 <label class="relative flex items-center justify-center cursor-pointer">
-                    <input type="radio" name="iadl-level-${activity.id}" value="independent" 
+                    <input type="radio" name="iadl-level-${activity.id}" value="2" 
+                        onchange="updateIADLScore()"
                         class="w-5 h-5 text-emerald-600 focus:ring-emerald-100">
                 </label>
             </td>
             <td class="p-3 text-center">
                 <label class="relative flex items-center justify-center cursor-pointer">
-                    <input type="radio" name="iadl-level-${activity.id}" value="supervised" 
+                    <input type="radio" name="iadl-level-${activity.id}" value="1.5" 
+                        onchange="updateIADLScore()"
                         class="w-5 h-5 text-blue-600 focus:ring-blue-100">
                 </label>
             </td>
             <td class="p-3 text-center">
                 <label class="relative flex items-center justify-center cursor-pointer">
-                    <input type="radio" name="iadl-level-${activity.id}" value="assisted" 
+                    <input type="radio" name="iadl-level-${activity.id}" value="1" 
+                        onchange="updateIADLScore()"
                         class="w-5 h-5 text-amber-600 focus:ring-amber-100">
                 </label>
             </td>
             <td class="p-3 text-center">
                 <label class="relative flex items-center justify-center cursor-pointer">
-                    <input type="radio" name="iadl-level-${activity.id}" value="dependent" 
+                    <input type="radio" name="iadl-level-${activity.id}" value="0" 
+                        onchange="updateIADLScore()"
                         class="w-5 h-5 text-slate-600 focus:ring-slate-100">
                 </label>
             </td>
@@ -348,12 +428,12 @@ window.module3Content = `
     
     <form id="module3-form" class="space-y-6 pb-20">
 
-        <!-- ADL Assessment Table -->
+        <!-- ADL Assessment Table - Barthel Index -->
         <div class="glass-panel rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
             <div class="bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-4">
                 <h3 class="font-black text-white text-sm flex items-center gap-2 tracking-wide uppercase">
                     <i data-lucide="user-check" class="w-5 h-5"></i>
-                    ADL - Hoạt động Sinh hoạt Cơ bản
+                    Barthel Index - Hoạt động Sinh hoạt Cơ bản (ADL)
                 </h3>
             </div>
             <div class="overflow-x-auto">
@@ -361,15 +441,16 @@ window.module3Content = `
                     <thead class="bg-emerald-50/50 backdrop-blur-md">
                         <tr class="border-b border-emerald-100">
                             <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Hạng mục</th>
-                            <th colspan="3" class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Mức độ</th>
+                            <th colspan="4" class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Mức độ</th>
                             <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Tình trạng</th>
                             <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Môi trường<br/>(địa điểm thực hiện và dụng cụ hỗ trợ)</th>
                             <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Tình trạng - vấn đề<br/>sinh hoạt</th>
                         </tr>
                         <tr class="border-b border-emerald-100">
-                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-24">Tự lập<br/>(10)</th>
-                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-32">Hỗ trợ một phần (5)</th>
-                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-32">HT toàn phần (0)</th>
+                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-24">Mức 1<br/><span class="text-emerald-600">(15-10-5)</span></th>
+                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-24">Mức 2<br/><span class="text-emerald-600">(10-5)</span></th>
+                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-24">Mức 3<br/><span class="text-emerald-600">(5)</span></th>
+                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-24">Mức 4<br/><span class="text-emerald-600">(0)</span></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50/50">
@@ -378,12 +459,15 @@ window.module3Content = `
                 </table>
             </div>
             <div class="bg-emerald-50/30 px-6 py-5 border-t border-emerald-100/50">
-                <div class="flex items-center justify-between">
-                    <span class="font-black text-emerald-900 uppercase tracking-widest text-xs">Tổng điểm ADL:</span>
+                <div class="flex items-center justify-between mb-3">
+                    <span class="font-black text-emerald-900 uppercase tracking-widest text-xs">Tổng điểm Barthel Index:</span>
                     <div class="flex items-center gap-2">
                         <span id="adl-total-score" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">0</span>
                         <span class="text-sm font-bold text-emerald-400">/ 100</span>
                     </div>
+                </div>
+                <div id="dependency-level-display" class="flex items-center gap-2 justify-end">
+                    <!-- Dynamic dependency level badge will be inserted here -->
                 </div>
             </div>
         </div>
@@ -393,7 +477,7 @@ window.module3Content = `
             <div class="bg-gradient-to-r from-violet-500 to-purple-500 px-6 py-4">
                 <h3 class="font-black text-white text-sm flex items-center gap-2 tracking-wide uppercase">
                     <i data-lucide="briefcase" class="w-5 h-5"></i>
-                    IADL - Hoạt động Sinh hoạt Công cụ
+                    Lawton Scale - Hoạt động Sinh hoạt Công cụ (IADL)
                 </h3>
             </div>
             <div class="overflow-x-auto">
@@ -401,10 +485,46 @@ window.module3Content = `
                     <thead class="bg-violet-50/50 backdrop-blur-md border-b border-violet-100/50">
                         <tr>
                             <th class="p-4 text-left font-black text-violet-900 text-[10px] uppercase tracking-widest">Hạng mục</th>
-                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Tự lập</th>
-                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Giám sát</th>
-                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Hỗ trợ</th>
-                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Phụ thuộc</th>
+                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24 relative group cursor-help">
+                                <div>Tự lập<br/><span class="text-violet-600">(2)</span></div>
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50 w-64">
+                                    <div class="bg-slate-900 text-white text-xs font-normal normal-case tracking-normal rounded-lg px-4 py-3 shadow-2xl">
+                                        <div class="font-bold mb-1">Tự lập</div>
+                                        <div class="text-slate-300">Thực hiện hoàn toàn, an toàn, đúng trình tự, không cần nhắc hay hỗ trợ</div>
+                                        <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24 relative group cursor-help">
+                                <div>Giám sát<br/><span class="text-violet-600">(1.5)</span></div>
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50 w-64">
+                                    <div class="bg-slate-900 text-white text-xs font-normal normal-case tracking-normal rounded-lg px-4 py-3 shadow-2xl">
+                                        <div class="font-bold mb-1">Giám sát</div>
+                                        <div class="text-slate-300">Thực hiện được nhưng cần nhắc nhở, theo dõi hoặc giám sát</div>
+                                        <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24 relative group cursor-help">
+                                <div>Hỗ trợ<br/><span class="text-violet-600">(1)</span></div>
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50 w-64">
+                                    <div class="bg-slate-900 text-white text-xs font-normal normal-case tracking-normal rounded-lg px-4 py-3 shadow-2xl">
+                                        <div class="font-bold mb-1">Hỗ trợ</div>
+                                        <div class="text-slate-300">Cần người hỗ trợ một phần (chuẩn bị, làm cùng, hướng dẫn trực tiếp)</div>
+                                        <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24 relative group cursor-help">
+                                <div>Phụ thuộc<br/><span class="text-violet-600">(0)</span></div>
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50 w-64">
+                                    <div class="bg-slate-900 text-white text-xs font-normal normal-case tracking-normal rounded-lg px-4 py-3 shadow-2xl">
+                                        <div class="font-bold mb-1">Phụ thuộc</div>
+                                        <div class="text-slate-300">Không thể tự thực hiện, người khác làm hoàn toàn</div>
+                                        <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                                    </div>
+                                </div>
+                            </th>
                             <th class="p-4 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Vấn đề</th>
                             <th class="p-4 text-left font-black text-violet-900 text-[10px] uppercase tracking-widest">Dung cụ hỗ trợ</th>
                             <th class="p-4 text-left font-black text-violet-900 text-[10px] uppercase tracking-widest">Ghi chú</th>
@@ -414,6 +534,18 @@ window.module3Content = `
                         ${generateIADLTableRows()}
                     </tbody>
                 </table>
+            </div>
+            <div class="bg-violet-50/30 px-6 py-5 border-t border-violet-100/50">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="font-black text-violet-900 uppercase tracking-widest text-xs">Tổng điểm IADL (Lawton-Brody):</span>
+                    <div class="flex items-center gap-2">
+                        <span id="iadl-total-score" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-purple-600">0</span>
+                        <span class="text-sm font-bold text-violet-400">/ 16</span>
+                    </div>
+                </div>
+                <div id="iadl-dependency-level-display" class="flex items-center gap-2 justify-end">
+                    <!-- Dynamic IADL dependency level badge will be inserted here -->
+                </div>
             </div>
         </div>
 
@@ -508,6 +640,64 @@ window.module3Content = `
 // STEP 4: Define Calculation & UI Functions
 // ============================================
 
+// Get Barthel Index Dependency Level Classification
+// Based on MDCalc standard: https://www.mdcalc.com/calc/3912/barthel-index-activities-daily-living-adl
+function getBarthelDependencyLevel(score) {
+    if (score >= 80) {
+        return {
+            level: 'Hoàn toàn độc lập',
+            englishLevel: 'Independent',
+            color: 'emerald',
+            bgColor: 'bg-emerald-100',
+            textColor: 'text-emerald-800',
+            borderColor: 'border-emerald-300',
+            icon: 'check-circle'
+        };
+    }
+    if (score >= 60) {
+        return {
+            level: 'Phụ thuộc nhẹ',
+            englishLevel: 'Minimal dependence',
+            color: 'blue',
+            bgColor: 'bg-blue-100',
+            textColor: 'text-blue-800',
+            borderColor: 'border-blue-300',
+            icon: 'alert-circle'
+        };
+    }
+    if (score >= 40) {
+        return {
+            level: 'Phụ thuộc vừa',
+            englishLevel: 'Partially dependent',
+            color: 'amber',
+            bgColor: 'bg-amber-100',
+            textColor: 'text-amber-800',
+            borderColor: 'border-amber-300',
+            icon: 'alert-triangle'
+        };
+    }
+    if (score >= 20) {
+        return {
+            level: 'Phụ thuộc nặng',
+            englishLevel: 'Very dependent',
+            color: 'orange',
+            bgColor: 'bg-orange-100',
+            textColor: 'text-orange-800',
+            borderColor: 'border-orange-300',
+            icon: 'alert-octagon'
+        };
+    }
+    return {
+        level: 'Phụ thuộc hoàn toàn',
+        englishLevel: 'Total dependence',
+        color: 'red',
+        bgColor: 'bg-red-100',
+        textColor: 'text-red-800',
+        borderColor: 'border-red-300',
+        icon: 'x-circle'
+    };
+}
+
 function updateADLScore() {
     var total = 0;
     adlActivities.forEach(function (activity) {
@@ -520,6 +710,116 @@ function updateADLScore() {
     var scoreElement = document.getElementById('adl-total-score');
     if (scoreElement) {
         scoreElement.textContent = total;
+    }
+
+    // Update dependency level display
+    var dependencyDisplay = document.getElementById('dependency-level-display');
+    if (dependencyDisplay && total > 0) {
+        var classification = getBarthelDependencyLevel(total);
+        dependencyDisplay.innerHTML = `
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl ${classification.bgColor} ${classification.textColor} border-2 ${classification.borderColor} shadow-sm">
+                <i data-lucide="${classification.icon}" class="w-5 h-5"></i>
+                <span class="font-black text-sm uppercase tracking-wider">${classification.level}</span>
+                <span class="text-xs opacity-75">(${total}/100)</span>
+            </div>
+        `;
+        // Reinitialize lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    } else if (dependencyDisplay) {
+        dependencyDisplay.innerHTML = '';
+    }
+}
+
+
+// Get IADL Dependency Level Classification
+// Based on Lawton-Brody IADL Scale (8 activities × 2 points = 16 max)
+function getIADLDependencyLevel(score) {
+    const maxScore = 16; // 8 activities × 2 points each
+    const percentage = (score / maxScore) * 100;
+
+    if (percentage === 100) {
+        return {
+            level: 'Hoàn toàn độc lập',
+            color: 'emerald',
+            bgColor: 'bg-emerald-100',
+            textColor: 'text-emerald-800',
+            borderColor: 'border-emerald-300',
+            icon: 'check-circle'
+        };
+    }
+    if (percentage >= 75) {
+        return {
+            level: 'Phụ thuộc nhẹ',
+            color: 'blue',
+            bgColor: 'bg-blue-100',
+            textColor: 'text-blue-800',
+            borderColor: 'border-blue-300',
+            icon: 'alert-circle'
+        };
+    }
+    if (percentage >= 50) {
+        return {
+            level: 'Phụ thuộc vừa',
+            color: 'amber',
+            bgColor: 'bg-amber-100',
+            textColor: 'text-amber-800',
+            borderColor: 'border-amber-300',
+            icon: 'alert-triangle'
+        };
+    }
+    if (percentage >= 25) {
+        return {
+            level: 'Phụ thuộc nặng',
+            color: 'orange',
+            bgColor: 'bg-orange-100',
+            textColor: 'text-orange-800',
+            borderColor: 'border-orange-300',
+            icon: 'alert-octagon'
+        };
+    }
+    return {
+        level: 'Phụ thuộc hoàn toàn',
+        color: 'red',
+        bgColor: 'bg-red-100',
+        textColor: 'text-red-800',
+        borderColor: 'border-red-300',
+        icon: 'x-circle'
+    };
+}
+
+function updateIADLScore() {
+    var total = 0;
+    iadlActivities.forEach(function (activity) {
+        var radio = document.querySelector('input[name="iadl-level-' + activity.id + '"]:checked');
+        if (radio && radio.value) {
+            total += parseFloat(radio.value);
+        }
+    });
+
+    var scoreElement = document.getElementById('iadl-total-score');
+    if (scoreElement) {
+        scoreElement.textContent = total.toFixed(1);
+    }
+
+    // Update dependency level display
+    var dependencyDisplay = document.getElementById('iadl-dependency-level-display');
+    if (dependencyDisplay && total > 0) {
+        var classification = getIADLDependencyLevel(total);
+        dependencyDisplay.innerHTML = `
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl ${classification.bgColor} ${classification.textColor} border-2 ${classification.borderColor} shadow-sm">
+                <i data-lucide="${classification.icon}" class="w-5 h-5"></i>
+                <span class="font-black text-sm uppercase tracking-wider">${classification.level}</span>
+                <span class="text-xs opacity-75">(${total.toFixed(1)}/16)</span>
+            </div>
+        `;
+        // Reinitialize lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    } else if (dependencyDisplay) {
+        dependencyDisplay.innerHTML = '';
     }
 }
 
@@ -635,9 +935,87 @@ function cancelModule3Edit() {
 }
 
 
+// Migrate old ADL data to Barthel Index format
+function migrateToBartheIndex(oldData) {
+    if (!oldData || !oldData.adl) return oldData;
+
+    // Check if already migrated (has 'feeding' instead of 'eating')
+    if (oldData.adl.feeding !== undefined) {
+        return oldData; // Already migrated
+    }
+
+    console.log('[Module3] Migrating old ADL data to Barthel Index format...');
+
+    const migratedAdl = {};
+
+    // Activity ID mapping: old -> new
+    const activityMapping = {
+        'eating': 'feeding',        // Rename
+        'transfer': 'transfer',     // Keep same
+        'hygiene': 'grooming',      // Rename (was general hygiene, now specific grooming)
+        'toilet': 'toilet',         // Keep same
+        'bathing': 'bathing',       // Keep same
+        'mobility': 'mobility',     // Keep same
+        'dressing': 'dressing',     // Keep same
+        'bowel': 'bowel',          // Keep same
+        'bladder': 'bladder',      // Keep same
+        'dining': null             // Remove (not in Barthel Index)
+    };
+
+    // Migrate existing activities
+    Object.keys(oldData.adl).forEach(oldKey => {
+        const newKey = activityMapping[oldKey];
+        if (newKey) {
+            const oldItem = oldData.adl[oldKey];
+            // Adjust scores if needed based on new max scores
+            let newLevel = oldItem.level;
+
+            // Special handling for activities with changed scoring
+            if (newKey === 'grooming' || newKey === 'bathing') {
+                // These now have max 5 instead of 10
+                if (newLevel === 10) newLevel = 5;
+                else if (newLevel === 5) newLevel = 0; // Partial help becomes dependent
+            } else if (newKey === 'transfer' || newKey === 'mobility') {
+                // These now have max 15 instead of 10
+                if (newLevel === 10) newLevel = 15; // Independent
+                else if (newLevel === 5) newLevel = 10; // Partial help
+                // 0 stays 0
+            }
+
+            migratedAdl[newKey] = {
+                level: newLevel,
+                hasProblem: oldItem.hasProblem || false,
+                support: oldItem.support || null,
+                notes: oldItem.notes || null
+            };
+        }
+    });
+
+    // Add new 'stairs' activity with default null (not assessed)
+    if (!migratedAdl.stairs) {
+        migratedAdl.stairs = {
+            level: null,
+            hasProblem: false,
+            support: null,
+            notes: null
+        };
+    }
+
+    return {
+        ...oldData,
+        adl: migratedAdl,
+        migrated: true,
+        migrationDate: new Date().toISOString()
+    };
+}
+
 // Load Data into Form
 function loadModule3Data(data) {
     if (!data) return;
+
+    // Migrate old data format if needed
+    data = migrateToBartheIndex(data);
+
     module3OriginalData = data; // Cache for revert
     m3IsDirty = false;
 
@@ -692,8 +1070,9 @@ function loadModule3Data(data) {
     // 4. General Notes
     setVal('generalNotes', data.generalNotes);
 
-    // Recalculate score
+    // Recalculate scores
     updateADLScore();
+    updateIADLScore();
 }
 
 // ----------------------------------------------------
@@ -827,9 +1206,10 @@ window.saveModule3Assessment = function () {
 
     // Collect IADL data
     var iadlData = {};
+    var iadlTotal = 0;
     iadlActivities.forEach(function (activity) {
         var radio = document.querySelector('input[name="iadl-level-' + activity.id + '"]:checked');
-        var level = radio ? radio.value : null;
+        var level = radio ? parseFloat(radio.value) : null;
 
         var checkbox = document.getElementById('iadl-status-' + activity.id);
         var problem = checkbox ? checkbox.checked : false;
@@ -840,6 +1220,10 @@ window.saveModule3Assessment = function () {
             support: null,
             notes: null
         };
+
+        if (level !== null) {
+            iadlTotal += level;
+        }
     });
 
     // Collect IADL Environment & Problems
@@ -879,6 +1263,7 @@ window.saveModule3Assessment = function () {
         adlEnvironment: adlEnvironment,
         adlProblems: adlProblems,
         iadl: iadlData,
+        iadlTotal: iadlTotal,
         iadlEnvironment: iadlEnvironment,
         iadlProblems: iadlProblems,
         basicMovement: movementData,
