@@ -29,8 +29,8 @@ window.module6Content = `
         <form id="module6-form" class="space-y-6">
             
             <!-- Section 1: Thông tin Chung (General Info) -->
-            <div class="glass-panel rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
-                <div class="bg-gradient-to-r from-indigo-500 to-blue-500 px-6 py-4 flex items-center justify-between cursor-pointer hover:brightness-110 transition-all"
+            <div class="glass-panel rounded-[32px] group hover:shadow-xl transition-all duration-300">
+                <div class="bg-gradient-to-r from-indigo-500 to-blue-500 px-6 py-4 flex items-center justify-between cursor-pointer hover:brightness-110 transition-all rounded-t-[32px]"
                      onclick="toggleModule6Section('general')">
                     <h3 class="font-black text-white text-sm flex items-center gap-2 uppercase tracking-wide">
                         <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
@@ -56,22 +56,69 @@ window.module6Content = `
                                    class="w-full px-4 py-3 bg-indigo-50/50 border border-indigo-100 rounded-xl text-indigo-600 font-black text-center" />
                         </div>
                          <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Tỷ lệ trao đổi chất (BMR)</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                                Tỷ lệ trao đổi chất (BMR)
+                                <div class="relative group/tooltip">
+                                    <i data-lucide="help-circle" class="w-3 h-3 text-slate-400 hover:text-indigo-500 cursor-help transition-colors"></i>
+                                    <div class="absolute bottom-full right-0 mb-2 w-64 bg-slate-800 text-white text-[11px] font-medium p-3 rounded-lg shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all z-50 whitespace-pre-line leading-relaxed pointer-events-none text-left">
+                                        <span class="text-indigo-200 font-bold block mb-1 border-b border-slate-600 pb-1">Năng lượng tiêu hao khi nghỉ</span>
+                                        Phản ánh mức năng lượng tối thiểu cơ thể cần để duy trì sự sống.
+                                        • Giảm dần theo tuổi tác.
+                                        • Tăng khi khối lượng cơ tăng.
+                                        <div class="absolute top-full right-1 border-8 border-transparent border-t-slate-800"></div>
+                                    </div>
+                                </div>
+                            </label>
                              <input type="number" id="bmr" step="1" placeholder="1400"
                                     class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Tỷ lệ mỡ (%)</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                                Tỷ lệ mỡ (%)
+                                <div class="relative group/tooltip">
+                                    <i data-lucide="help-circle" class="w-3 h-3 text-slate-400 hover:text-indigo-500 cursor-help transition-colors"></i>
+                                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-slate-800 text-white text-[11px] font-medium p-3 rounded-lg shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all z-50 whitespace-pre-line leading-relaxed pointer-events-none text-left">
+                                        <span class="text-indigo-200 font-bold block mb-1 border-b border-slate-600 pb-1">Tỉ lệ mỡ trong cơ thể</span>
+                                        Đánh giá nguy cơ béo phì và các bệnh lý chuyển hóa.
+                                        • Nam: 10-20% (Chuẩn)
+                                        • Nữ: 18-28% (Chuẩn)
+                                        <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-800"></div>
+                                    </div>
+                                </div>
+                            </label>
                             <input type="number" id="body-fat" step="0.1" placeholder="25.5"
                                    class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Khối lượng cơ (kg)</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                                Khối lượng cơ (kg)
+                                <div class="relative group/tooltip">
+                                    <i data-lucide="help-circle" class="w-3 h-3 text-slate-400 hover:text-indigo-500 cursor-help transition-colors"></i>
+                                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-slate-800 text-white text-[11px] font-medium p-3 rounded-lg shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all z-50 whitespace-pre-line leading-relaxed pointer-events-none text-left">
+                                        <span class="text-indigo-200 font-bold block mb-1 border-b border-slate-600 pb-1">Lượng cơ tham gia vận động</span>
+                                        Bao gồm cơ vân xương, giúp duy trì tư thế và di chuyển.
+                                        • Chỉ số quan trọng để phát hiện thiểu cơ (Sarcopenia).
+                                        <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-800"></div>
+                                    </div>
+                                </div>
+                            </label>
                             <input type="number" id="muscle-mass" step="0.1" placeholder="45.2"
                                    class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Khối lượng xương (kg)</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                                Khối lượng xương (kg)
+                                <div class="relative group/tooltip">
+                                    <i data-lucide="help-circle" class="w-3 h-3 text-slate-400 hover:text-indigo-500 cursor-help transition-colors"></i>
+                                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-slate-800 text-white text-[11px] font-medium p-3 rounded-lg shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all z-50 whitespace-pre-line leading-relaxed pointer-events-none text-left">
+                                        <span class="text-indigo-200 font-bold block mb-1 border-b border-slate-600 pb-1">Lượng khoáng chất xương</span>
+                                        Cho biết sức khỏe của hệ xương.
+                                        • Thấp: Nguy cơ loãng xương.
+                                        • Cần chú ý bổ sung Canxi/Vitamin D nếu thấp.
+                                        <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-800"></div>
+                                    </div>
+                                </div>
+                            </label>
                             <input type="number" id="bone-mass" step="0.1" placeholder="2.5"
                                    class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
                         </div>
@@ -85,8 +132,8 @@ window.module6Content = `
             </div>
 
             <!-- Section 2: Đánh giá Cơ bắp (Muscle Assessment) -->
-            <div class="glass-panel rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
-                <div class="bg-gradient-to-r from-teal-500 to-emerald-500 px-6 py-4 flex items-center justify-between cursor-pointer hover:brightness-110 transition-all"
+            <div class="glass-panel rounded-[32px] group hover:shadow-xl transition-all duration-300">
+                <div class="bg-gradient-to-r from-teal-500 to-emerald-500 px-6 py-4 flex items-center justify-between cursor-pointer hover:brightness-110 transition-all rounded-t-[32px]"
                      onclick="toggleModule6Section('muscle')">
                     <h3 class="font-black text-white text-sm flex items-center gap-2 uppercase tracking-wide">
                         <i data-lucide="dumbbell" class="w-5 h-5"></i>
@@ -97,20 +144,56 @@ window.module6Content = `
                 <div id="section-muscle" class="p-8">
                      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div class="bg-teal-50/50 p-6 rounded-[24px] border border-teal-100 hover:shadow-md transition-shadow">
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">SMI (kg/m²)</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                                SMI (kg/m²)
+                                <div class="relative group/tooltip">
+                                    <i data-lucide="help-circle" class="w-3 h-3 text-teal-400 hover:text-teal-600 cursor-help transition-colors"></i>
+                                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-slate-800 text-white text-[11px] font-medium p-3 rounded-lg shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all z-50 whitespace-pre-line leading-relaxed pointer-events-none text-left">
+                                        <span class="text-teal-200 font-bold block mb-1 border-b border-slate-600 pb-1">Chỉ số khối cơ xương</span>
+                                        Tiêu chuẩn chẩn đoán thiểu cơ (Sarcopenia).
+                                        • Nam: < 7.0 kg/m² (Thiểu cơ)
+                                        • Nữ: < 5.7 kg/m² (Thiểu cơ)
+                                        <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-800"></div>
+                                    </div>
+                                </div>
+                            </label>
                             <input type="number" id="smi" step="0.1" placeholder="7.2"
                                    class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
                             <p class="text-xs text-teal-600 font-bold mt-2">Skeletal Muscle Index</p>
                         </div>
                         <div class="bg-blue-50/50 p-6 rounded-[24px] border border-blue-100 hover:shadow-md transition-shadow">
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Góc pha (Phase Angle)</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                                Góc pha (Phase Angle)
+                                <div class="relative group/tooltip">
+                                    <i data-lucide="help-circle" class="w-3 h-3 text-blue-400 hover:text-blue-600 cursor-help transition-colors"></i>
+                                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-slate-800 text-white text-[11px] font-medium p-3 rounded-lg shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all z-50 whitespace-pre-line leading-relaxed pointer-events-none text-left">
+                                        <span class="text-blue-200 font-bold block mb-1 border-b border-slate-600 pb-1">Chỉ số chất lượng tế bào</span>
+                                        • Phản ánh sức khỏe màng tế bào và tình trạng dinh dưỡng.
+                                        • Giá trị cao: Tế bào khỏe mạnh (thường > 5.0).
+                                        • Giá trị thấp: Suy giảm sức khỏe tế bào.
+                                        <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-800"></div>
+                                    </div>
+                                </div>
+                            </label>
                             <input type="number" id="phase-angle" step="0.1" placeholder="5.5"
                                    class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
                             <p class="text-xs text-blue-600 font-bold mt-2">Chỉ số chất lượng cơ</p>
                         </div>
                          <!-- Keeping ECW/TBW here as it relates to cell health/quality -->
                         <div class="bg-purple-50/50 p-6 rounded-[24px] border border-purple-100 hover:shadow-md transition-shadow">
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">ECW/TBW</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                                ECW/TBW
+                                <div class="relative group/tooltip">
+                                    <i data-lucide="help-circle" class="w-3 h-3 text-purple-400 hover:text-purple-600 cursor-help transition-colors"></i>
+                                    <div class="absolute bottom-full right-0 mb-2 w-64 bg-slate-800 text-white text-[11px] font-medium p-3 rounded-lg shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all z-50 whitespace-pre-line leading-relaxed pointer-events-none text-left">
+                                        <span class="text-purple-200 font-bold block mb-1 border-b border-slate-600 pb-1">Chỉ số cân bằng nước</span>
+                                        Tỉ lệ nước nằm ngoài tế bào so với tổng lượng nước cơ thể, dùng để đánh giá cân bằng dịch và tình trạng mô.
+                                        • Bình thường: 0.36 - 0.39
+                                        • > 0.40: Có dấu hiệu phù nề hoặc viêm.
+                                        <div class="absolute top-full right-1 border-8 border-transparent border-t-slate-800"></div>
+                                    </div>
+                                </div>
+                            </label>
                             <input type="number" id="ecw-tbw" step="0.01" placeholder="0.38"
                                    class="input-glass w-full px-4 py-3 rounded-xl outline-none text-sm font-bold text-slate-700" />
                             <p class="text-xs text-purple-600 font-bold mt-2">Tỷ lệ nước ngoài tế bào</p>
@@ -120,8 +203,8 @@ window.module6Content = `
             </div>
 
             <!-- Section 3: Khối lượng cơ/chất lượng cơ theo từng bộ phận (Segmental) -->
-            <div class="glass-panel rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
-                <div class="bg-gradient-to-r from-blue-500 to-cyan-500 px-6 py-4 flex items-center justify-between cursor-pointer hover:brightness-110 transition-all"
+            <div class="glass-panel rounded-[32px] group hover:shadow-xl transition-all duration-300">
+                <div class="bg-gradient-to-r from-blue-500 to-cyan-500 px-6 py-4 flex items-center justify-between cursor-pointer hover:brightness-110 transition-all rounded-t-[32px]"
                      onclick="toggleModule6Section('segmental')">
                     <h3 class="font-black text-white text-sm flex items-center gap-2 uppercase tracking-wide">
                         <i data-lucide="activity" class="w-5 h-5"></i>

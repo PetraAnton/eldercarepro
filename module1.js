@@ -131,8 +131,8 @@ window.module1Content = `
         </div>
 
         <!-- SECTION 3: MỨC ĐỘ TỰ LẬP -->
-        <div class="glass-panel rounded-[24px] shadow-sm border border-slate-200 overflow-hidden group hover:shadow-lg transition-shadow duration-300">
-            <div class="bg-emerald-50/50 backdrop-blur-sm px-6 py-4 border-b border-emerald-100/50 flex items-center justify-between">
+        <div class="glass-panel rounded-[24px] shadow-sm border border-slate-200 group hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-emerald-50/50 backdrop-blur-sm px-6 py-4 border-b border-emerald-100/50 flex items-center justify-between rounded-t-[24px]">
                 <h3 class="font-bold text-emerald-900 flex items-center gap-2 text-lg">
                     <div class="p-1.5 bg-emerald-100 rounded-lg text-emerald-600"><i data-lucide="activity" class="w-5 h-5"></i></div>
                     3. Mức độ Tự lập trong sinh hoạt hàng ngày
@@ -141,7 +141,24 @@ window.module1Content = `
             <div class="p-6 space-y-8">
                 <!-- Group 1 -->
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-3">Mức độ tự lập sinh hoạt của người cao tuổi khuyết tật</label>
+                    <label class="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        Mức độ tự lập sinh hoạt của người cao tuổi khuyết tật
+                        <div class="relative group/tooltip">
+                            <i data-lucide="help-circle" class="w-4 h-4 text-slate-400 hover:text-blue-500 cursor-help transition-colors"></i>
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[500px] bg-slate-800 text-white text-[11px] font-medium p-4 rounded-lg shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all z-50 whitespace-pre-line leading-relaxed pointer-events-none text-left">
+                                <span class="text-blue-200 font-bold block mb-2 text-sm uppercase border-b border-slate-600 pb-1">Mức độ tự lập sinh hoạt (Người khuyết tật)</span>
+                                • <span class="text-orange-300 font-bold">J1</span>: Gần như tự lập hoàn toàn; có thể ra ngoài và sinh hoạt xã hội, chỉ hạn chế nhẹ về vận động.
+                                • <span class="text-orange-300 font-bold">J2</span>: Tự lập nhưng khi ra ngoài cần chú ý an toàn hoặc sử dụng dụng cụ hỗ trợ (gậy, tay vịn…).
+                                • <span class="text-orange-300 font-bold">A1</span>: Có thể đi lại và sinh hoạt trong nhà; cần hỗ trợ nhẹ trong một số hoạt động.
+                                • <span class="text-orange-300 font-bold">A2</span>: Khó khăn khi đi lại trong nhà; cần người hỗ trợ rõ ràng khi di chuyển.
+                                • <span class="text-orange-300 font-bold">B1</span>: Không thể tự đi lại; có thể ngồi trên giường hoặc xe lăn và cần hỗ trợ khi di chuyển.
+                                • <span class="text-orange-300 font-bold">B2</span>: Phụ thuộc nhiều vào người chăm sóc; khả năng ngồi còn hạn chế, cần hỗ trợ gần như toàn bộ.
+                                • <span class="text-orange-300 font-bold">C1</span>: Nằm liệt giường; không tự thay đổi tư thế nhưng vẫn còn khả năng giao tiếp.
+                                • <span class="text-orange-300 font-bold">C2</span>: Nằm liệt giường hoàn toàn; không tự thay đổi tư thế và khả năng giao tiếp rất hạn chế.
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-800"></div>
+                            </div>
+                        </div>
+                    </label>
                     <div class="grid grid-cols-3 md:grid-cols-9 gap-2">
                         <label class="cursor-pointer border hover:bg-emerald-50 has-[:checked]:bg-emerald-600 has-[:checked]:text-white has-[:checked]:border-emerald-600 rounded-md p-2 text-center transition-all">
                             <input type="radio" name="disabilityLevel" value="independent" class="hidden">
@@ -184,7 +201,23 @@ window.module1Content = `
 
                 <!-- Group 2 -->
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-3">Mức độ tự lập sinh hoạt của người cao tuổi sa sút trí tuệ</label>
+                    <label class="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        Mức độ tự lập sinh hoạt của người cao tuổi sa sút trí tuệ
+                        <div class="relative group/tooltip">
+                            <i data-lucide="help-circle" class="w-4 h-4 text-slate-400 hover:text-blue-500 cursor-help transition-colors"></i>
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[500px] bg-slate-800 text-white text-[11px] font-medium p-4 rounded-lg shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all z-50 whitespace-pre-line leading-relaxed pointer-events-none text-left">
+                                <span class="text-blue-200 font-bold block mb-2 text-sm uppercase border-b border-slate-600 pb-1">Mức độ tự lập sinh hoạt (Sa sút trí tuệ)</span>
+                                • <span class="text-orange-300 font-bold">Ⅰ</span>: Giảm nhận thức nhẹ; sinh hoạt độc lập, hầu như không ảnh hưởng đến đời sống thường ngày.
+                                • <span class="text-orange-300 font-bold">Ⅱa</span>: Có vấn đề về nhận thức khi ra ngoài; sinh hoạt trong nhà cơ bản vẫn an toàn.
+                                • <span class="text-orange-300 font-bold">Ⅱb</span>: Có vấn đề về nhận thức ngay cả trong nhà; cần hỗ trợ hoặc giám sát một phần.
+                                • <span class="text-orange-300 font-bold">Ⅲa</span>: Hành vi hoặc rối loạn nhận thức ảnh hưởng rõ rệt, chủ yếu xuất hiện ban ngày.
+                                • <span class="text-orange-300 font-bold">Ⅲb</span>: Hành vi hoặc rối loạn nhận thức ảnh hưởng rõ rệt, chủ yếu xuất hiện ban đêm.
+                                • <span class="text-orange-300 font-bold">Ⅳ</span>: Không thể tự sinh hoạt do sa sút trí tuệ; cần chăm sóc và giám sát thường xuyên.
+                                • <span class="text-orange-300 font-bold">M</span>: Có rối loạn tâm thần nặng hoặc triệu chứng hành vi nghiêm trọng; cần can thiệp y khoa chuyên sâu.
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-800"></div>
+                            </div>
+                        </div>
+                    </label>
                      <div class="grid grid-cols-4 md:grid-cols-8 gap-2">
                         <label class="cursor-pointer border hover:bg-emerald-50 has-[:checked]:bg-emerald-600 has-[:checked]:text-white has-[:checked]:border-emerald-600 rounded-md p-2 text-center transition-all">
                             <input type="radio" name="dementiaLevel" value="independent" class="hidden">
