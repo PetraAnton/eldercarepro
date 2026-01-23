@@ -158,8 +158,8 @@ function deleteM7Record(index) {
 function renderM7CreateTab() {
     const today = new Date().toISOString().split('T')[0];
     return `
-        <div class="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden animate-fade-in-up">
-            <div class="p-8 border-b border-slate-100 bg-blue-50/30">
+        <div class="bg-white rounded-[32px] border border-slate-100 shadow-sm animate-fade-in-up">
+            <div class="p-8 border-b border-slate-100 bg-blue-50/30 rounded-t-[32px]">
                 <h3 class="font-black text-slate-800 text-lg flex items-center gap-2">
                     <i data-lucide="plus-circle" class="w-5 h-5 text-blue-600"></i> Nhập liệu kết quả đo mới
                 </h3>
@@ -194,7 +194,18 @@ function renderM7CreateTab() {
                 <!-- 1. Lực cơ -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
                     <div class="md:col-span-4">
-                         <label class="block text-sm font-bold text-slate-700 mb-1">Lực cơ (Muscle)</label>
+                         <label class="block text-sm font-bold text-slate-700 mb-1 flex items-center gap-2">
+                             Lực cơ (Muscle Strength)
+                             <div class="relative group/tooltip">
+                                 <i data-lucide="help-circle" class="w-4 h-4 text-slate-400 hover:text-blue-500 cursor-help transition-colors"></i>
+                                 <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 bg-slate-800 text-white text-[11px] font-medium p-3 rounded-lg shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all z-50 whitespace-pre-line leading-relaxed pointer-events-none text-left">
+                                     <span class="text-blue-200 font-bold block mb-1 border-b border-slate-600 pb-1">Khả năng tạo lực của cơ bắp</span>
+                                     • Phản ánh khả năng nâng, đẩy, kéo, giữ cơ thể hoặc chi thể.
+                                     • Lực cơ giảm làm tăng nguy cơ mệt nhanh, té ngã.
+                                     <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-800"></div>
+                                 </div>
+                             </div>
+                         </label>
                          <p class="text-xs text-slate-400">Tải trọng tối đa / Cân nặng (F/w)</p>
                     </div>
                     <div class="md:col-span-8 grid grid-cols-2 gap-4">
@@ -210,7 +221,18 @@ function renderM7CreateTab() {
                 <!-- 2. Nhanh nhẹn -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
                     <div class="md:col-span-4">
-                         <label class="block text-sm font-bold text-slate-700 mb-1">Độ nhanh nhẹn (Agility)</label>
+                         <label class="block text-sm font-bold text-slate-700 mb-1 flex items-center gap-2">
+                             Độ nhanh nhạy (Agility)
+                             <div class="relative group/tooltip">
+                                 <i data-lucide="help-circle" class="w-4 h-4 text-slate-400 hover:text-blue-500 cursor-help transition-colors"></i>
+                                 <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 bg-slate-800 text-white text-[11px] font-medium p-3 rounded-lg shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all z-50 whitespace-pre-line leading-relaxed pointer-events-none text-left">
+                                     <span class="text-blue-200 font-bold block mb-1 border-b border-slate-600 pb-1">Khả năng phản ứng nhanh</span>
+                                     • Liên quan đến tốc độ phản xạ, phối hợp thần kinh – cơ.
+                                     • Ảnh hưởng đến khả năng tránh va chạm, bắt – đỡ – né.
+                                     <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-800"></div>
+                                 </div>
+                             </div>
+                         </label>
                          <p class="text-xs text-slate-400">Tốc độ phát lực (RFD/w)</p>
                     </div>
                     <div class="md:col-span-8 grid grid-cols-2 gap-4">
@@ -226,7 +248,18 @@ function renderM7CreateTab() {
                 <!-- 3. Ổn định -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
                     <div class="md:col-span-4">
-                         <label class="block text-sm font-bold text-slate-700 mb-1">Độ ổn định (Stability)</label>
+                         <label class="block text-sm font-bold text-slate-700 mb-1 flex items-center gap-2">
+                             Độ ổn định (Stability)
+                             <div class="relative group/tooltip">
+                                 <i data-lucide="help-circle" class="w-4 h-4 text-slate-400 hover:text-blue-500 cursor-help transition-colors"></i>
+                                 <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 bg-slate-800 text-white text-[11px] font-medium p-3 rounded-lg shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all z-50 whitespace-pre-line leading-relaxed pointer-events-none text-left">
+                                     <span class="text-blue-200 font-bold block mb-1 border-b border-slate-600 pb-1">Khả năng giữ thăng bằng</span>
+                                     • Bao gồm thăng bằng tĩnh (giữ tư thế) và động (di chuyển).
+                                     • Độ ổn định kém làm tăng nguy cơ ngã.
+                                     <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-800"></div>
+                                 </div>
+                             </div>
+                         </label>
                          <p class="text-xs text-slate-400">Thời gian ổn định / Rung lắc</p>
                     </div>
                     <div class="md:col-span-8 grid grid-cols-2 gap-4">

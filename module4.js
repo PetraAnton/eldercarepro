@@ -115,17 +115,17 @@ function generateActivityGrid() {
         const headerClass = colorClasses[category.color] || 'bg-gradient-to-r from-pink-500 to-rose-400';
 
         return `
-        <div class="glass-panel rounded-[32px] overflow-hidden mb-8 group hover:shadow-xl transition-all duration-300">
+        <div class="glass-panel rounded-[24px] overflow-hidden mb-6 group hover:shadow-xl transition-all duration-300">
             <div class="${headerClass} px-6 py-4 cursor-pointer hover:brightness-110 transition-all" onclick="toggleCategory('${category.id}')">
                 <div class="flex items-center justify-between">
                     <h3 class="font-black text-white text-sm flex items-center gap-2 uppercase tracking-wide">
                         <i data-lucide="${category.icon}" class="w-5 h-5"></i>
                         ${category.name} <span class="bg-white/20 px-2 py-0.5 rounded-full text-[10px] backdrop-blur-sm">${category.activities.length}</span>
                     </h3>
-                    <i data-lucide="chevron-down" id="chevron-${category.id}" class="w-5 h-5 text-white transition-transform"></i>
+                    <i data-lucide="chevron-down" id="chevron-${category.id}" class="w-5 h-5 text-white transition-transform" style="transform: rotate(-90deg)"></i>
                 </div>
             </div>
-            <div id="category-${category.id}" class="p-6">
+            <div id="category-${category.id}" class="p-6 hidden">
                 <table class="w-full text-left border-collapse">
                     <thead class="border-b border-slate-100/50">
                         <tr>
@@ -179,8 +179,8 @@ function generateActivityGrid() {
                     </tbody>
                 </table>
             </div>
-        </div>
-        `;
+        </div >
+            `;
     }).join('');
 }
 
@@ -189,91 +189,92 @@ function generateActivityGrid() {
 // ============================================
 
 window.module4Content = `
-<div class="animate-fade-in">
-    
-    <form id="module4-form" class="space-y-6 pb-20">
+            <div class="animate-fade-in">
 
-        <!-- Activity Grid -->
-        ${generateActivityGrid()}
+                <form id="module4-form" class="space-y-6 pb-20">
 
-        <!-- Recommendations Panel -->
-        <div class="glass-panel rounded-[32px] p-8 border border-amber-100/50 relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-            <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-                <i data-lucide="sparkles" class="w-32 h-32 text-amber-500"></i>
-            </div>
-            <h3 class="font-black text-amber-600 text-lg mb-4 flex items-center gap-2 uppercase tracking-wide relative z-10">
-                <i data-lucide="lightbulb" class="w-6 h-6"></i>
-                Gợi ý hoạt động phù hợp
-            </h3>
-            <div id="recommendations-list" class="flex flex-wrap gap-3 relative z-10 min-h-[60px]">
-                <span class="text-sm text-slate-400 italic">Chọn các hoạt động để nhận gợi ý cá nhân hóa...</span>
-            </div>
-        </div>
+                    <!-- Activity Grid -->
+                    ${generateActivityGrid()}
 
-        <!-- Notes Section -->
-        <div class="glass-panel p-6 rounded-[32px] border border-pink-100/50">
-            <h3 class="font-black text-pink-900 text-xs uppercase tracking-widest mb-3 flex items-center gap-2">
-                <i data-lucide="file-text" class="w-5 h-5"></i>
-                Ghi chú bổ sung
-            </h3>
-            <textarea id="additionalNotes" rows="4"
-                class="input-glass w-full px-4 py-3 rounded-2xl outline-none text-sm font-medium resize-none shadow-inner"
-                placeholder="Nhận xét về sở thích, khả năng tham gia, hạn chế, khuyến nghị..."></textarea>
-        </div>
-        
-    </form>
+                    <!-- Recommendations Panel -->
+                    <!-- Recommendations Panel -->
+                    <div class="glass-panel rounded-[24px] p-8 border border-amber-100/50 relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                            <i data-lucide="sparkles" class="w-32 h-32 text-amber-500"></i>
+                        </div>
+                        <h3 class="font-black text-amber-600 text-lg mb-4 flex items-center gap-2 uppercase tracking-wide relative z-10">
+                            <i data-lucide="lightbulb" class="w-6 h-6"></i>
+                            Gợi ý hoạt động phù hợp
+                        </h3>
+                        <div id="recommendations-list" class="flex flex-wrap gap-3 relative z-10 min-h-[60px]">
+                            <span class="text-sm text-slate-400 italic">Chọn các hoạt động để nhận gợi ý cá nhân hóa...</span>
+                        </div>
+                    </div>
+
+                    <!-- Notes Section -->
+                    <div class="glass-panel p-6 rounded-[24px] border border-pink-100/50">
+                        <h3 class="font-black text-pink-900 text-xs uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-5 h-5"></i>
+                            Ghi chú bổ sung
+                        </h3>
+                        <textarea id="additionalNotes" rows="4"
+                            class="input-glass w-full px-4 py-3 rounded-2xl outline-none text-sm font-medium resize-none shadow-inner"
+                            placeholder="Nhận xét về sở thích, khả năng tham gia, hạn chế, khuyến nghị..."></textarea>
+                    </div>
+
+                </form>
 
 </div>
 
 <!-- FLOATING ACTION BUTTONS (FAB) - Moved Outside -->
 <!-- FABs for Module 4 -->
-<div id="module4-fab-container" class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
-    
-    <!-- SAVE (Create Mode) -->
-    <button type="button" id="module4-fab-save" onclick="saveModule4Assessment()" 
-        class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-pink-600 to-rose-500 text-white rounded-full shadow-[0_8px_30px_rgb(219,39,119,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-        <i data-lucide="save" class="w-7 h-7"></i>
-        <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-            Lưu đánh giá
-        </span>
-    </button>
+            <div id="module4-fab-container" class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
 
-    <!-- UPDATE (Edit Mode) -->
-    <button type="button" id="module4-fab-update" onclick="saveModule4Assessment()" 
-        class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-        <i data-lucide="save" class="w-7 h-7"></i>
-        <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-            Lưu thay đổi
-        </span>
-    </button>
+                <!-- SAVE (Create Mode) -->
+                <button type="button" id="module4-fab-save" onclick="saveModule4Assessment()"
+                    class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-pink-600 to-rose-500 text-white rounded-full shadow-[0_8px_30px_rgb(219,39,119,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+                    <i data-lucide="save" class="w-7 h-7"></i>
+                    <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                        Lưu đánh giá
+                    </span>
+                </button>
 
-    <!-- EDIT (View Mode) -->
-    <button type="button" id="module4-fab-edit" onclick="toggleModule4EditMode(true)" 
-        class="pointer-events-auto w-14 h-14 bg-amber-500 text-white rounded-full shadow-[0_8px_25px_rgb(245,158,11,0.5)] hover:bg-amber-400 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-        <i data-lucide="edit-2" class="w-6 h-6"></i>
-        <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-            Chỉnh sửa
-        </span>
-    </button>
+                <!-- UPDATE (Edit Mode) -->
+                <button type="button" id="module4-fab-update" onclick="saveModule4Assessment()"
+                    class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+                    <i data-lucide="save" class="w-7 h-7"></i>
+                    <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                        Lưu thay đổi
+                    </span>
+                </button>
 
-    <!-- CLOSE (Cancel Edit) -->
-    <button type="button" id="module4-fab-close" onclick="cancelModule4Edit()" 
-        class="pointer-events-auto hidden w-12 h-12 bg-white text-slate-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-slate-200 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-slate-100 ring-2 ring-white">
-        <i data-lucide="x" class="w-6 h-6"></i>
-        <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-            Đóng / Hủy
-        </span>
-    </button>
+                <!-- EDIT (View Mode) -->
+                <button type="button" id="module4-fab-edit" onclick="toggleModule4EditMode(true)"
+                    class="pointer-events-auto w-14 h-14 bg-amber-500 text-white rounded-full shadow-[0_8px_25px_rgb(245,158,11,0.5)] hover:bg-amber-400 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+                    <i data-lucide="edit-2" class="w-6 h-6"></i>
+                    <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                        Chỉnh sửa
+                    </span>
+                </button>
 
-    <!-- RESET (Create Mode) -->
-    <button type="button" id="module4-fab-reset" onclick="resetModule4Form()" 
-        class="pointer-events-auto hidden w-12 h-12 bg-white text-rose-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-rose-100 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-rose-50 ring-2 ring-white">
-        <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
-        <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-            Nhập lại
-        </span>
-    </button>
-</div>
+                <!-- CLOSE (Cancel Edit) -->
+                <button type="button" id="module4-fab-close" onclick="cancelModule4Edit()"
+                    class="pointer-events-auto hidden w-12 h-12 bg-white text-slate-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-slate-200 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-slate-100 ring-2 ring-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                    <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                        Đóng / Hủy
+                    </span>
+                </button>
+
+                <!-- RESET (Create Mode) -->
+                <button type="button" id="module4-fab-reset" onclick="resetModule4Form()"
+                    class="pointer-events-auto hidden w-12 h-12 bg-white text-rose-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-rose-100 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-rose-50 ring-2 ring-white">
+                    <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+                    <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                        Nhập lại
+                    </span>
+                </button>
+            </div>
 `;
 
 // ============================================
@@ -465,10 +466,10 @@ function loadModule4Data(data) {
             const categoryId = parts[0];
             const activityId = parts.slice(1).join('_'); // Handle if activityId has underscore? actually split limit 2 is safer but our ID const data uses simple IDs.
             // Wait, the key stored was `category.id + '_' + activity.id`. 
-            // The HTML IDs are `doing-category.id-activity.id`.
+            // The HTML IDs are `doing - category.id - activity.id`.
 
             const setChecked = (type, val) => {
-                const el = document.getElementById(`${type}-${categoryId}-${activityId}`);
+                const el = document.getElementById(`${type} -${categoryId} -${activityId} `);
                 if (el) el.checked = !!val;
             };
 
@@ -535,7 +536,7 @@ function initModule4() {
     const patientId = getCurrentPatientId();
 
     // Load existing data (Single Record)
-    const savedData = localStorage.getItem(`mirabocaresync_${patientId}_interests_assessment`); // New key
+    const savedData = localStorage.getItem(`mirabocaresync_${patientId} _interests_assessment`); // New key
 
     if (savedData) {
         try {
@@ -548,7 +549,7 @@ function initModule4() {
         }
     } else {
         // Check legacy array data for migration
-        const legacyData = localStorage.getItem(`mirabocaresync_${patientId}_interests`);
+        const legacyData = localStorage.getItem(`mirabocaresync_${patientId} _interests`);
         if (legacyData) {
             try {
                 const arr = JSON.parse(legacyData);
