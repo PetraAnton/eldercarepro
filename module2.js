@@ -353,6 +353,23 @@ function switchModule2Tab(tabName) {
         }
     });
 
+    // Portal Actions Logic
+    const actions = document.getElementById('module-actions');
+    if (actions) {
+        if (tabName === 'history') {
+            actions.innerHTML = `
+                <button onclick="switchModule2Tab('form'); toggleM2Fab(true); if(typeof resetModule2Form === 'function') resetModule2Form(true); m2EditingIndex = null; showToast('Đã mở form tạo mới', 'info');" 
+                    class="btn-ios btn-ios-primary"
+                    title="Tạo đánh giá mới">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    <span>Tạo đánh giá mới</span>
+                </button>
+            `;
+        } else {
+            actions.innerHTML = '';
+        }
+    }
+
     // Load history if switching to history tab
     if (tabName === 'history') {
         loadMeetingHistory();
@@ -361,7 +378,7 @@ function switchModule2Tab(tabName) {
         if (fab) fab.classList.add('hidden');
     } else {
         // If switching to form, update state to show (if applicable)
-        updateModule2FabState();
+        if (typeof updateModule2FabState === 'function') updateModule2FabState(m2EditingIndex !== null ? 'edit' : 'create');
     }
 
     lucide.createIcons();

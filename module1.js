@@ -7,7 +7,6 @@ window.module1Content = `
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-2xl font-black text-blue-900">Thông tin Cơ bản (Face Sheet)</h2>
-                <p class="text-slate-500 text-sm">Hồ sơ quản lý người cao tuổi theo tiêu chuẩn</p>
             </div>
             <div class="flex gap-2">
                 <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">Mẫu chuẩn 2026</span>

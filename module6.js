@@ -826,57 +826,59 @@ function switchModule6Tab(tabName) {
     // Reset all
     formTab.classList.add('hidden');
     historyTab.classList.add('hidden');
-    reportTab?.classList.add('hidden'); // reportTab might be dynamically rendered later
+    reportTab?.classList.add('hidden');
 
     const inactiveClass = 'px-6 py-3 font-bold text-slate-400 border-b-4 border-transparent hover:text-slate-600 transition-all flex items-center gap-2';
-    const activeClass = 'px-6 py-3 font-bold text-indigo-600 border-b-4 border-indigo-600 transition-all flex items-center gap-2';
+    const activeClass = 'px-6 py-3 font-black text-indigo-600 border-b-4 border-indigo-600 transition-all flex items-center gap-2';
 
     formBtn.className = inactiveClass;
     historyBtn.className = inactiveClass;
     reportBtn.className = inactiveClass;
 
+    // Portal Actions Logic
+    const actions = document.getElementById('module-actions');
+    if (actions) {
+        if (tabName !== 'form') {
+            actions.innerHTML = `
+                <button onclick="switchModule6Tab('form')" 
+                    class="btn-ios btn-ios-primary"
+                    title="Tạo đánh giá mới">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    <span>Tạo đánh giá mới</span>
+                </button>
+            `;
+            lucide.createIcons();
+        } else {
+            actions.innerHTML = '';
+        }
+    }
+
     if (tabName === 'form') {
         formTab.classList.remove('hidden');
         formBtn.className = activeClass;
 
-        // Auto-reset form for fresh start (Silent)
         if (typeof resetModule6Form === 'function') {
             document.getElementById('module6-form').reset();
-            // Reset calculated UI fields manually since form.reset doesn't cover them all
-            // Reset calculated fields logic duplicated here or ensure resetModule6Form is clean
-            // Since resetModule6Form calls confirm() which we removed, effectively making it just reset logic.
-            // But wait, resetModule6Form calls confirm() in older version, but I removed it in step 3178.
-            // However, fabHelper calls onReset inside confirm.
-            // Here we just want the logic.
             resetModule6Form();
-
-            // Force FAB update
             if (window.module6FAB && window.module6FAB.updateFABs) {
-                window.module6FAB.isDirty = false; // We just cleaned it
+                window.module6FAB.isDirty = false;
                 window.module6FAB.updateFABs();
             }
         }
-
-        updateModule6FabState(); // Check dirty state
+        updateModule6FabState();
     } else if (tabName === 'history') {
         historyTab.classList.remove('hidden');
         historyBtn.className = activeClass;
         loadModule6History();
         document.getElementById('module6-fab-container')?.classList.add('hidden');
     } else if (tabName === 'report') {
-        // If report tab doesn't exist yet in DOM, we check later
         if (reportTab) reportTab.classList.remove('hidden');
         reportBtn.className = activeClass;
-
-        // Force hide FAB again just in case
         document.getElementById('module6-fab-container')?.classList.add('hidden');
-
-        // Load latest report or last selected
         const lastSelected = window.lastSelectedReportTimestamp || null;
         renderModule6Report(lastSelected);
     }
 
-    // Reinitialize icons
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
@@ -1288,11 +1290,11 @@ function renderReportTable(data, patientId) {
     const metrics = [
         { name: 'Độ tuổi', value: age, unit: 'tuổi', refText: 'Thông tin hành chính' },
         { name: 'Chiều cao', value: data.general.height, unit: 'cm', refText: 'Thông tin hành chính' },
-        { name: 'Cân nặng', value: data.general.weight, unit: 'kg', min: 50, max: 75, refText: fmtRange(50, 75, 'kg') },
-        { name: 'BMI', value: data.general.bmi, unit: 'kg/m²', min: 18.5, max: 23, refText: fmtRange(18.5, 23, 'kg/m²') },
-        { name: 'Tỷ lệ mỡ cơ thể', value: data.general.bodyFat, unit: '%', min: 10, max: 20, refText: fmtRange(10, 20, '%') },
-        { name: 'Khối lượng cơ', value: data.general.muscleMass, unit: 'kg', min: 25, max: 35, refText: fmtRange(25, 35, 'kg') },
-        { name: 'Khối lượng xương ước tính', value: data.general.boneMass || '--', unit: 'kg', refText: '2.0 - 4.0' },
+        { name: 'Cân nặng', value: parseFloat(data.general.weight).toFixed(1), unit: 'kg', min: 50, max: 75, refText: fmtRange(50, 75, 'kg') },
+        { name: 'BMI', value: parseFloat(data.general.bmi).toFixed(1), unit: 'kg/m²', min: 18.5, max: 23, refText: fmtRange(18.5, 23, 'kg/m²') },
+        { name: 'Tỷ lệ mỡ cơ thể', value: parseFloat(data.general.bodyFat).toFixed(1), unit: '%', min: 10, max: 20, refText: fmtRange(10, 20, '%') },
+        { name: 'Khối lượng cơ', value: parseFloat(data.general.muscleMass).toFixed(1), unit: 'kg', min: 25, max: 35, refText: fmtRange(25, 35, 'kg') },
+        { name: 'Khối lượng xương ước tính', value: data.general.boneMass ? parseFloat(data.general.boneMass).toFixed(1) : '--', unit: 'kg', refText: '2.0 - 4.0' },
         { name: 'Tỷ lệ trao đổi chất (BMR)', value: bmr || '--', unit: 'kcal', refText: '1200 - 2000' },
     ];
 

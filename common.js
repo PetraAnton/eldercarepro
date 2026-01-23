@@ -269,7 +269,68 @@ function logout() {
  * @returns {Array} Array of patient objects
  */
 function getAllPatients() {
-    return JSON.parse(localStorage.getItem('mirabocaresync_patients') || '[]');
+    let patients = JSON.parse(localStorage.getItem('mirabocaresync_patients') || '[]');
+
+    // Auto-generate dummy data if empty
+    if (patients.length === 0) {
+        patients = generateDummyPatients();
+        localStorage.setItem('mirabocaresync_patients', JSON.stringify(patients));
+    }
+
+    return patients;
+}
+
+/**
+ * Generate 10 dummy patients for testing
+ * @returns {Array} Array of patient objects
+ */
+function generateDummyPatients() {
+    const lastNames = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Huỳnh', 'Phan', 'Vũ', 'Võ', 'Đặng'];
+    const middleNames = ['Văn', 'Thị', 'Đức', 'Ngọc', 'Minh', 'Thanh', 'Hữu', 'Thu', 'Quang', 'Xuân'];
+    const firstNames = ['An', 'Bình', 'Cường', 'Dung', 'Phúc', 'Giang', 'Hà', 'Hiếu', 'Khánh', 'Lan', 'Minh', 'Nam', 'Oanh', 'Phú', 'Quân', 'Sơn', 'Tâm', 'Uyên', 'Vinh', 'Yến'];
+
+    const careLevels = ['Chăm sóc 1', 'Chăm sóc 2', 'Chăm sóc 3', 'Chăm sóc 4', 'Chăm sóc 5'];
+
+    const patients = [];
+    const currentYear = new Date().getFullYear();
+
+    for (let i = 1; i <= 10; i++) {
+        // Random Name
+        const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+        const middleName = middleNames[Math.floor(Math.random() * middleNames.length)];
+        const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+        const fullName = `${lastName} ${middleName} ${firstName}`;
+
+        // Random Gender (Roughly based on middle name or random)
+        let gender = Math.random() > 0.5 ? 'male' : 'female';
+        if (middleName === 'Thị' || middleName === 'Thu' || middleName === 'Oanh' || middleName === 'Lan') gender = 'female';
+        if (middleName === 'Văn' || middleName === 'Đức' || middleName === 'Hữu') gender = 'male';
+
+        // Random DOB (Age 60-95)
+        const age = 60 + Math.floor(Math.random() * 36);
+        const birthYear = currentYear - age;
+        const birthMonth = String(1 + Math.floor(Math.random() * 12)).padStart(2, '0');
+        const birthDay = String(1 + Math.floor(Math.random() * 28)).padStart(2, '0');
+        const dateOfBirth = `${birthYear}-${birthMonth}-${birthDay}`;
+
+        // Random Care Level
+        const careLevel = careLevels[Math.floor(Math.random() * careLevels.length)];
+
+        const patientId = String(i).padStart(3, '0') + '-DAY-' + String(currentYear).slice(-2);
+
+        patients.push({
+            id: patientId,
+            fullName: fullName,
+            dateOfBirth: dateOfBirth,
+            gender: gender,
+            careLevel: careLevel,
+            active: true,
+            status: 'active',
+            createdAt: new Date().toISOString()
+        });
+    }
+
+    return patients;
 }
 
 /**

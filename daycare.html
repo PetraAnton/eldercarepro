@@ -17,6 +17,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest"></script>
     <!-- html2pdf.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- Demo Data Generator -->
+    <script src="js/dummy_data_generator.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
@@ -61,14 +65,43 @@
         }
 
         /* Animation cho mượt */
+        /* Mobile Layour Adjustments */
+        @media (max-width: 1024px) {
+
+            /* Full Screen Patient Switcher */
+            #patient-switcher-dropdown {
+                position: fixed !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%);
+                width: 90% !important;
+                max-width: 400px;
+                max-height: 80vh !important;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 100vmax rgba(0, 0, 0, 0.5) !important;
+                z-index: 100 !important;
+            }
+
+            /* Hide Scroll Helpers (if any generic fixed buttons at bottom right) */
+            /* Targeting buttons that are likely scroll arrows (usually small, near bottom edge) */
+            /* Excluding known FAB containers if they are critical */
+            button[class*="fixed"][class*="bottom-"][class*="w-8"],
+            button[class*="fixed"][class*="bottom-"][class*="w-10"],
+            .scroll-helper-arrow {
+                display: none !important;
+            }
+        }
+
         .animate-fade-in {
             animation: fadeIn 0.4s ease-out;
         }
+
+
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
                 transform: translateY(10px);
+
             }
 
             to {
@@ -76,8 +109,220 @@
                 transform: translateY(0);
             }
         }
+
+        /* PREMIUM IOS BUTTON SYSTEM */
+        .btn-ios {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            /* Pill shape */
+            font-weight: 700;
+            font-size: 0.875rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        /* Small Variant */
+        .btn-ios-sm {
+            padding: 0.4rem 1rem;
+            font-size: 0.75rem;
+        }
+
+        /* Scale Effect on Active/Click */
+        .btn-ios:active {
+            transform: scale(0.96);
+        }
+
+        /* Primary: Blue Gradient + Colored Shadow */
+        .btn-ios-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: none;
+        }
+
+        .btn-ios-primary::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center top, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .btn-ios-primary:hover {
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.45),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-ios-primary:hover::after {
+            opacity: 1;
+        }
+
+        /* Secondary: White Glassy + Subtle Shadow */
+        .btn-ios-secondary {
+            background: white;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-ios-secondary:hover {
+            background-color: #f8fafc;
+            color: #1e293b;
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
+
+        /* PRINT MODE STYLES (PDF Generation) */
+        .print-mode {
+            width: 210mm !important;
+            max-width: 210mm !important;
+            min-height: 297mm;
+            background: white !important;
+            margin: 0 auto !important;
+            padding: 20px !important;
+            box-shadow: none !important;
+        }
+
+        .print-mode .print-section {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            margin-bottom: 24px;
+        }
+
+        /* Force gradients to render correctly in capture */
+        .print-mode * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
     </style>
     <link rel="stylesheet" href="print.css">
+    <!-- PDF Hidden Container (Off-screen) -->
+    <div id="pdf-hidden-container"
+        style="position: fixed; left: -9999px; top: 0; width: 210mm; background: white; z-index: -1;"></div>
+
+    <style>
+        /* Medical Report Print Styles */
+        .medical-report {
+            font-family: 'Times New Roman', Times, serif;
+            /* Professional Serif */
+            color: #000;
+            line-height: 1.5;
+            width: 100%;
+        }
+
+        .medical-report h1 {
+            font-size: 24pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .medical-report h2 {
+            font-size: 16pt;
+            font-weight: bold;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .medical-report h3 {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .medical-report p {
+            font-size: 12pt;
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        /* Medical Tables */
+        .medical-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 11pt;
+        }
+
+        .medical-table th,
+        .medical-table td {
+            border: 1px solid #333;
+            padding: 8px 12px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .medical-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .medical-table td.center {
+            text-align: center;
+        }
+
+        .medical-table td.right {
+            text-align: right;
+        }
+
+        .medical-table td.bold {
+            font-weight: bold;
+        }
+
+        /* Images */
+        .report-image-container {
+            text-align: center;
+            margin: 20px 0;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background: #fff;
+        }
+
+        .report-image {
+            max-height: 500px;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        /* Page Break Utility */
+        .page-break {
+            page-break-before: always;
+        }
+
+        /* Utility */
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-4 {
+            margin-top: 20px;
+        }
+
+        .mb-4 {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 
 <body class="bg-[#F2F2F7] text-[#000000] h-screen flex overflow-hidden selection:bg-[#007AFF]/20">
@@ -140,6 +385,12 @@
                 <div class="w-6 h-6 flex justify-center shrink-0"><i data-lucide="settings" class="w-6 h-6"></i></div>
                 <span class="block lg:hidden group-[.is-expanded]:lg:block transition-opacity duration-300">Cài
                     đặt</span>
+            </button>
+            <button onclick="generateDummyData()" title="Tạo dữ liệu mẫu"
+                class="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[17px] font-medium text-amber-600 hover:bg-amber-50 overflow-hidden whitespace-nowrap group/item border-t border-slate-100 mt-4 pt-4">
+                <div class="w-6 h-6 flex justify-center shrink-0"><i data-lucide="database" class="w-6 h-6"></i></div>
+                <span class="block lg:hidden group-[.is-expanded]:lg:block transition-opacity duration-300">Tạo Dữ liệu
+                    Mẫu</span>
             </button>
         </nav>
 
@@ -260,6 +511,7 @@
                                 <tr>
                                     <th class="px-4 md:px-6 lg:px-10 py-6 whitespace-nowrap">Tên Bệnh nhân</th>
                                     <th class="px-4 md:px-6 lg:px-10 py-6 whitespace-nowrap">Mức độ</th>
+                                    <th class="px-4 md:px-6 lg:px-10 py-6 whitespace-nowrap">Tiến độ</th>
                                     <th class="px-4 md:px-6 lg:px-10 py-6 whitespace-nowrap">Trạng thái</th>
                                     <th class="px-4 md:px-6 lg:px-10 py-6 text-right whitespace-nowrap">Hành động</th>
                                 </tr>
@@ -279,7 +531,7 @@
                                             hoạt động</span></td>
                                     <td class="px-4 md:px-6 lg:px-10 py-6 text-right">
                                         <button onclick="openPatient(1)"
-                                            class="bg-slate-900 text-white px-6 py-2 rounded-2xl text-xs font-black hover:bg-blue-600 transition-all shadow-lg shadow-slate-200">Chi
+                                            class="btn-ios btn-ios-primary btn-ios-sm shadow-blue-200">Chi
                                             tiết hồ sơ</button>
                                     </td>
                                 </tr>
@@ -326,29 +578,48 @@
                         </div>
                     </div>
                     <div class="flex gap-4">
-                        <button onclick="switchTab('patients')"
-                            class="px-6 py-4 bg-slate-100 text-slate-600 rounded-3xl font-black text-sm hover:bg-slate-200 transition-all">
-                            Quay lại danh sách</button>
+                        <button onclick="switchTab('patients')" class="btn-ios btn-ios-secondary">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                            <span>Quay lại danh sách</span></button>
                     </div>
                 </div>
 
                 <!-- 9 Modules Workspace -->
-                <div class="flex flex-col lg:flex-row gap-10 pb-16">
-                    <!-- Nav Tabs -->
-                    <div id="module-tabs" class="w-full lg:w-80 space-y-3">
+                <div class="flex flex-col lg:flex-row gap-10 pb-16 relative">
+                    <!-- Nav Tabs (Mobile: Dashboard View) -->
+                    <div id="mobile-dashboard-view" class="w-full lg:w-80 space-y-3 transition-all duration-300">
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-[3px] mb-6 pl-4">9 Nghiệp vụ
                             quản lý</p>
-                        <!-- Module items via JS -->
+                        <div id="module-tabs" class="space-y-3">
+                            <!-- Module items via JS -->
+                        </div>
                     </div>
 
-                    <!-- Work Area -->
-                    <div
-                        class="flex-1 bg-white rounded-[24px] border border-slate-100 shadow-sm overflow-hidden min-h-[600px] flex flex-col relative">
+                    <!-- Work Area (Mobile: Detail View) -->
+                    <div id="mobile-detail-view"
+                        class="hidden lg:block flex-1 bg-white rounded-[24px] border border-slate-100 shadow-sm overflow-hidden min-h-[600px] flex flex-col relative transition-all duration-300">
+
+                        <!-- Mobile Back Navigation -->
+                        <div
+                            class="lg:hidden p-4 border-b border-slate-50 flex items-center gap-3 bg-white sticky top-0 z-20">
+                            <button onclick="toggleMobileView('dashboard')"
+                                class="p-2 -ml-2 text-slate-500 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all flex items-center gap-2">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                                <span class="text-sm font-bold">Quay lại danh sách</span>
+                            </button>
+                        </div>
+
                         <!-- Floating Module Actions -->
-                        <div id="module-actions" class="absolute top-8 right-8 z-10 flex gap-2"></div>
+                        <div id="module-actions"
+                            class="relative top-0 right-0 p-4 flex justify-end gap-2 z-10 md:absolute md:top-5 md:right-10 md:p-0">
+                        </div>
 
                         <div id="module-content" class="p-4 md:p-10 flex-1 overflow-y-auto min-h-[400px]">
                             <!-- Dynamic Content -->
+                            <div class="flex flex-col items-center justify-center h-full text-center p-10 opacity-50">
+                                <i data-lucide="layout-grid" class="w-16 h-16 text-slate-200 mb-4"></i>
+                                <p class="text-slate-400 font-bold">Chọn một nghiệp vụ để bắt đầu</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1473,6 +1744,14 @@
                             </div>
                         </td>
                         <td class="px-4 md:px-6 lg:px-10 py-4 text-slate-500 text-sm whitespace-nowrap">${patient.careLevel || 'Chăm sóc 1'}</td>
+                        <td class="px-4 md:px-6 lg:px-10 py-4 text-slate-500 text-sm whitespace-nowrap">
+                            <div class="flex items-center gap-2">
+                                <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-blue-500 rounded-full" style="width: ${progressPercent}%"></div>
+                                </div>
+                                <span class="text-xs font-medium text-slate-600">${realCount}/${totalModules}</span>
+                            </div>
+                        </td>
                         <td class="px-4 md:px-6 lg:px-10 py-4 whitespace-nowrap">
                             ${statusBadge}
                         </td>
@@ -1613,9 +1892,55 @@
             lucide.createIcons();
         }
 
+        // --- Mobile View Logic ---
+        let currentMobileState = 'dashboard';
+
+        function checkMobileView() {
+            return window.innerWidth < 1024; // lg breakpoint matches CSS
+        }
+
+        function toggleMobileView(view) {
+            const dashboard = document.getElementById('mobile-dashboard-view');
+            const detail = document.getElementById('mobile-detail-view');
+
+            if (!checkMobileView()) {
+                // Desktop: Ensure both visible
+                if (dashboard) dashboard.classList.remove('hidden');
+                if (detail) detail.classList.remove('hidden');
+                return;
+            }
+
+            if (view === 'dashboard') {
+                if (dashboard) dashboard.classList.remove('hidden');
+                if (detail) detail.classList.add('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                if (dashboard) dashboard.classList.add('hidden');
+                if (detail) detail.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            currentMobileState = view;
+        }
+
+        // Resize Listener
+        window.addEventListener('resize', () => {
+            if (!checkMobileView()) {
+                const dashboard = document.getElementById('mobile-dashboard-view');
+                const detail = document.getElementById('mobile-detail-view');
+                if (dashboard) dashboard.classList.remove('hidden');
+                if (detail) detail.classList.remove('hidden');
+            } else {
+                toggleMobileView(currentMobileState);
+            }
+        });
+
         function setActiveModule(id) {
             currentModuleId = id;
-            // document.getElementById('module-title').innerText = modules.find(m => m.id === id).title; // Removed redundant header update
+
+            // Switch to detail view on mobile
+            if (checkMobileView()) {
+                toggleMobileView('detail');
+            }
 
             modules.forEach(m => {
                 const btn = document.getElementById(`module-btn-${m.id}`);
@@ -1734,6 +2059,42 @@
     <script src="module7.js"></script>
     <script src="module8.js"></script>
     <script src="module9.js"></script>
+
+    <!-- PDF Preview Modal -->
+    <div id="pdf-preview-modal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full h-full max-w-6xl flex flex-col overflow-hidden shadow-2xl">
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800">Xem trước báo cáo PDF</h3>
+                        <p class="text-sm text-slate-500" id="pdf-preview-filename">Report.pdf</p>
+                    </div>
+                </div>
+                <button onclick="closePdfPreview()"
+                    class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- PDF Viewer Iframe -->
+            <div class="flex-1 bg-slate-100 relative">
+                <div id="pdf-loading"
+                    class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 gap-3">
+                    <i data-lucide="loader-2" class="w-8 h-8 animate-spin text-indigo-600"></i>
+                    <p class="font-medium">Đang tạo PDF chuẩn y khoa...</p>
+                </div>
+                <iframe id="pdf-viewer-frame" class="w-full h-full border-0 hidden"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Module 10 PDF Generator (Professional Medical Report) -->
+    <script src="module10_pdf.js"></script>
 </body>
 
 </html>
