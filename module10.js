@@ -62,27 +62,32 @@ function renderGalleryItem(view) {
 const assessmentViewTemplate = `
 <div id="assessment-overlay" class="fixed inset-0 z-50 bg-slate-900 flex flex-col hidden animate-fade-in">
     <!-- Header -->
-    <div class="px-6 py-4 border-b border-slate-700 bg-slate-800 flex items-center justify-between">
-        <div class="flex items-center gap-4">
-            <button onclick="closeSession()" class="text-slate-400 hover:text-white transition-colors flex items-center gap-2">
+    <div class="px-6 py-4 border-b border-slate-700 bg-slate-800 flex items-center justify-between relative">
+        <!-- Left: Exit & Title -->
+        <div class="flex items-center gap-4 z-10">
+            <button onclick="closeSession()" class="text-slate-400 hover:text-white transition-colors flex items-center gap-2 hover:bg-slate-700/50 px-3 py-1.5 rounded-lg active:scale-95">
                 <i data-lucide="x" class="w-5 h-5"></i>
-                <span class="font-semibold">Exit</span>
+                <span class="font-semibold">Thoát</span>
             </button>
             <div class="w-px h-6 bg-slate-600"></div>
-            <h1 class="text-lg font-bold text-white">New Assessment Session</h1>
+            <h1 class="text-lg font-bold text-white hidden md:block">New Assessment Session</h1>
         </div>
         
-        <div class="flex items-center gap-4">
-            <!-- Status Indicator -->
-            <div id="posture-status" class="flex items-center gap-3 bg-slate-900 px-4 py-1.5 rounded-full border border-slate-600">
-                <div id="status-dot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></div>
-                <span id="status-text" class="text-white font-semibold text-xs">ADJUST POSITION</span>
+        <!-- Center: Status Indicator (Enlarged) -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div id="posture-status" class="flex items-center gap-3 bg-slate-900 px-6 py-2.5 rounded-full border border-slate-600 shadow-xl pointer-events-auto transition-all duration-300">
+                <div id="status-dot" class="w-3 h-3 rounded-full bg-slate-500"></div>
+                <span id="status-text" class="text-white font-black text-sm tracking-wider">ADJUST POSITION</span>
             </div>
-            
+        </div>
+        
+        <!-- Right: Save Button -->
+        <div class="flex items-center gap-4 z-10">
             <button onclick="saveSessionToHistory()" 
-                    class="flex items-center gap-2 px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors">
+                    class="flex items-center gap-2 px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors shadow-lg hover:shadow-green-500/20 active:scale-95 duration-200">
                 <i data-lucide="save" class="w-4 h-4"></i>
-                Save & Finish
+                <span class="hidden md:inline">Save & Finish</span>
+                <span class="md:hidden">Save</span>
             </button>
         </div>
     </div>
@@ -203,6 +208,29 @@ const measureModalTemplate = `
 `;
 
 const pdfPreviewModalTemplate = `
+<style>
+    @media print {
+        body > * { display: none !important; }
+        #pdf-preview-modal { 
+            display: block !important; 
+            position: absolute !important; 
+            top: 0 !important; 
+            left: 0 !important; 
+            width: 100% !important; 
+            height: auto !important; 
+            background: white !important;
+            z-index: 9999 !important;
+        }
+        #pdf-preview-modal > div:first-child { display: none !important; } /* Hide Toolbar */
+        #pdf-page-container {
+            box-shadow: none !important;
+            margin: 0 !important;
+            width: 100% !important;
+            padding: 0 !important;
+        }
+        #pdf-preview-modal .overflow-y-auto { overflow: visible !important; }
+    }
+</style>
 <div id="pdf-preview-modal" class="fixed inset-0 bg-slate-200/95 z-[80] hidden flex flex-col backdrop-blur-sm animate-fade-in">
     <!-- Toolbar -->
     <div class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shadow-sm z-10 transition-colors">
@@ -260,9 +288,10 @@ window.renderModule10 = async function (container) {
     if (actionsContainer) {
         actionsContainer.innerHTML = `
         <button onclick="openNewSession()" 
-                class="flex items-center gap-3 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-500/30 transform hover:scale-105">
-            <i data-lucide="plus-circle" class="w-5 h-5"></i>
-            Tạo đánh giá mới
+                class="btn-ios btn-ios-primary"
+                title="Tạo đánh giá mới">
+            <i data-lucide="plus" class="w-5 h-5"></i>
+            <span>Tạo đánh giá mới</span>
         </button>
         `;
     }
@@ -424,11 +453,10 @@ async function openNewSession() {
 }
 
 function closeSession() {
-    if (confirm('Exit assessment? Unsaved data will be lost.')) {
-        stopPostureCamera();
-        document.getElementById('assessment-overlay').classList.add('hidden');
-        postureState.mode = 'HISTORY';
-    }
+    // Direct exit without blocking confirm to ensure reliability
+    stopPostureCamera();
+    document.getElementById('assessment-overlay').classList.add('hidden');
+    postureState.mode = 'HISTORY';
 }
 
 function saveSessionToHistory() {
@@ -472,17 +500,22 @@ function deleteSession(sessionId) {
 }
 
 function viewReport(sessionId, directPdf = false) {
-    const patientId = getCurrentPatientId();
-    const history = getPostureHistory(patientId);
-    const session = history.find(s => s.id === sessionId);
+    try {
+        const patientId = getCurrentPatientId();
+        const history = getPostureHistory(patientId);
+        const session = history.find(s => s.id === sessionId);
 
-    if (!session) return;
+        if (!session) return;
 
-    // Reuse generate report logic but pass session data instead of global state
-    generateReportForSession(session);
+        // Reuse generate report logic but pass session data instead of global state
+        generateReportForSession(session);
 
-    if (directPdf) {
-        openPdfPreview();
+        if (directPdf) {
+            openPdfPreview();
+        }
+    } catch (e) {
+        console.error('Error generating report:', e);
+        showToast('Error generating report: ' + e.message, 'error');
     }
 }
 
@@ -511,12 +544,19 @@ function downloadReportPdf() {
     const element = document.getElementById('pdf-page-container');
     const filename = document.getElementById('pdf-preview-filename').textContent || 'Report.pdf';
 
+    // Premium iOS Style PDF Options
     const opt = {
-        margin: 0,
+        margin: [15, 10, 20, 10], // Top, Right, Bottom, Left (mm)
         filename: filename,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            scrollY: 0,
+            letterRendering: true
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     };
 
     // Show loading state
@@ -524,11 +564,47 @@ function downloadReportPdf() {
     const originalText = btn.innerHTML;
     btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Downloading...`;
 
-    html2pdf().set(opt).from(element).save().then(() => {
+    // Generate PDF with Header & Footer
+    element.classList.add('print-mode');
+    html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
+        const totalPages = pdf.internal.getNumberOfPages();
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+
+        for (let i = 1; i <= totalPages; i++) {
+            pdf.setPage(i);
+
+            // --- HEADER ---
+            pdf.setFontSize(8);
+            pdf.setTextColor(100, 116, 139); // Slate-500
+            pdf.text('Mirabo CareSync - Posture Assessment Report', 15, 10);
+
+            // Draw Header Line
+            pdf.setDrawColor(226, 232, 240); // Slate-200
+            pdf.setLineWidth(0.1);
+            pdf.line(15, 12, pageWidth - 15, 12);
+
+            // --- FOOTER ---
+            pdf.setFontSize(8);
+            pdf.setTextColor(148, 163, 184); // Slate-400
+
+            // Page Number
+            const pageStr = `Page ${i} of ${totalPages}`;
+            pdf.text(pageStr, pageWidth - 25, pageHeight - 10);
+
+            // System Generated Tag
+            pdf.text('Generated by Mirabo CareSync System', 15, pageHeight - 10);
+
+            // Draw Footer Line
+            pdf.line(15, pageHeight - 14, pageWidth - 15, pageHeight - 14);
+        }
+    }).save().then(() => {
+        element.classList.remove('print-mode');
         btn.innerHTML = originalText;
         lucide.createIcons();
         showToast('PDF downloaded successfully!', 'success');
     }).catch(err => {
+        element.classList.remove('print-mode');
         console.error(err);
         btn.innerHTML = originalText;
         lucide.createIcons();
@@ -593,27 +669,48 @@ async function initPoseTracking() {
 async function startPostureCamera() {
     try {
         const video = document.getElementById('posture-video');
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' }
-        });
+
+        let stream = postureState.videoStream;
+        // Check if stream is active
+        const isLive = stream && stream.getTracks().some(t => t.readyState === 'live');
+
+        if (isLive) {
+            console.log('[Posture] Reusing existing stream (Hot Standby)');
+            stream.getTracks().forEach(t => t.enabled = true);
+        } else {
+            console.log('[Posture] Requesting new stream');
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' }
+            });
+            postureState.videoStream = stream;
+        }
 
         video.srcObject = stream;
-        postureState.videoStream = stream;
 
-        video.addEventListener('loadeddata', () => {
+        // Check if video is already ready (reused stream might load instantly)
+        if (video.readyState >= 2) {
             predictWebcam();
-        });
+        } else {
+            video.addEventListener('loadeddata', () => {
+                predictWebcam();
+            }, { once: true });
+        }
     } catch (error) {
-        showToast('Camera access denied', 'error');
+        console.error(error);
+        showToast('Camera access denied or error: ' + error.message, 'error');
     }
 }
 
 function stopPostureCamera() {
+    // Soft stop: Disable tracks but keep stream alive to preserve permission
     if (postureState.videoStream) {
-        postureState.videoStream.getTracks().forEach(track => track.stop());
-        postureState.videoStream = null;
+        postureState.videoStream.getTracks().forEach(track => track.enabled = false);
     }
     cancelAnimationFrame(postureState.animationFrameId);
+
+    // Detach from video to ensure UI is clear
+    const video = document.getElementById('posture-video');
+    if (video) video.srcObject = null;
 }
 
 function predictWebcam() {
@@ -837,41 +934,41 @@ function closeImagePreview() {
 }
 
 // 6. Report Generation
+// 6. Report Generation
 function generateReportForSession(session) {
     const modal = document.getElementById('report-modal');
     const content = document.getElementById('report-content');
     const dateEl = document.getElementById('report-date');
 
-
     dateEl.textContent = new Date(session.timestamp).toLocaleString('vi-VN');
-
-    // Save current session for modal access
     currentReportSession = session;
 
-    let html = '<div class="space-y-8">';
+    let html = `
+    <style>
+        .html2pdf__page-break { page-break-before: always; }
+        @media print {
+            .html2pdf__page-break { page-break-before: always; }
+        }
+    </style>
+    <div class="space-y-6 bg-white p-8" style="font-family: Arial, sans-serif; color: #000; line-height: 1.6;">`;
 
-    // Patient Info
+    // Patient Info - Simple text
     const patient = getPatientById(session.patientId);
     if (patient) {
         html += `
-        <div class="bg-indigo-50/50 rounded-2xl p-6 border border-indigo-100 flex gap-6 items-center">
-            <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center font-black text-2xl">
-                ${patient.fullName.charAt(0)}
-            </div>
-            <div>
-                <h3 class="font-bold text-lg text-slate-800">${patient.fullName}</h3>
-                <p class="text-sm text-slate-500">ID: ${patient.id} • ${patient.gender === 'male' ? 'Nam' : 'Nữ'}</p>
-            </div>
+        <div class="mb-6 border-b border-gray-200 pb-4">
+            <h1 class="text-2xl font-bold mb-2 uppercase">BÁO CÁO ĐÁNH GIÁ TƯ THẾ</h1>
+            <div class="text-lg font-bold mb-1">${patient.fullName}</div>
+            <div class="text-sm text-gray-700">Mã hồ sơ: ${patient.id} | Giới tính: ${patient.gender === 'male' ? 'Nam' : 'Nữ'}</div>
         </div>`;
     }
 
-    // 1. OVERALL MEDICAL SUMMARY (New Section)
+    // Calculate metrics
     const frontCap = session.captures['FRONT'];
     const backCap = session.captures['BACK'];
     const leftCap = session.captures['LEFT'];
     const rightCap = session.captures['RIGHT'];
 
-    // Calculate metrics for narrative generation
     const frontMetrics = frontCap ? calculatePostureMetrics(frontCap.landmarks, 'FRONT', 170, 70) : null;
     const backMetrics = backCap ? calculatePostureMetrics(backCap.landmarks, 'BACK', 170, 70) : null;
     let sideMetrics = null;
@@ -880,266 +977,336 @@ function generateReportForSession(session) {
 
     const overallNarrative = generateOverallSummary(frontMetrics, backMetrics, sideMetrics);
 
+    // Section I
+    html += `<div class="mb-8"><h2 class="text-xl font-bold mb-3 pb-2 border-b border-gray-300">I. TỔNG QUAN</h2>`;
+
+    // 1. Overall Assessment - Plain text
     html += `
-    <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
-        <h2 class="text-xl font-bold text-blue-800 mb-2">Tóm tắt tổng quan (Overall Summary)</h2>
-        <p class="text-slate-700 leading-relaxed text-justify">
-            ${overallNarrative}
-        </p>
-    </div>
-    `;
+    <div class="mb-6">
+        <h3 class="font-bold mb-2">Đánh giá chung</h3>
+        <p class="text-justify text-gray-800">${overallNarrative}</p>
+    </div>`;
 
-    // 2. Posture Index Summary (Grid 2x2)
-    const views = ['FRONT', 'BACK', 'LEFT', 'RIGHT'].filter(v => session.captures[v] && session.captures[v].landmarks);
-    if (views.length > 0) {
-        html += '<div><h2 class="text-2xl font-bold text-slate-800 mb-4">Tóm tắt Chỉ số (Metrics Summary)</h2>';
-        html += '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+    // 2. Metrics Summary - Simple table
+    const activeViews = ['FRONT', 'BACK', 'LEFT', 'RIGHT'].filter(v => session.captures[v]);
+    if (activeViews.length > 0) {
+        html += `
+        <div class="mb-6">
+            <h3 class="font-bold mb-2">Tóm tắt chỉ số</h3>
+            <table class="w-full text-sm border-collapse">
+                <thead>
+                    <tr class="border-b border-gray-300 bg-gray-50">
+                        <th class="text-left py-2 px-2">Góc nhìn</th>
+                        <th class="text-center py-2 px-2">Điểm số (Score)</th>
+                        <th class="text-right py-2 px-2">Độ lệch (Shifts)</th>
+                        <th class="text-right py-2 px-2">Độ nghiêng (Tilts)</th>
+                        <th class="text-right py-2 px-2">TL đầu (Head Wt)</th>
+                    </tr>
+                </thead>
+                <tbody>`;
 
-        views.forEach(view => {
+        activeViews.forEach(view => {
             const cap = session.captures[view];
             const metrics = calculatePostureMetrics(cap.landmarks, view, 170, 70);
+            const scoreColor = metrics.score >= 80 ? 'text-green-600' : (metrics.score >= 65 ? 'text-yellow-600' : 'text-red-600');
+            const headWt = metrics.headWeightAnalysis ? metrics.headWeightAnalysis.effective + ' lbs' : '-';
 
             html += `
-            <div class="border-2 border-blue-500 rounded-lg overflow-hidden">
-                <div class="bg-blue-500 text-white px-4 py-2 text-center font-bold text-sm">
-                    Chỉ số Tư thế®: Góc nhìn ${view}
-                </div>
-                <div class="bg-blue-600 text-white flex border-b border-blue-300">
-                    <div class="flex-1 px-3 py-2 border-r border-blue-300 text-sm font-semibold">Tổng độ lệch (Total Shifts)</div>
-                    <div class="w-24 px-3 py-2 text-center bg-white text-black font-bold">${metrics.totalShifts} in</div>
-                </div>
-                <div class="bg-blue-600 text-white flex">
-                    <div class="flex-1 px-3 py-2 border-r border-blue-300 text-sm font-semibold">Tổng độ nghiêng (Total Tilts)</div>
-                    <div class="w-24 px-3 py-2 text-center bg-white text-black font-bold">${metrics.totalTilts || '0.0'}°</div>
-                </div>
-            </div>`;
+                <tr class="border-b border-gray-100">
+                    <td class="py-2 px-2 font-bold">${view}</td>
+                    <td class="text-center py-2 px-2 font-black ${scoreColor}">${metrics.score}/100</td>
+                    <td class="text-right py-2 px-2">${metrics.totalShifts} in</td>
+                    <td class="text-right py-2 px-2">${metrics.totalTilts || '0.0'}°</td>
+                    <td class="text-right py-2 px-2 font-bold text-blue-600">${headWt}</td>
+                </tr>`;
         });
 
-        html += '</div></div>';
+        html += `
+                </tbody>
+            </table>
+        </div>`;
+    }
+    html += `</div>`; // Close Section I
 
-        // 2b. Head Weight Summary (Max from Side Views)
-        let maxHeadWeight = 0;
-        let maxHeadWeightSide = '';
+    // Section II - Detailed Views
+    html += `<div class="mb-8"><h2 class="text-xl font-bold mb-3 pb-2 border-b border-gray-300">II. PHÂN TÍCH CHI TIẾT</h2>`;
 
-        ['LEFT', 'RIGHT'].forEach(side => {
-            if (session.captures[side]) {
-                const m = calculatePostureMetrics(session.captures[side].landmarks, side, 170, 70);
-                if (m && m.headWeightAnalysis) {
-                    const val = parseFloat(m.headWeightAnalysis.effective);
-                    if (val > maxHeadWeight) {
-                        maxHeadWeight = val;
-                        maxHeadWeightSide = side;
-                    }
-                }
-            }
-        });
+    const viewMap = {
+        'FRONT': 'NHÌN THẲNG',
+        'BACK': 'NHÌN SAU',
+        'LEFT': 'NHÌN NGHIÊNG (TRÁI)',
+        'RIGHT': 'NHÌN NGHIÊNG (PHẢI)'
+    };
 
-        if (maxHeadWeight > 0) {
-            html += `
-            <div class="mt-4 flex justify-center">
-                <div class="border-2 border-sky-500 rounded-lg overflow-hidden max-w-md w-full">
-                    <div class="bg-sky-500 text-white px-4 py-2 text-center font-bold text-sm">
-                        Trọng lượng đầu hiệu dụng (Effective Head Weight)
+    ['FRONT', 'BACK', 'LEFT', 'RIGHT'].forEach((view, index) => {
+        if (!session.captures[view]) return;
+
+        // Force Page Break
+        html += `<div class="html2pdf__page-break"></div>`;
+
+        const cap = session.captures[view];
+        const m = calculatePostureMetrics(cap.landmarks, view, 170, 70);
+
+        let narrative = "";
+        if (view === 'FRONT') narrative = generateFrontNarrative(m);
+        else if (view === 'BACK') narrative = generateBackNarrative(m);
+        else narrative = generateSideNarrative(m);
+
+        const scoreColor = m.score >= 80 ? 'text-green-600' : (m.score >= 65 ? 'text-yellow-600' : 'text-red-600');
+        const scoreRingColor = m.score >= 80 ? 'border-green-500' : (m.score >= 65 ? 'border-yellow-500' : 'border-red-500');
+
+        // Header for this Page
+        html += `
+        <div class="border border-gray-400 bg-gray-100 p-3 mb-6 flex justify-between items-end">
+             <div>
+                <div class="font-bold text-lg">${patient ? patient.fullName : 'N/A'}</div>
+                <div class="text-sm text-gray-600">Mã hồ sơ: ${patient ? patient.id : 'N/A'} | Giới tính: ${patient ? (patient.gender === 'male' ? 'Nam' : 'Nữ') : 'N/A'}</div>
+             </div>
+             <div class="text-xs text-gray-500">Ngày: ${new Date(session.timestamp).toLocaleDateString('vi-VN')}</div>
+        </div>
+        
+        <!-- Image & Title -->
+        <div class="flex flex-col items-center mb-6">
+            <div class="h-[350px] w-full flex items-center justify-center bg-gray-50 mb-4 border border-gray-200">
+                 <img src="${cap.image}" class="h-full object-contain cursor-pointer" onclick="openMeasureModal('${view}')">
+            </div>
+            <h2 class="text-2xl font-bold uppercase text-slate-800 tracking-wide">${viewMap[view]}</h2>
+        </div>
+
+        <!-- Score & Metrics - Table Layout for PDF Safety -->
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 32px;">
+            <tr>
+                <!-- Left: Score Circle -->
+                <td style="width: 35%; vertical-align: middle; text-align: center; padding-right: 20px;">
+                    <div style="position: relative; width: 160px; height: 160px; margin: 0 auto;">
+                        <svg class="w-full h-full transform -rotate-90">
+                            <circle cx="80" cy="80" r="70" stroke="#f3f4f6" stroke-width="8" fill="none" />
+                            <circle cx="80" cy="80" r="70" stroke="${m.score >= 80 ? '#22c55e' : (m.score >= 65 ? '#eab308' : '#ef4444')}" 
+                                    stroke-width="8" fill="none"
+                                    stroke-dasharray="440" 
+                                    stroke-dashoffset="440"
+                                    class="score-progress-circle"
+                                    data-target="${440 - (440 * m.score / 100)}"
+                            />
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <div class="text-xs font-bold text-red-700 uppercase mb-1">Posture Score</div>
+                            <div class="text-5xl font-black ${scoreColor}">${m.score}</div>
+                        </div>
                     </div>
-                    <div class="bg-sky-600 text-white flex items-center justify-center px-4 py-3">
-                        <span class="bg-white text-black font-black px-4 py-2 rounded-lg text-xl">${maxHeadWeight.toFixed(1)} lbs</span>
+                </td>
+                
+                <!-- Right: Metrics Box -->
+                <td style="width: 65%; vertical-align: middle;">
+                    <div class="bg-gray-100 p-6 rounded border border-gray-200">
+                        ${(view === 'LEFT' || view === 'RIGHT') && m.headWeightAnalysis ? `
+                        <div class="mb-4 p-3 border border-blue-100 bg-blue-50 rounded">
+                             <div class="flex justify-between items-center">
+                                <span class="font-bold text-sm text-blue-900 uppercase">Trọng lượng đầu</span>
+                                <span class="font-black text-2xl text-blue-700">${m.headWeightAnalysis.effective} <span class="text-xs font-normal text-gray-500">lbs</span></span>
+                             </div>
+                             <div class="text-xs text-blue-400 mt-1">Độ lệch: ${m.headWeightAnalysis.shift} inches</div>
+                        </div>` : ''}
+
+                        <h3 class="font-bold text-base text-slate-700 mb-3 border-b border-gray-300 pb-2">Chỉ số đo lường</h3>
+                        <ul class="space-y-2 text-sm text-slate-700">`;
+
+        m.details.forEach(d => {
+            html += `<li class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-500 mt-1.5 shrink-0"></span>
+                <span>${d.text}</span>
+            </li>`;
+        });
+
+        html += `   </ul>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Expert Assessment -->
+        <div class="bg-[#fcf8e3] p-6 rounded border border-[#faebcc] flex gap-4 mb-4">
+             <div class="shrink-0 pt-1">
+                 <div class="w-10 h-10 bg-slate-700 rounded text-white flex items-center justify-center">
+                    <i data-lucide="user" class="w-6 h-6"></i>
+                 </div>
+             </div>
+             <div>
+                 <h3 class="font-bold text-base text-slate-800 mb-1">Đánh giá chuyên gia</h3>
+                 <p class="text-sm text-justify text-slate-800 italic leading-relaxed">
+                    "${narrative}"
+                 </p>
+             </div>
+        </div>
+        
+        <!-- Page Footer Spacer -->
+        <div class="mt-auto pt-4 border-t border-gray-200 text-xs text-gray-400 flex justify-between">
+            <span>Mirabo CareSync System</span>
+            <span>Page View Analysis</span>
+        </div>`;
+    });
+
+    html += `</div>`; // Close Section II
+
+    // Section III - Advanced Analysis
+    const hasLegs = frontMetrics && frontMetrics.legAnalysis;
+    const hasKneeNeck = sideMetrics && (sideMetrics.kneeAnalysis || sideMetrics.neckAnalysis);
+
+    if (hasLegs || hasKneeNeck) {
+        html += `<div class="html2pdf__page-break"></div>`;
+        html += `<div class="mb-8"><h2 class="text-xl font-bold mb-3 pb-2 border-b border-gray-300">III. CHỈ SỐ CHUYÊN SÂU</h2>`;
+
+        // 1. Leg Inclination Analysis (Front View)
+        if (hasLegs) {
+            const legStatus = getLegStatus(frontMetrics);
+            const legNarrative = generateLegNarrative(frontMetrics);
+            const { kneeDist, ankleDist } = frontMetrics.legAnalysis;
+
+            const legStatusLabel = legStatus === 'NORMAL' ? 'Bình thường' : (legStatus === 'O_LEGS' ? 'Chân vòng kiềng (O-Legs)' : 'Chân chữ X (X-Legs)');
+
+            // Select illustration for leg inclination
+            let legIllustration = 'docs/assets/normal-legs.png';
+            if (legStatus === 'O_LEGS') legIllustration = 'docs/assets/o-leg.png';
+            if (legStatus === 'X_LEGS') legIllustration = 'docs/assets/x-legs.png';
+
+            html += `
+            <div class="mb-6 p-4 border border-gray-200 bg-gray-50">
+                <h3 class="font-bold mb-4 text-indigo-900">1. HÌNH DÁNG CHÂN (LEG INCLINATION)</h3>
+                <div class="flex gap-6">
+                    <!-- Left: Illustration -->
+                    <div class="w-1/3 shrink-0 flex flex-col items-center justify-center bg-white border border-gray-100 rounded p-2 self-start">
+                        <img src="${legIllustration}" class="w-full h-auto object-contain">
+                    </div>
+                    
+                    <!-- Right: Info -->
+                    <div class="flex-1">
+                        <div class="mb-4">
+                            <p class="text-xs text-gray-500 uppercase font-bold mb-2">Thông số đo lường</p>
+                            <div class="grid grid-cols-2 gap-2 bg-white p-3 rounded border border-gray-100 text-center">
+                                <div>
+                                    <span class="block text-[10px] text-gray-400 uppercase">Khoảng cách Gối</span>
+                                    <span class="font-bold text-gray-800">${kneeDist} in</span>
+                                </div>
+                                <div>
+                                    <span class="block text-[10px] text-gray-400 uppercase">Khoảng cách Mắt cá</span>
+                                    <span class="font-bold text-gray-800">${ankleDist} in</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase font-bold mb-2">Kết luận</p>
+                            <div class="mb-2">
+                                <span class="font-bold text-gray-800 mr-2">• Hình dáng:</span> ${legStatusLabel}
+                            </div>
+                            <p class="text-sm text-justify text-gray-600 border-t border-gray-200 pt-2 italic">
+                                ${legNarrative}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>`;
         }
-    }
 
-    // 3. DETAILED ANALYSIS
-    if (views.length > 0) {
-        html += '<div><h2 class="text-2xl font-bold text-slate-800 mb-4">Chi tiết Phân tích (Detailed Analysis)</h2>';
-        html += '<div class="space-y-6">';
-
-        views.forEach(view => {
-            const cap = session.captures[view];
-            const metrics = calculatePostureMetrics(cap.landmarks, view, 170, 70);
-            const title = `${view.charAt(0) + view.slice(1).toLowerCase()} View`;
-
-            html += `
-            <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
-                <div class="bg-blue-500 text-white px-4 py-3 font-bold text-base">
-                    ${title}
-                </div>
-                
-                <div class="grid md:grid-cols-2 gap-6 p-6">
-                    <!-- Left: Image -->
-                    <div class="flex flex-col group relative cursor-pointer" onclick="openMeasureModal('${view}')">
-                        <img src="${cap.image}" class="w-full rounded-lg shadow-md transition-transform group-hover:scale-[1.01]">
-                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg flex items-center justify-center">
-                            <div class="bg-black/70 text-white px-3 py-1 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 backdrop-blur-sm scale-90 group-hover:scale-100 duration-200">
-                                <i data-lucide="maximize-2" class="w-3 h-3"></i>
-                                Click để xem chi tiết đo lường
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Right: Analysis -->
-                    <div class="flex flex-col space-y-4">`;
-
-            // Head Weight Analysis for Side Views
-            if ((view === 'LEFT' || view === 'RIGHT') && metrics.headWeightAnalysis) {
-                html += `
-                        <div class="bg-sky-50 border border-sky-200 rounded-lg p-4">
-                            <div class="font-bold text-blue-700 mb-1 text-sm">Trọng lượng đầu hiệu dụng (Effective Head Weight)</div>
-                            <div class="text-3xl font-black text-blue-600">${metrics.headWeightAnalysis.effective} lbs</div>
-                            <div class="text-xs text-slate-600 mt-1">
-                                Bình thường: ${metrics.headWeightAnalysis.base} lbs (Lệch: ${metrics.headWeightAnalysis.shift} in)
-                            </div>
-                        </div>`;
-            }
-
-            // Generate Narrative based on View
-            let narrative = "";
-            let status = "good"; // For coloring
-
-            if (view === 'FRONT') {
-                narrative = generateFrontNarrative(metrics);
-                status = getFrontViewStatus(metrics) === 'BALANCED' ? 'good' : 'fair';
-            } else if (view === 'BACK') {
-                narrative = generateBackNarrative(metrics);
-                status = getBackViewStatus(metrics) === 'SYMMETRICAL_ALIGNMENT' ? 'good' : 'fair';
-            } else {
-                narrative = generateSideNarrative(metrics);
-                status = getSideViewStatus(metrics) === 'NEUTRAL' ? 'good' : (getSideViewStatus(metrics) === 'MILD_FHP' ? 'fair' : 'poor');
-            }
-
-            const statusColors = {
-                good: 'bg-green-50 border-green-200 text-green-800',
-                fair: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-                poor: 'bg-red-50 border-red-200 text-red-800'
-            };
-            const statusColor = statusColors[status] || statusColors.fair;
-
-            html += `
-                    <div class="${statusColor} border rounded-lg p-4">
-                        <div class="font-bold text-sm mb-2">Đánh giá chung (General Assessment)</div>
-                        <div class="text-sm text-justify leading-relaxed">${narrative}</div>
-                    </div>`;
-
-            // Details List
-            html += '<div class="border border-slate-200 rounded-lg overflow-hidden">';
-            metrics.details.forEach((detail, i) => {
-                const bgClass = i % 2 === 0 ? 'bg-white' : 'bg-slate-50';
-                html += `
-                        <div class="${bgClass} px-3 py-2 ${i < metrics.details.length - 1 ? 'border-b border-slate-100' : ''} text-xs text-slate-700">
-                            ${detail.text}
-                        </div>`;
-            });
-            html += `
-                        </div>
-                    </div>
-                </div>
-            </div>`;
-        });
-
-        html += '</div></div>';
-    }
-
-    // 4. LEG ANALYSIS (X/O Legs)
-    if (frontMetrics && frontMetrics.legAnalysis) {
-        const legStatus = getLegStatus(frontMetrics);
-        const legNarrative = generateLegNarrative(frontMetrics);
-        const { kneeDist, ankleDist } = frontMetrics.legAnalysis;
-
-        let statusColor = 'bg-green-50 border-green-200 text-green-800';
-        if (legStatus === 'O_LEGS' || legStatus === 'X_LEGS') statusColor = 'bg-yellow-50 border-yellow-200 text-yellow-800';
-
-        html += `
-        <div>
-            <h2 class="text-2xl font-bold text-slate-800 mb-4">Đánh giá Hình dáng Chân (Leg Alignment)</h2>
-            <div class="${statusColor} border rounded-xl p-6">
-                 <div class="flex flex-col md:flex-row gap-6 items-center">
-                    <div class="flex-1">
-                        <div class="font-bold text-lg mb-2">Kết quả phân tích: ${legStatus === 'NORMAL' ? 'Bình thường' : (legStatus === 'O_LEGS' ? 'Chân vòng kiềng (O-Legs)' : 'Chân chữ X (X-Legs)')}</div>
-                        <p class="text-slate-700 leading-relaxed text-justify mb-4">
-                            ${legNarrative}
-                        </p>
-                        <div class="grid grid-cols-2 gap-4 text-sm">
-                            <div class="bg-white p-3 rounded border border-slate-200">
-                                <span class="block text-slate-500 text-xs">Khoảng cách đầu gối (Knee Dist)</span>
-                                <span class="font-bold text-slate-800">${kneeDist} in</span>
-                            </div>
-                            <div class="bg-white p-3 rounded border border-slate-200">
-                                <span class="block text-slate-500 text-xs">Khoảng cách mắt cá (Ankle Dist)</span>
-                                <span class="font-bold text-slate-800">${ankleDist} in</span>
-                            </div>
-                        </div>
-                    </div>
-                 </div>
-            </div>
-        </div>
-        `;
-    }
-
-    // 5. KNEE & NECK ANALYSIS (Side View)
-    if (sideMetrics) {
-        // Knee Flexion
-        if (sideMetrics.kneeAnalysis) {
+        // 2. Knee Alignment Analysis (Side View)
+        if (sideMetrics && sideMetrics.kneeAnalysis) {
             const kneeStatus = getKneeFlexionStatus(sideMetrics);
             const kneeNarrative = generateKneeFlexionNarrative(sideMetrics);
             const { angle } = sideMetrics.kneeAnalysis;
 
-            let statusColor = 'bg-green-50 border-green-200 text-green-800';
-            if (kneeStatus !== 'NORMAL') statusColor = 'bg-yellow-50 border-yellow-200 text-yellow-800';
+            const kneeStatusLabel = kneeStatus === 'NORMAL' ? 'Bình thường' : (kneeStatus === 'FLEXION' ? 'Cong gối' : 'Duỗi quá mức (Genu Recurvatum)');
+
+            // Select illustration for knee alignment
+            let kneeIllustration = 'docs/assets/neutral.png';
+            if (kneeStatus === 'HYPEREXTENSION') kneeIllustration = 'docs/assets/genu-recurvatum.png';
 
             html += `
-            <div>
-                <h2 class="text-2xl font-bold text-slate-800 mb-4">Đánh giá Độ cong Đầu gối (Knee Flexion)</h2>
-                <div class="${statusColor} border rounded-xl p-6">
-                    <div class="flex flex-col md:flex-row gap-6 items-center">
-                        <div class="flex-1">
-                            <div class="font-bold text-lg mb-2">Kết quả phân tích: ${kneeStatus === 'NORMAL' ? 'Bình thường' : (kneeStatus === 'FLEXION' ? 'Cong gối (Flexion)' : 'Duỗi quá mức (Hyperextension)')}</div>
-                            <p class="text-slate-700 leading-relaxed text-justify mb-4">
+            <div class="mb-6 p-4 border border-gray-200 bg-gray-50">
+                <h3 class="font-bold mb-4 text-indigo-900">2. THẲNG HÀNG ĐẦU GỐI (KNEE ALIGNMENT)</h3>
+                <div class="flex gap-6">
+                    <!-- Left: Illustration -->
+                    <div class="w-1/3 shrink-0 flex flex-col items-center justify-center bg-white border border-gray-100 rounded p-2 self-start">
+                        <img src="${kneeIllustration}" class="w-full h-auto object-contain">
+                    </div>
+                    
+                    <!-- Right: Info -->
+                    <div class="flex-1">
+                        <div class="mb-4">
+                            <p class="text-xs text-gray-500 uppercase font-bold mb-2">Thông số đo lường</p>
+                            <div class="bg-white p-3 rounded border border-gray-100 text-center">
+                                <span class="block text-[10px] text-gray-400 uppercase">Góc đầu gối</span>
+                                <span class="font-bold text-gray-800 text-xl">${angle}°</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase font-bold mb-2">Kết luận</p>
+                            <div class="mb-2">
+                                <span class="font-bold text-gray-800 mr-2">• Khớp gối:</span> ${kneeStatusLabel}
+                            </div>
+                            <p class="text-sm text-justify text-gray-600 border-t border-gray-200 pt-2 italic">
                                 ${kneeNarrative}
                             </p>
-                            <div class="bg-white p-3 rounded border border-slate-200 inline-block">
-                                <span class="block text-slate-500 text-xs">Góc đầu gối (Knee Angle)</span>
-                                <span class="font-bold text-slate-800">${angle}°</span>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>`;
         }
 
-        // Neck Inclination
-        if (sideMetrics.neckAnalysis) {
+        // Neck Analysis (Updated with Image)
+        if (sideMetrics && sideMetrics.neckAnalysis) {
             const neckStatus = getNeckInclinationStatus(sideMetrics);
             const neckNarrative = generateNeckInclinationNarrative(sideMetrics);
             const { angle } = sideMetrics.neckAnalysis;
 
-            let statusColor = 'bg-green-50 border-green-200 text-green-800';
-            if (neckStatus !== 'NORMAL') statusColor = 'bg-yellow-50 border-yellow-200 text-yellow-800';
+            // Select Image
+            let neckImg = 'docs/assets/neck-none-inclination.png';
+            if (neckStatus !== 'NORMAL') neckImg = 'docs/assets/neck-inclination.png';
 
             html += `
-            <div class="mt-8">
-                <h2 class="text-2xl font-bold text-slate-800 mb-4">Đánh giá Độ nghiêng Cổ (Neck Inclination)</h2>
-                <div class="${statusColor} border rounded-xl p-6">
-                    <div class="flex flex-col md:flex-row gap-6 items-center">
-                        <div class="flex-1">
-                            <div class="font-bold text-lg mb-2">Kết quả phân tích: ${neckStatus === 'NORMAL' ? 'Bình thường' : 'Nghiêng trước (Forward Inclination)'}</div>
-                            <p class="text-slate-700 leading-relaxed text-justify mb-4">
-                                ${neckNarrative}
-                            </p>
-                            <div class="bg-white p-3 rounded border border-slate-200 inline-block">
-                                <span class="block text-slate-500 text-xs">Góc nghiêng cổ (Neck Angle)</span>
-                                <span class="font-bold text-slate-800">${angle}°</span>
+            <div class="mb-6 p-4 border border-gray-200 bg-gray-50">
+                <h3 class="font-bold mb-4 text-indigo-900">3. ĐỘ NGHIÊNG CỔ (NECK INCLINATION)</h3>
+                <div class="flex gap-6">
+                    <!-- Left: Illustration -->
+                     <div class="w-1/3 shrink-0 flex flex-col items-center justify-center bg-white border border-gray-100 rounded p-2 self-start">
+                        <img src="${neckImg}" class="w-full h-auto object-contain">
+                    </div>
+
+                    <!-- Right: Info -->
+                    <div class="flex-1">
+                        <div class="grid grid-cols-2 gap-4 mb-3">
+                            <div>
+                                 <p class="text-xs text-gray-500 uppercase">Kết luận</p>
+                                 <p class="font-bold text-lg">${neckStatus === 'NORMAL' ? 'Bình thường' : 'Nghiêng trước'}</p>
+                            </div>
+                            <div>
+                                 <p class="text-xs text-gray-500 uppercase">Góc đo</p>
+                                 <p class="text-lg font-black">${angle}°</p>
                             </div>
                         </div>
+                        <p class="text-sm text-justify text-gray-600 border-t border-gray-200 pt-2">${neckNarrative}</p>
                     </div>
                 </div>
             </div>`;
         }
+
+
+
+        html += `</div > `; // Close Section III
     }
 
     html += '</div>';
     content.innerHTML = html;
     modal.classList.remove('hidden');
     if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    // Trigger Animations
+    setTimeout(() => {
+        const circles = content.querySelectorAll('.score-progress-circle');
+        circles.forEach(c => {
+            c.style.strokeDashoffset = c.dataset.target;
+        });
+    }, 100);
 }
 
 
@@ -1197,6 +1364,60 @@ function openMeasureModal(view) {
 
 function closeMeasureModal() {
     document.getElementById('measure-modal').classList.add('hidden');
+}
+
+/**
+ * PDF Logic
+ */
+function openPdfPreview() {
+    const reportContent = document.getElementById('report-content').innerHTML;
+    const pdfContent = document.getElementById('pdf-content');
+
+    // Inject content
+    pdfContent.innerHTML = reportContent;
+
+    // Show Modal
+    document.getElementById('pdf-preview-modal').classList.remove('hidden');
+}
+
+function closePdfPreview() {
+    document.getElementById('pdf-preview-modal').classList.add('hidden');
+}
+
+function downloadReportPdf() {
+    const element = document.getElementById('pdf-page-container');
+    const opt = {
+        margin: 0,
+        filename: `PostureReport_${new Date().toISOString().split('T')[0]}.pdf`,
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { scale: 1.5, useCORS: true, logging: true, allowTaint: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    // Check if html2pdf is loaded
+    if (typeof html2pdf === 'undefined') {
+        alert('PDF Library not loaded. Please contact support.');
+        return;
+    }
+
+    const btn = document.querySelector('button[onclick="downloadReportPdf()"]');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Generating...';
+    btn.disabled = true;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    // Use SetTimeout to allow UI update
+    setTimeout(() => {
+        html2pdf().set(opt).from(element).save().then(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }).catch(err => {
+            console.error('PDF Gen Error:', err);
+            alert('Failed to generate PDF. Please try again or print to PDF using the Print button.');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    }, 100);
 }
 
 // Cleanup

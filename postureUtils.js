@@ -165,7 +165,7 @@ function drawPostureOverlay(ctx, landmarks, width, height) {
         ctx.moveTo(anchor.x, anchor.y);
         ctx.lineTo(anchor.x, 0);
         ctx.strokeStyle = '#22c55e';
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 2; // Thinner (was 4)
         ctx.stroke();
 
         // 2. RED DEVIATION LINE (Patient)
@@ -178,7 +178,7 @@ function drawPostureOverlay(ctx, landmarks, width, height) {
             else ctx.lineTo(p.x, p.y);
         });
         ctx.strokeStyle = '#ef4444';
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 2; // Thinner (was 4)
         ctx.stroke();
 
         // 3. POINTS & H-LINES
@@ -200,7 +200,7 @@ function drawPostureOverlay(ctx, landmarks, width, height) {
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.strokeStyle = line.color;
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 2; // Thinner (was 3)
             ctx.stroke();
 
             // Draw End Points
@@ -253,6 +253,34 @@ function drawPostureOverlay(ctx, landmarks, width, height) {
                 });
             });
         }
+
+        // --- DRAW L/R LABELS ---
+        ctx.font = "bold 24px Arial";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 3;
+
+        const labelY = height - 20;
+        const leftX = 20;
+        const rightX = width - 40;
+
+        // Front View: Mirrored (Patient's Right is Image Left)
+        // Back View: Standard (Patient's Left is Image Left)
+        let leftText = "R";
+        let rightText = "L";
+
+        if (view === 'BACK') {
+            leftText = "L";
+            rightText = "R";
+        }
+
+        // Draw Left Corner
+        ctx.strokeText(leftText, leftX, labelY);
+        ctx.fillText(leftText, leftX, labelY);
+
+        // Draw Right Corner
+        ctx.strokeText(rightText, rightX, labelY);
+        ctx.fillText(rightText, rightX, labelY);
     }
     else if (view === 'SIDE' || view === 'LEFT' || view === 'RIGHT') {
         const { ankle, knee, hip, shoulder, ear } = points;
@@ -264,7 +292,7 @@ function drawPostureOverlay(ctx, landmarks, width, height) {
             ctx.moveTo(anchor.x, anchor.y);
             ctx.lineTo(anchor.x, 0);
             ctx.strokeStyle = '#22c55e';
-            ctx.lineWidth = 4;
+            ctx.lineWidth = 2; // Thinner (was 4)
             ctx.stroke();
         }
 
@@ -434,7 +462,8 @@ function calculatePostureMetrics(landmarks, viewMode, heightCm = 170, weightKg =
         pixelBodyHeight = Math.abs(points.midAnkle.y - points.midEye.y) * 1.15;
         plumbLineX = points.midAnkle.x;
     } else {
-        pixelBodyHeight = Math.abs(points.ankle.y - points.ear.y) * 1.10;
+        // SIDE, LEFT, RIGHT
+        pixelBodyHeight = Math.abs(points.ankle.y - points.ear.y) * 1.05; // Using 1.05 consistent with Front
         plumbLineX = points.ankle.x;
     }
 
@@ -529,7 +558,9 @@ function calculatePostureMetrics(landmarks, viewMode, heightCm = 170, weightKg =
         const l3psisT = calcSegTilt(l3, psis, "L3-PSIS");
 
         const calcTilt = (p1, p2, name) => {
-            if (!p1 || !p2) return { name, val: "0.0", dir: 'Level', raw: 0 };
+            if (!p1 || !p2) return { name, val: "0.0", dir: 'Cân bằng', raw: 0 };
+
+            // p1 is Left Anatomy, p2 is Right Anatomy (e.g. Left Eye, Right Eye)
             const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
             let deg = Math.abs(angle * (180 / Math.PI));
 
@@ -537,8 +568,17 @@ function calculatePostureMetrics(landmarks, viewMode, heightCm = 170, weightKg =
                 deg = Math.abs(180 - deg);
             }
 
-            let dir = "Cân bằng"; // Translated Level
-            if (deg > 0.5) dir = "Phải"; // Translated Right
+            let dir = "Cân bằng";
+            if (deg > 0.5) {
+                // In Canvas Y grows downwards.
+                // If p1.y (Left) > p2.y (Right), Left is 'Lower/Deeper' in Y -> Left is lower physically? 
+                // Wait. Canvas Y=0 is TOP. Y=1000 is BOTTOM.
+                // Left Eye Y=100 (High), Right Eye Y=110 (Low). 
+                // This means Head tilts to RIGHT (Right side is lower).
+
+                if (p1.y < p2.y) dir = "Phải"; // Right side is lower (Y is bigger)
+                else dir = "Trái"; // Left side is lower (Y is bigger)
+            }
 
             return { name, val: deg.toFixed(1), dir, raw: deg };
         };
@@ -610,24 +650,27 @@ function calculatePostureMetrics(landmarks, viewMode, heightCm = 170, weightKg =
         };
         // 1. Plumb Line (Green)
         metrics.visuals.lines.push({
-            x1: plumbLineX, y1: points.midAnkle.y - pixelBodyHeight * 1.2,
+            x1: plumbLineX, y1: points.midAnkle.y - pixelBodyHeight * 1.05,
             x2: plumbLineX, y2: points.midAnkle.y,
-            color: '#22c55e', label: 'Phương thẳng đứng', width: 2,
+            color: '#22c55e', label: 'Phương thẳng đứng', width: 1.5,
             align: 'top'
         });
 
         // 2. Tilt Lines
         const addTiltLine = (p1, p2, m) => {
             if (p1 && p2 && m) {
-                metrics.visuals.lines.push({
-                    x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y,
-                    color: '#eab308', label: `${m.val}°`, width: 2
-                });
+                if (p1 && p2 && m) {
+                    metrics.visuals.lines.push({
+                        x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y,
+                        color: 'rgba(0,0,0,0)', label: `${m.val}°`,
+                        align: 'leader_right'
+                    });
+                }
             }
         };
-        addTiltLine(points.eyes[0], points.eyes[1], headT);
-        addTiltLine(points.shoulders[0], points.shoulders[1], shldrT);
-        addTiltLine(points.hips[0], points.hips[1], hipT);
+        addTiltLine(points.eyes[1], points.eyes[0], headT);
+        addTiltLine(points.shoulders[1], points.shoulders[0], shldrT);
+        addTiltLine(points.hips[1], points.hips[0], hipT);
 
         // 3. Shift lines (Mid to Plumb)
         const addFrontShift = (pt, m) => {
@@ -635,9 +678,9 @@ function calculatePostureMetrics(landmarks, viewMode, heightCm = 170, weightKg =
                 const isLeft = pt.x < plumbLineX;
                 metrics.visuals.lines.push({
                     x1: pt.x, y1: pt.y, x2: plumbLineX, y2: pt.y,
-                    color: '#ef4444',
+                    color: 'rgba(0,0,0,0)',
                     label: `${toInches(Math.abs(m.raw))} in`,
-                    align: isLeft ? 'right' : 'left'
+                    align: isLeft ? 'leader_left' : 'leader_right'
                 });
             }
         };
@@ -655,7 +698,7 @@ function calculatePostureMetrics(landmarks, viewMode, heightCm = 170, weightKg =
                         x1: spinePoints[i].x, y1: spinePoints[i].y,
                         x2: spinePoints[i + 1].x, y2: spinePoints[i + 1].y,
                         color: '#3b82f6', // blue-500
-                        width: 3
+                        width: 2 // Thinner (was 3)
                     });
                 }
             }
@@ -666,8 +709,8 @@ function calculatePostureMetrics(landmarks, viewMode, heightCm = 170, weightKg =
             addFrontShift(l3, l3S);
         }
 
-    } else {
-        // SIDE VIEW
+    } else if (viewMode === 'SIDE' || viewMode === 'LEFT' || viewMode === 'RIGHT') {
+        // SIDE VIEW (and Left/Right)
         const isFacingRight = (points.nose && points.ear) ? (points.nose.x > points.ear.x) : true;
         const forwardSign = isFacingRight ? 1 : -1;
 
@@ -763,39 +806,63 @@ function calculatePostureMetrics(landmarks, viewMode, heightCm = 170, weightKg =
         };
         // Plumb Line
         metrics.visuals.lines.push({
-            x1: plumbLineX, y1: points.ankle.y - pixelBodyHeight * 1.2,
+            x1: plumbLineX, y1: points.ankle.y - pixelBodyHeight * 1.05,
             x2: plumbLineX, y2: points.ankle.y,
-            color: '#22c55e', label: 'Phương thẳng đứng', width: 2
+            color: '#22c55e', label: 'Phương thẳng đứng', width: 1.5,
+            align: 'top'
         });
 
         // Side Shifts
-        const addShiftLine = (pt, m, align) => {
+        const addShiftLine = (pt, m) => {
             if (pt && m) {
+                const isLeft = pt.x < plumbLineX;
                 metrics.visuals.lines.push({
                     x1: pt.x, y1: pt.y,
                     x2: plumbLineX, y2: pt.y,
-                    color: '#ef4444',
+                    color: 'rgba(0,0,0,0)',
                     label: `${m.shift} in, ${m.angle}°`,
-                    dashed: true,
-                    align: align || 'leader_right'
+                    align: isLeft ? 'leader_left' : 'leader_right'
                 });
             }
         };
 
-        addShiftLine(points.knee, kneeM, 'leader_left');
-        addShiftLine(points.hip, hipM, 'leader_right');
-        addShiftLine(points.shoulder, shldrM, 'leader_left');
-        addShiftLine(points.ear, headM, 'leader_right');
+        addShiftLine(points.knee, kneeM);
+        addShiftLine(points.hip, hipM);
+        addShiftLine(points.shoulder, shldrM);
+        addShiftLine(points.ear, headM);
 
         // Head Weight Line
         if (points.ear && points.shoulder) {
+            const isLeft = points.ear.x < plumbLineX;
             metrics.visuals.lines.push({
                 x1: points.ear.x, y1: points.ear.y,
                 x2: points.shoulder.x, y2: points.ear.y,
-                color: '#eab308', label: `Đầu-Vai: ${fhpShoulderIn} in`, width: 2
+                color: 'rgba(0,0,0,0)', label: `Đầu-Vai: ${fhpShoulderIn} in`,
+                align: isLeft ? 'leader_left' : 'leader_right'
             });
         }
     }
+
+    // --- POSTURE SCORING SYSTEM ---
+    // Formula: 100 - (TotalShifts * 8) - (TotalTilts * 2)
+    // - Shift Penalty: 8 points per inch (Significant deviation)
+    // - Tilt Penalty: 2 points per degree (Angular deviation)
+    // Max Score: 100, Min Score: 0
+
+    let score = 100;
+    const shiftPenalty = parseFloat(metrics.totalShifts) * 8;
+    const tiltPenalty = parseFloat(metrics.totalTilts) * 2;
+
+    score = score - shiftPenalty - tiltPenalty;
+    if (score < 0) score = 0;
+
+    metrics.score = Math.round(score);
+
+    // Determine Rating
+    if (metrics.score >= 90) metrics.rating = "Excellent";
+    else if (metrics.score >= 80) metrics.rating = "Good";
+    else if (metrics.score >= 65) metrics.rating = "Fair";
+    else metrics.rating = "Poor";
 
     return metrics;
 }
@@ -926,20 +993,25 @@ function getFrontViewStatus(metrics) {
     const headShift = parseFloat(metrics.shifts.Head?.val || 0); // inches
     const shoulderTilt = parseFloat(metrics.tilts.Shoulders?.val || 0); // degrees
     const hipTilt = parseFloat(metrics.tilts.Hips?.val || 0); // degrees
+    const headTilt = parseFloat(metrics.tilts.Head?.val || 0); // degrees
 
     // SIGNIFICANT IMBALANCE
-    if (shoulderTilt > 7 || hipTilt > 7) return 'SIGNIFICANT_IMBALANCE';
+    // Head > 1.25in shift or > 8 deg tilt
+    // Shoulder/Hip > 7 deg
+    if (shoulderTilt > 7 || hipTilt > 7 || headShift > 1.25 || headTilt > 8) return 'SIGNIFICANT_IMBALANCE';
 
     // MILD ASYMMETRY
-    if ((headShift >= 0.5 && headShift <= 1.0) ||
+    if ((headShift >= 0.5 && headShift <= 1.25) ||
         (shoulderTilt >= 3 && shoulderTilt <= 7) ||
-        (hipTilt >= 3 && hipTilt <= 5)) {
+        (hipTilt >= 3 && hipTilt <= 7) ||
+        (headTilt > 3 && headTilt <= 8)) {
         return 'MILD_ASYMMETRY';
     }
 
     // BALANCED
     // Head shift <= 0.5, Shoulder <= 3, Hip <= 3 (Ruleset says 2-3, using 3)
-    if (headShift <= 0.5 && shoulderTilt <= 3 && hipTilt <= 3) {
+    // Head Tilt <= 3
+    if (headShift <= 0.5 && shoulderTilt <= 3 && hipTilt <= 3 && headTilt <= 3) {
         return 'BALANCED';
     }
 
@@ -1057,7 +1129,7 @@ function generateOverallSummary(frontMetrics, backMetrics, sideMetrics) {
 
     let summary = parts.join(", ") + ". ";
 
-    // Side
+    // Side (covers SIDE, LEFT, RIGHT)
     if (sideMetrics) {
         const sideStatus = getSideViewStatus(sideMetrics);
         summary += "Phân tích mặt phẳng đứng dọc (Sagittal) tiết lộ ";
@@ -1174,7 +1246,15 @@ function generateNeckInclinationNarrative(metrics) {
 function drawMeasurementVisuals(ctx, visuals, width, height) {
     if (!visuals || !visuals.lines) return;
 
-    visuals.lines.forEach(line => {
+    // Sort lines by Y coordinate (y1) to handle collision detection top-down
+    const sortedLines = [...visuals.lines].sort((a, b) => (a.y1 * height) - (b.y1 * height));
+
+    const plumbPixel = visuals.plumbLineX * width;
+    let lastRightY = -100;
+    let lastLeftY = -100;
+    const spacing = 25; // Min vertical spacing
+
+    sortedLines.forEach(line => {
         const x1 = line.x1 * width;
         const y1 = line.y1 * height;
         const x2 = line.x2 * width;
@@ -1199,8 +1279,14 @@ function drawMeasurementVisuals(ctx, visuals, width, height) {
             let bgX, bgY = (y1 + y2) / 2 - 10;
 
             if (line.align === 'leader_right') {
-                // Position text to RIGHT of Plumb Line (x2, y2)
-                bgX = x2 + 30;
+                // Position text 100px to RIGHT of Plumb Line (Standardized)
+                bgX = plumbPixel + 100;
+
+                // Collision Detection (Right)
+                if (bgY < lastRightY + spacing) {
+                    bgY = lastRightY + spacing;
+                }
+                lastRightY = bgY;
 
                 // Draw Leader Line (From Body Point -> Text)
                 ctx.beginPath();
@@ -1218,8 +1304,14 @@ function drawMeasurementVisuals(ctx, visuals, width, height) {
                 ctx.fill();
 
             } else if (line.align === 'leader_left') {
-                // Position text to LEFT of Plumb Line (x2)
-                bgX = x2 - tw - padding - 30;
+                // Position text 100px to LEFT of Plumb Line (Standardized)
+                bgX = plumbPixel - 100 - tw - padding;
+
+                // Collision Detection (Left)
+                if (bgY < lastLeftY + spacing) {
+                    bgY = lastLeftY + spacing;
+                }
+                lastLeftY = bgY;
 
                 // Draw Leader Line
                 ctx.beginPath();

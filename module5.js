@@ -2,149 +2,13 @@
 // Vietnamese Localized
 
 window.module5Content = `
-<div class="animate-fade-in max-w-6xl mx-auto pb-20">
-    <form id="module5-form" class="space-y-8">
-        
-        <!-- HEADER -->
-        <div class="flex items-center justify-between">
-            <div>
-                <h2 class="text-3xl font-black text-slate-800 tracking-tight">Kế hoạch Phục hồi & Chăm sóc</h2>
-                <p class="text-slate-500 font-medium mt-1">Xây dựng mục tiêu và lịch trình tập luyện</p>
-            </div>
-            <div class="flex gap-3">
-                <span class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-xs font-black uppercase tracking-wider">
-                    <i data-lucide="calendar-days" class="w-4 h-4 inline-block mr-1 mb-0.5"></i>
-                    Care Plan
-                </span>
-            </div>
-        </div>
-
-        <!-- SECTION 1: MỤC TIÊU PHỤC HỒI (GOALS) -->
-        <div class="bg-white rounded-[32px] shadow-sm border border-slate-100 overflow-hidden group hover:shadow-xl transition-all duration-500">
-            <div class="bg-indigo-50/50 backdrop-blur-sm px-8 py-6 border-b border-indigo-100/50 flex items-center gap-4">
-                <div class="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm shadow-indigo-200">
-                    <i data-lucide="target" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-indigo-900 text-xl">1. Mục tiêu Phục hồi</h3>
-                    <p class="text-indigo-600/70 text-xs font-bold uppercase tracking-wider mt-0.5">Development Goals</p>
-                </div>
-            </div>
-            
-            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Long Term Goal -->
-                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:border-indigo-200 transition-colors">
-                    <div class="flex justify-between items-center mb-4">
-                        <label class="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                             <span class="w-2 h-2 rounded-full bg-blue-500"></span> Mục tiêu Dài hạn (Lâu dài)
-                        </label>
-                        <select id="longTermPeriod" class="text-xs font-bold bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-                            <option value="6m">6 Tháng</option>
-                            <option value="1y">1 Năm</option>
-                            <option value="2y">2 Năm</option>
-                        </select>
-                    </div>
-                    <textarea id="longTermGoal" rows="4" 
-                        class="w-full bg-white px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm font-medium resize-none shadow-sm"
-                        placeholder="Ví dụ: Có thể tự đi lại trong nhà mà không cần gậy hỗ trợ..."></textarea>
-                </div>
-
-                <!-- Short Term Goal -->
-                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:border-indigo-200 transition-colors">
-                    <div class="flex justify-between items-center mb-4">
-                        <label class="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Mục tiêu Ngắn hạn (Trước mắt)
-                        </label>
-                        <select id="shortTermPeriod" class="text-xs font-bold bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all">
-                            <option value="1m">1 Tháng</option>
-                            <option value="3m">3 Tháng</option>
-                            <option value="6m">6 Tháng</option>
-                        </select>
-                    </div>
-                    <textarea id="shortTermGoal" rows="4" 
-                        class="w-full bg-white px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all text-sm font-medium resize-none shadow-sm"
-                        placeholder="Ví dụ: Cải thiện thăng bằng đứng, tăng sức mạnh cơ chân..."></textarea>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION 2: CHƯƠNG TRÌNH HỖ TRỢ (SERVICE CONTENT) -->
-        <div class="bg-white rounded-[32px] shadow-sm border border-slate-100 overflow-hidden group hover:shadow-xl transition-all duration-500">
-            <div class="bg-orange-50/50 backdrop-blur-sm px-8 py-6 border-b border-orange-100/50 flex items-center gap-4">
-                <div class="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 shadow-sm shadow-orange-200">
-                    <i data-lucide="layers" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-orange-900 text-xl">2. Nội dung Hỗ trợ & Phục hồi</h3>
-                    <p class="text-orange-600/70 text-xs font-bold uppercase tracking-wider mt-0.5">Service Content</p>
-                </div>
-            </div>
-            
-            <div class="p-8 space-y-6">
-                <!-- Preset Services Checklist -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    ${renderServiceCheckbox('srv_rom', 'Tập vận động khớp (ROM)', 'zap')}
-                    ${renderServiceCheckbox('srv_muscle', 'Tăng cường cơ bắp (Muscle)', 'dumbbell')}
-                    ${renderServiceCheckbox('srv_balance', 'Tập thăng bằng (Balance)', 'activity')}
-                    ${renderServiceCheckbox('srv_walk', 'Tập đi bộ (Gait Training)', 'footprints')}
-                    ${renderServiceCheckbox('srv_adls', 'Huấn luyện ADLs (Sinh hoạt)', 'coffee')}
-                    ${renderServiceCheckbox('srv_pain', 'Vật lý trị liệu giảm đau', 'thermometer-sun')}
-                </div>
-
-                <!-- Custom Note -->
-                <div>
-                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Ghi chú chi tiết / Chương trình khác</label>
-                    <textarea id="serviceNote" rows="3" 
-                        class="w-full bg-slate-50 px-4 py-3 rounded-xl border border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-all text-sm font-medium resize-none focus:bg-white"
-                        placeholder="Mô tả kỹ thuật cụ thể hoặc lưu ý đặc biệt..."></textarea>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION 3: LỊCH TRÌNH HÀNG TUẦN (WEEKLY SCHEDULE) -->
-        <div class="bg-white rounded-[32px] shadow-sm border border-slate-100 overflow-hidden group hover:shadow-xl transition-all duration-500">
-            <div class="bg-blue-50/50 backdrop-blur-sm px-8 py-6 border-b border-blue-100/50 flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm shadow-blue-200">
-                        <i data-lucide="calendar-clock" class="w-6 h-6"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-blue-900 text-xl">3. Lịch trình Hàng tuần</h3>
-                        <p class="text-blue-600/70 text-xs font-bold uppercase tracking-wider mt-0.5">Weekly Schedule</p>
-                    </div>
-                </div>
-                <button type="button" onclick="clearWeeklySchedule()" class="text-xs font-bold text-rose-500 hover:bg-rose-50 px-3 py-2 rounded-lg transition-colors">
-                    Reset Lịch
-                </button>
-            </div>
-            
-            <div class="p-8 overflow-x-auto">
-                <table class="w-full min-w-[800px] border-collapse">
-                    <thead>
-                        <tr class="text-center">
-                            <th class="p-3 w-28"></th>
-                            ${renderDayHeader('Thứ 2', 'Mon')}
-                            ${renderDayHeader('Thứ 3', 'Tue')}
-                            ${renderDayHeader('Thứ 4', 'Wed')}
-                            ${renderDayHeader('Thứ 5', 'Thu')}
-                            ${renderDayHeader('Thứ 6', 'Fri')}
-                            ${renderDayHeader('Thứ 7', 'Sat')}
-                            ${renderDayHeader('Chủ nhật', 'Sun')}
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        ${renderScheduleRow('morning', 'Sáng', 'sun')}
-                        ${renderScheduleRow('afternoon', 'Chiều', 'sunset')}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-    </form>
+<div class="flex flex-col items-center justify-center h-[500px] text-center p-10 animate-fade-in">
+    <div class="w-24 h-24 bg-slate-100 rounded-3xl flex items-center justify-center mb-6">
+        <i data-lucide="cone" class="w-12 h-12 text-slate-400"></i>
+    </div>
+    <h2 class="text-2xl font-black text-slate-800 mb-2">Đang Xây Dựng</h2>
+    <p class="text-slate-500 font-medium max-w-md">Chức năng Kế hoạch Phục hồi & Chăm sóc đang được phát triển. Vui lòng quay lại sau.</p>
 </div>
-
-<!-- FAB Container -->
-<div id="module5-fab-container" class="fixed bottom-10 right-10 z-50 flex flex-col items-end gap-4 pointer-events-none"></div>
 `;
 
 // Helper: Render Service Checkbox
@@ -249,6 +113,12 @@ function initModule5() {
         } catch (e) {
             console.error('Error parsing module 5 data', e);
         }
+    }
+
+    // Portal Actions Logic
+    const actions = document.getElementById('module-actions');
+    if (actions) {
+        actions.innerHTML = '';
     }
 
     lucide.createIcons();

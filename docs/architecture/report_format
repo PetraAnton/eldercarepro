@@ -1,0 +1,357 @@
+import React, { useMemo } from 'react';
+import { Printer } from 'lucide-react';
+
+// --- DỮ LIỆU GỐC ---
+const PATIENT_DATA = {
+  name: "Nguyễn Văn An",
+  id: "P001",
+  gender: "Nam",
+  date: "23-01-2026",
+  summary: "Tổng quan đánh giá tư thế cho thấy sự mất cân đối nhẹ trên mặt phẳng trán, với độ lệch ngang rõ rệt được quan sát từ phía sau. Phân tích mặt phẳng đứng dọc (Sagittal) tiết lộ vị trí đầu và cổ cân bằng.",
+  metrics: {
+    front: {
+      title: "Góc nhìn: MẶT TRƯỚC (FRONT VIEW)",
+      analysis: "Phân tích cho thấy sự mất cân đối nhẹ giữa bên trái và bên phải liên quan đến đầu, vai hoặc khung chậu.",
+      data: [
+        { label: "Đầu lệch", value: "0.04 in", side: "Phải" },
+        { label: "Đầu nghiêng", value: "7.6°", side: "Phải" },
+        { label: "Vai lệch", value: "0.10 in", side: "Trái" },
+        { label: "Vai nghiêng", value: "2.8°", side: "Phải" },
+        { label: "Hông lệch", value: "0.17 in", side: "Trái" },
+        { label: "Hông nghiêng", value: "4.1°", side: "Phải" },
+        { label: "Góc Q bên Phải", value: "0.1°", side: "-" },
+        { label: "Góc Q bên Trái", value: "0.3°", side: "-" },
+      ]
+    },
+    back: {
+      title: "Góc nhìn: MẶT SAU (BACK VIEW)",
+      analysis: "Góc nhìn từ phía sau làm nổi bật sự lệch ngang nhất quán qua nhiều đoạn cột sống. Duy trì sự thẳng hàng này có thể góp phần vào việc chịu tải cơ bắp không đối xứng.",
+      data: [
+        { label: "Đầu lệch", value: "0.21 in", side: "Trái" },
+        { label: "Đầu nghiêng", value: "1.7°", side: "Phải" },
+        { label: "Vai lệch", value: "0.28 in", side: "Trái" },
+        { label: "Vai nghiêng", value: "1.7°", side: "Phải" },
+        { label: "Lồng ngực lệch", value: "0.26 in", side: "Trái" },
+        { label: "Hông lệch", value: "0.19 in", side: "Trái" },
+        { label: "Hông nghiêng", value: "1.9°", side: "Phải" },
+      ],
+      spine: [
+        { segment: "T1 - T4", shift: "0.26 in", tilt: "0.2° Phải" },
+        { segment: "T4 - T8", shift: "0.24 in", tilt: "0.2° Phải" },
+        { segment: "T8 - T12", shift: "0.23 in", tilt: "0.2° Phải" },
+        { segment: "T12 - L3", shift: "0.21 in", tilt: "0.2° Phải" },
+      ]
+    },
+    left: {
+      title: "Góc nhìn: NGHIÊNG TRÁI (LEFT VIEW)",
+      analysis: "Đánh giá chỉ ra vị trí đầu hơi nhô ra phía trước, dẫn đến nhu cầu tăng lên đối với hệ cơ cổ.",
+      headWeight: "20.0 lbs",
+      fhp: "1.00 in",
+      data: [
+        { label: "Đầu nhô trước vai", value: "1.00 in", status: "Cần chú ý" },
+        { label: "Đầu lệch (Mắt cá)", value: "2.26 in", status: "2.1° Forward" },
+        { label: "Vai lệch", value: "1.26 in", status: "1.3° Forward" },
+        { label: "Hông lệch", value: "1.81 in", status: "3.3° Forward" },
+        { label: "Đầu gối lệch", value: "0.79 in", status: "2.9° Forward" },
+      ]
+    },
+    right: {
+      title: "Góc nhìn: NGHIÊNG PHẢI (RIGHT VIEW)",
+      analysis: "Sự thẳng hàng của đầu và cổ có vẻ cân bằng tốt trên thân người, tải trọng nằm trong phạm vi sinh lý bình thường.",
+      headWeight: "16.3 lbs",
+      fhp: "0.63 in",
+      data: [
+        { label: "Đầu nhô trước vai", value: "0.63 in", status: "Bình thường" },
+        { label: "Đầu lệch (Mắt cá)", value: "0.87 in", status: "0.8° Forward" },
+        { label: "Vai lệch", value: "0.25 in", status: "0.3° Forward" },
+        { label: "Hông lệch", value: "0.47 in", status: "0.9° Forward" },
+        { label: "Đầu gối lệch", value: "0.11 in", status: "0.4° Forward" },
+      ]
+    }
+  },
+  extra: {
+    leg: { label: "Hình dáng chân", result: "Bình thường", knee: "6.22 in", ankle: "7.61 in" },
+    knee: { label: "Độ cong đầu gối", result: "Bình thường", angle: "179.1°" },
+    neck: { label: "Nghiêng cổ", result: "Bình thường", angle: "4.8°" }
+  }
+};
+
+// --- COMPONENTS ---
+
+const PageWrapper = ({ children, pageNumber }) => (
+  <div className="bg-white w-[210mm] min-h-[297mm] mx-auto my-0 p-[20mm] relative shadow-none print:shadow-none page-break border-b print:border-none last:border-none">
+    <div className="flex justify-between items-center mb-10 border-b border-black pb-4">
+      <div>
+        <h1 className="text-xl font-bold text-slate-900 tracking-tight">MIRABO CARESYNC</h1>
+        <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Posture Assessment Report</p>
+      </div>
+      <div className="text-right text-[11px] font-medium leading-tight">
+        <p>Bệnh nhân: <span className="font-bold">{PATIENT_DATA.name}</span></p>
+        <p>ID: {PATIENT_DATA.id} | Giới tính: {PATIENT_DATA.gender}</p>
+        <p>Ngày thực hiện: {PATIENT_DATA.date}</p>
+      </div>
+    </div>
+    
+    <div className="content">
+      {children}
+    </div>
+
+    <div className="absolute bottom-[10mm] left-[20mm] right-[20mm] flex justify-between text-[9px] text-slate-400 font-bold border-t pt-2">
+      <span>© MIRABO CARESYNC SYSTEM G8</span>
+      <span>TRANG {pageNumber} / 6</span>
+    </div>
+  </div>
+);
+
+const SectionHeader = ({ title }) => (
+  <h2 className="text-sm font-black bg-slate-900 text-white px-3 py-1.5 mb-6 uppercase tracking-wider">{title}</h2>
+);
+
+const App = () => {
+  const postureScore = useMemo(() => {
+    // Tính điểm dựa trên shift (logic đơn giản)
+    let penalty = 0;
+    Object.values(PATIENT_DATA.metrics).forEach(m => penalty += m.shift || 0);
+    return 100 - Math.round(penalty * 4);
+  }, []);
+
+  return (
+    <div className="bg-slate-100 min-h-screen py-10 print:bg-white print:p-0 font-serif">
+      {/* Action Bar */}
+      <div className="fixed top-6 right-6 print:hidden z-50">
+        <button 
+          onClick={() => window.print()}
+          className="flex items-center gap-2 bg-slate-900 text-white px-6 py-3 rounded shadow-lg hover:bg-slate-800 transition-all font-bold"
+        >
+          <Printer size={18} /> IN BÁO CÁO (PDF)
+        </button>
+      </div>
+
+      {/* PAGE 1: TỔNG QUAN */}
+      <PageWrapper pageNumber={1}>
+        <div className="py-20 text-center">
+          <h1 className="text-4xl font-black mb-16 underline decoration-4 underline-offset-8 uppercase tracking-tighter text-slate-900">
+            Báo cáo Đánh giá Tư thế
+          </h1>
+          
+          <div className="max-w-md mx-auto mb-20 border-4 border-slate-900 p-8">
+            <p className="text-xs font-bold text-slate-500 uppercase mb-2">Posture Score</p>
+            <div className="text-8xl font-black text-slate-900 mb-2">{postureScore}</div>
+            <div className="h-2 w-full bg-slate-200 rounded-full mb-4">
+              <div className="h-full bg-slate-900" style={{width: `${postureScore}%`}}></div>
+            </div>
+            <p className="text-sm font-bold uppercase tracking-widest text-green-700">Trạng thái: Ổn định</p>
+          </div>
+
+          <div className="text-left max-w-2xl mx-auto space-y-6">
+            <div className="border-l-4 border-slate-900 pl-4">
+              <h3 className="text-xs font-black uppercase text-slate-500 mb-2">Tóm tắt tổng quan</h3>
+              <p className="text-base leading-relaxed text-slate-800 font-medium italic">"{PATIENT_DATA.summary}"</p>
+            </div>
+          </div>
+        </div>
+      </PageWrapper>
+
+      {/* PAGE 2: FRONT VIEW */}
+      <PageWrapper pageNumber={2}>
+        <SectionHeader title={PATIENT_DATA.metrics.front.title} />
+        
+        <div className="mb-10 aspect-video bg-slate-50 border border-slate-200 flex items-center justify-center relative">
+          <span className="text-slate-300 font-bold text-xs uppercase tracking-widest">[ Hình ảnh Mặt trước / Front View Analysis ]</span>
+          {/* Lưới định vị mảnh */}
+          <div className="absolute inset-0 border-x border-slate-200/50 flex justify-center">
+            <div className="w-[1px] h-full bg-slate-300"></div>
+          </div>
+        </div>
+
+        <div className="mb-8 p-4 bg-slate-50 border-l-4 border-slate-300 text-xs leading-relaxed font-medium">
+          <span className="font-bold text-slate-900">ĐÁNH GIÁ CHUNG:</span> {PATIENT_DATA.metrics.front.analysis}
+        </div>
+
+        <table className="w-full text-left text-xs">
+          <thead className="border-b-2 border-slate-900">
+            <tr className="uppercase font-black text-slate-500">
+              <th className="py-2">Chỉ số Phân tích</th>
+              <th className="py-2">Giá trị</th>
+              <th className="py-2">Hướng lệch</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-200">
+            {PATIENT_DATA.metrics.front.data.map((item, i) => (
+              <tr key={i} className="hover:bg-slate-50">
+                <td className="py-3 font-bold text-slate-700">{item.label}</td>
+                <td className="py-3 font-black text-slate-900">{item.value}</td>
+                <td className="py-3 font-semibold text-slate-500 uppercase">{item.side}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </PageWrapper>
+
+      {/* PAGE 3: BACK VIEW */}
+      <PageWrapper pageNumber={3}>
+        <SectionHeader title={PATIENT_DATA.metrics.back.title} />
+        
+        <div className="mb-10 aspect-video bg-slate-50 border border-slate-200 flex items-center justify-center">
+          <span className="text-slate-300 font-bold text-xs uppercase tracking-widest">[ Hình ảnh Mặt sau / Back View Analysis ]</span>
+        </div>
+
+        <div className="mb-8 p-4 bg-slate-50 border-l-4 border-slate-300 text-xs leading-relaxed font-medium">
+          <span className="font-bold text-slate-900">ĐÁNH GIÁ CHUNG:</span> {PATIENT_DATA.metrics.back.analysis}
+        </div>
+
+        <div className="grid grid-cols-2 gap-10">
+          <div>
+            <h4 className="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-tighter">Thông số lệch ngang</h4>
+            <table className="w-full text-[11px]">
+              <tbody className="divide-y">
+                {PATIENT_DATA.metrics.back.data.map((item, i) => (
+                  <tr key={i}>
+                    <td className="py-2 font-bold text-slate-600">{item.label}</td>
+                    <td className="py-2 text-right font-black">{item.value} {item.side}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h4 className="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-tighter">Phân đoạn Cột sống</h4>
+            <table className="w-full text-[11px]">
+              <thead className="border-b">
+                <tr className="text-[9px] font-bold text-slate-400">
+                  <th className="text-left py-1">Đoạn</th>
+                  <th className="text-right py-1">Độ lệch (Shift)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {PATIENT_DATA.metrics.back.spine.map((seg, i) => (
+                  <tr key={i}>
+                    <td className="py-2 font-bold">{seg.segment}</td>
+                    <td className="py-2 text-right font-black">{seg.shift}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </PageWrapper>
+
+      {/* PAGE 4: LEFT VIEW */}
+      <PageWrapper pageNumber={4}>
+        <SectionHeader title={PATIENT_DATA.metrics.left.title} />
+        
+        <div className="grid grid-cols-3 gap-8 mb-10">
+          <div className="col-span-1 flex flex-col justify-center items-center border-2 border-slate-900 p-6">
+            <p className="text-[10px] font-black text-slate-400 uppercase mb-2 text-center leading-none">Trọng lượng đầu hiệu dụng</p>
+            <p className="text-4xl font-black text-slate-900">{PATIENT_DATA.metrics.left.headWeight}</p>
+            <p className="text-[9px] font-bold text-red-600 mt-2 uppercase tracking-widest underline italic">Mức độ: Tăng tải trọng</p>
+          </div>
+          <div className="col-span-2 aspect-video bg-slate-50 border border-slate-200 flex items-center justify-center">
+             <span className="text-slate-300 font-bold text-xs uppercase tracking-widest">[ Ảnh Nghiêng Trái / Left Analysis ]</span>
+          </div>
+        </div>
+
+        <div className="mb-8 p-4 bg-slate-50 border-l-4 border-slate-300 text-xs font-medium">
+          <span className="font-bold text-slate-900 uppercase">FHP:</span> Đầu nhô trước vai {PATIENT_DATA.metrics.left.fhp}
+        </div>
+
+        <table className="w-full text-xs border">
+          <thead className="bg-slate-900 text-white">
+            <tr className="uppercase text-[10px] tracking-widest">
+              <th className="p-3 text-left">Điểm đo (Left)</th>
+              <th className="p-3 text-right">Độ lệch Mắt cá</th>
+              <th className="p-3 text-right">Tình trạng</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {PATIENT_DATA.metrics.left.data.map((item, i) => (
+              <tr key={i}>
+                <td className="p-3 font-bold text-slate-700">{item.label}</td>
+                <td className="p-3 text-right font-black text-slate-900">{item.value}</td>
+                <td className="p-3 text-right font-semibold text-slate-500 italic">{item.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </PageWrapper>
+
+      {/* PAGE 5: RIGHT VIEW */}
+      <PageWrapper pageNumber={5}>
+        <SectionHeader title={PATIENT_DATA.metrics.right.title} />
+        
+        <div className="grid grid-cols-3 gap-8 mb-10">
+          <div className="col-span-1 flex flex-col justify-center items-center border-2 border-slate-900 p-6">
+            <p className="text-[10px] font-black text-slate-400 uppercase mb-2 text-center leading-none">Trọng lượng đầu hiệu dụng</p>
+            <p className="text-4xl font-black text-slate-900">{PATIENT_DATA.metrics.right.headWeight}</p>
+            <p className="text-[9px] font-bold text-green-700 mt-2 uppercase tracking-widest italic">Mức độ: Bình thường</p>
+          </div>
+          <div className="col-span-2 aspect-video bg-slate-50 border border-slate-200 flex items-center justify-center">
+             <span className="text-slate-300 font-bold text-xs uppercase tracking-widest">[ Ảnh Nghiêng Phải / Right Analysis ]</span>
+          </div>
+        </div>
+
+        <table className="w-full text-xs border">
+          <thead className="bg-slate-900 text-white">
+            <tr className="uppercase text-[10px] tracking-widest">
+              <th className="p-3 text-left">Điểm đo (Right)</th>
+              <th className="p-3 text-right">Độ lệch Mắt cá</th>
+              <th className="p-3 text-right">Tình trạng</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {PATIENT_DATA.metrics.right.data.map((item, i) => (
+              <tr key={i}>
+                <td className="p-3 font-bold text-slate-700">{item.label}</td>
+                <td className="p-3 text-right font-black text-slate-900">{item.value}</td>
+                <td className="p-3 text-right font-semibold text-slate-500 italic">{item.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </PageWrapper>
+
+      {/* PAGE 6: CHI TIẾT KỸ THUẬT (Đã bỏ khuyến nghị và chữ ký) */}
+      <PageWrapper pageNumber={6}>
+        <SectionHeader title="Phân tích Chi dưới & Các phép đo khác" />
+        
+        <div className="space-y-8 mt-10">
+          {/* Khối 1: Hình dáng chân */}
+          <div className="border p-8 bg-slate-50">
+            <h4 className="text-[10px] font-black uppercase text-slate-500 mb-6 tracking-widest border-b pb-2">Hình dáng chân</h4>
+            <div className="flex justify-between items-end mb-8 px-4">
+              <div>
+                  <p className="text-[11px] font-bold text-slate-600 uppercase mb-1">Khoảng cách đầu gối</p>
+                  <p className="text-3xl font-black text-slate-900">{PATIENT_DATA.extra.leg.knee}</p>
+              </div>
+              <div>
+                  <p className="text-[11px] font-bold text-slate-600 uppercase mb-1 text-right">Khoảng cách mắt cá</p>
+                  <p className="text-3xl font-black text-slate-900 text-right">{PATIENT_DATA.extra.leg.ankle}</p>
+              </div>
+            </div>
+            <div className="text-center font-bold text-sm text-green-700 bg-green-50 py-3 border border-green-200 uppercase tracking-widest mx-4">
+              Kết quả: {PATIENT_DATA.extra.leg.result}
+            </div>
+          </div>
+
+          {/* Khối 2: Các phép đo khác */}
+          <div className="border p-8 bg-slate-50">
+            <h4 className="text-[10px] font-black uppercase text-slate-500 mb-6 tracking-widest border-b pb-2">Các phép đo góc</h4>
+            <div className="grid grid-cols-2 gap-10 px-4">
+              <div className="flex flex-col items-center justify-center p-4 border-2 border-slate-200 bg-white">
+                <span className="text-[10px] text-slate-500 uppercase font-bold mb-2">Góc nghiêng cổ</span>
+                <span className="text-4xl font-black text-slate-900">{PATIENT_DATA.extra.neck.angle}</span>
+              </div>
+              <div className="flex flex-col items-center justify-center p-4 border-2 border-slate-200 bg-white">
+                <span className="text-[10px] text-slate-500 uppercase font-bold mb-2">Độ cong gối</span>
+                <span className="text-4xl font-black text-slate-900">{PATIENT_DATA.extra.knee.angle}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </PageWrapper>
+
+    </div>
+  );
+};
+
+export default App;
