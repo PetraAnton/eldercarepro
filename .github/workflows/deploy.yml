@@ -1,27 +1,27 @@
-name: Vercel Production Deployment
-on:
-  push:
-    branches:
-      - main
+# name: Vercel Production Deployment
+# on:
+#   push:
+#     branches:
+#       - main
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#         with:
+#           fetch-depth: 0
+#           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Configure Git
-        run: |
-          git config user.name "chau0301"
-          git config user.email "nongngocchau1@gmail.com"
+#       - name: Configure Git
+#         run: |
+#           git config user.name "chau0301"
+#           git config user.email "nongngocchau1@gmail.com"
 
-      - name: Rewrite commit author
-        run: |
-          git commit --amend --no-edit --author="chau0301 <nongngocchau1@gmail.com>"
-          git push --force
+#       - name: Rewrite commit author
+#         run: |
+#           git commit --amend --no-edit --author="chau0301 <nongngocchau1@gmail.com>"
+#           git push --force
 
       # - name: Deploy to Vercel
       #   uses: amondnet/vercel-action@v20
