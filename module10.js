@@ -896,7 +896,25 @@ async function handlePostureCapture() {
             drawPostureOverlay(ctx, savedLandmarks, canvas.width, canvas.height);
         }
 
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        // Resize for storage optimization (Max width 800px)
+        const MAX_WIDTH = 800;
+        let finalWidth = canvas.width;
+        let finalHeight = canvas.height;
+
+        if (finalWidth > MAX_WIDTH) {
+            finalHeight = Math.round((finalHeight * MAX_WIDTH) / finalWidth);
+            finalWidth = MAX_WIDTH;
+        }
+
+        const storageCanvas = document.createElement('canvas');
+        storageCanvas.width = finalWidth;
+        storageCanvas.height = finalHeight;
+        const sCtx = storageCanvas.getContext('2d');
+        sCtx.drawImage(canvas, 0, 0, finalWidth, finalHeight);
+
+        // Lower quality to 0.7 to save space
+        const dataUrl = storageCanvas.toDataURL('image/jpeg', 0.7);
+
         postureState.captures[postureState.viewMode] = {
             image: dataUrl,
             landmarks: savedLandmarks // Save Mirrored Landmarks!
@@ -1479,38 +1497,99 @@ window.importModule10Data = function () {
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = function (event) {
+        reader.onload = async function (event) {
             try {
+                // Show loading toast
+                const loadingToast = document.createElement('div');
+                loadingToast.id = 'import-loading-toast';
+                loadingToast.className = 'fixed top-5 right-5 z-[200] bg-blue-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-fade-in';
+                loadingToast.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> <span class="font-bold text-sm">Đang xử lý và nén dữ liệu...</span>';
+                document.body.appendChild(loadingToast);
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+
                 const jsonObj = JSON.parse(event.target.result);
                 if (!Array.isArray(jsonObj)) {
+                    document.body.removeChild(loadingToast);
                     throw new Error('Định dạng file không hợp lệ (phải là danh sách bản ghi)');
                 }
 
                 const userId = getCurrentUserId();
                 let currentHistory = getPostureHistory(userId);
 
-                // Merge strategies:
-                // 1. Filter out duplicates by ID
+                // Helper to compress image string (base64)
+                const compressBase64 = (base64Str, maxWidth = 600, quality = 0.6) => {
+                    return new Promise((resolve) => {
+                        const img = new Image();
+                        img.src = base64Str;
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            let w = img.width;
+                            let h = img.height;
+
+                            if (w > maxWidth) {
+                                h = Math.round((h * maxWidth) / w);
+                                w = maxWidth;
+                            }
+
+                            canvas.width = w;
+                            canvas.height = h;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, w, h);
+                            resolve(canvas.toDataURL('image/jpeg', quality));
+                        };
+                        img.onerror = () => resolve(base64Str); // Fail safe
+                    });
+                };
+
+                // Process items to compress images
+                // Only process new items to save time
                 const existingIds = new Set(currentHistory.map(h => h.id));
-                let addedCount = 0;
+                const newItems = [];
 
-                jsonObj.forEach(item => {
+                for (const item of jsonObj) {
                     if (item.id && !existingIds.has(item.id)) {
-                        currentHistory.push(item);
+                        // Compress images in captures
+                        if (item.captures) {
+                            for (const view of ['FRONT', 'BACK', 'LEFT', 'RIGHT']) {
+                                if (item.captures[view] && item.captures[view].image) {
+                                    // Compress heavily for storage
+                                    item.captures[view].image = await compressBase64(item.captures[view].image, 600, 0.6);
+                                }
+                            }
+                        }
+                        newItems.push(item);
                         existingIds.add(item.id);
-                        addedCount++;
                     }
-                });
+                }
 
-                if (addedCount > 0) {
-                    savePostureHistory(userId, currentHistory);
-                    renderHistoryList();
-                    showToast(`Đã nhập thành công ${addedCount} bản ghi`, 'success');
+                if (newItems.length > 0) {
+                    // Try to save one by one or batch? Batch is standard.
+                    // Check quota risk
+                    const newHistory = [...currentHistory, ...newItems];
+                    try {
+                        savePostureHistory(userId, newHistory);
+                        renderHistoryList();
+                        showToast(`Đã nhập thành công ${newItems.length} bản ghi`, 'success');
+                    } catch (e) {
+                        if (e.name === 'QuotaExceededError') {
+                            // If still fails, try to just add recent ones or warn
+                            showToast('Bộ nhớ đầy! Không thể lưu tất cả bản ghi. Đã cố gắng nén nhưng vẫn không đủ chỗ.', 'error');
+                        } else {
+                            throw e;
+                        }
+                    }
                 } else {
                     showToast('Không có bản ghi mới nào được thêm (trùng lặp)', 'info');
                 }
 
+                // Remove loading
+                const toast = document.getElementById('import-loading-toast');
+                if (toast) toast.remove();
+
             } catch (err) {
+                const toast = document.getElementById('import-loading-toast');
+                if (toast) toast.remove();
+
                 console.error('Import error', err);
                 showToast('Lỗi nhập dữ liệu: ' + err.message, 'error');
             }

@@ -234,48 +234,126 @@ function getUserProfile(username) {
     const users = JSON.parse(localStorage.getItem('mirabocaresync_users') || '[]');
     return users.find(u => u.username === username);
 }
-function resetDemoData() {
-    // Keep session if possible, or just logout
-    // We'll clear everything starting with mirabocaresync_ except session?
-    // User asked to reset demo data.
+/**
+ * Clear all module data for the currently selected user
+ * Preserves the user record itself and only removes module data (1-9)
+ */
+function clearCurrentUserData() {
+    const userId = getCurrentUserId();
 
+    if (!userId) {
+        showToast('Vui lòng chọn người dùng trước', 'error');
+        return;
+    }
+
+    // Confirm action
+    if (!confirm(`Bạn có chắc muốn xóa TẤT CẢ dữ liệu của người dùng này?\n\nThông tin người dùng sẽ được giữ lại, nhưng tất cả dữ liệu đánh giá (Module 1-9) sẽ bị xóa vĩnh viễn.`)) {
+        return;
+    }
+
+    // List of all module data keys to remove
+    const moduleKeys = [
+        `mirabocaresync_${userId}_facesheet`,           // Module 1
+        `mirabocaresync_${userId}_meetings`,            // Module 2
+        `mirabocaresync_${userId}_adl_assessment`,      // Module 3
+        `mirabocaresync_${userId}_interests_assessment`,// Module 4
+        `mirabocaresync_${userId}_plan`,                // Module 5
+        `mirabocaresync_${userId}_body_assessments`,    // Module 6
+        `mirabo_m7_records_${userId}`,                  // Module 7
+        `mirabocaresync_${userId}_privacy`,             // Module 8
+        `mirabocaresync_${userId}_home_survey`,         // Module 9
+        `mirabocaresync_${userId}_status`               // Status tracking
+    ];
+
+    // Remove all module data
+    moduleKeys.forEach(key => {
+        localStorage.removeItem(key);
+        console.log(`[ClearData] Removed: ${key}`);
+    });
+
+    showToast(`Đã xóa tất cả dữ liệu của người dùng ${userId}`, 'success');
+
+    // Reload to refresh UI
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}
+
+/**
+ * Reset ALL demo data (for complete system reset)
+ * This clears everything including all users
+ */
+function resetDemoData() {
+    if (!confirm('CẢNH BÁO: Thao tác này sẽ xóa TẤT CẢ dữ liệu trong hệ thống!\n\nBao gồm:\n- Tất cả người dùng\n- Tất cả dữ liệu đánh giá\n- Tất cả cài đặt\n\nBạn có chắc chắn muốn tiếp tục?')) {
+        return;
+    }
+
+    // Full wipe as requested
+    console.log('[ResetDemo] Wiping all mirabo data...');
     const keysToRemove = [];
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key.startsWith('mirabocaresync_')) {
-            // Keep session? User probably expects a clean slate.
-            // Let's keep the current session to avoid immediate logout/confusion, 
-            // or we force logout. Forced logout is cleaner.
+        if (key.startsWith('mirabocaresync_') || key.startsWith('mirabo_')) {
+            // Keep Session and Admin data
+            if (key.includes('_session') ||
+                key.includes('_admin_pw') ||
+                key.includes('_admin_profile') ||
+                key.includes('_remembered_username')) {
+                continue;
+            }
             keysToRemove.push(key);
         }
     }
 
     keysToRemove.forEach(k => localStorage.removeItem(k));
-    location.reload();
+
+    showToast('Đã xóa toàn bộ dữ liệu hệ thống', 'success');
+
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
 }
 
 /**
  * Logout user
  */
+/**
+ * Logout user
+ */
 function logout() {
     localStorage.removeItem('mirabocaresync_session');
+    localStorage.removeItem('mirabocaresync_active_patient'); // Fix: Clear active patient reference
     location.reload(); // Reload to show login screen
 }
 
 // --- User Management (Service Users) ---
 
 /**
+ * Get storage key for patients based on logged in staff
+ */
+function getPatientStorageKey() {
+    try {
+        const sess = JSON.parse(localStorage.getItem('mirabocaresync_session'));
+        if (sess && sess.user && sess.user.username) {
+            return `mirabocaresync_patients_${sess.user.username}`;
+        }
+    } catch (e) { console.error(e); }
+    return 'mirabocaresync_patients_global'; // Fallback
+}
+
+/**
  * Get all users from localStorage
  * @returns {Array} Array of user objects
  */
 function getAllUsers() {
-    let users = JSON.parse(localStorage.getItem('mirabocaresync_patients') || '[]');
+    const storageKey = getPatientStorageKey();
+    let users = JSON.parse(localStorage.getItem(storageKey) || '[]');
 
-    // Auto-generate dummy data if empty
-    if (users.length === 0) {
-        users = generateDummyUsers();
-        localStorage.setItem('mirabocaresync_patients', JSON.stringify(users));
-    }
+    // AUTO-GENERATION DISABLED: User requested manual generation only
+    // if (users.length === 0) {
+    //     users = generateDummyUsers();
+    //     localStorage.setItem(storageKey, JSON.stringify(users));
+    // }
 
     return users;
 }
@@ -284,44 +362,200 @@ function getAllUsers() {
  * Generate 10 dummy users for testing
  * @returns {Array} Array of user objects
  */
+/**
+ * Generate 5 comprehensive dummy users with full profile data for Modules 1-10
+ * @returns {Array} Array of user objects
+ */
 function generateDummyUsers() {
+    console.log('Generating comprehensive dummy data for 5 users (Modules 1-10)...');
+
+    // --- Helpers ---
+    const tinyImage = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; // 1x1 px transparent/white
+    const rInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    const rItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    const getDate = (daysAgo) => {
+        const d = new Date();
+        d.setDate(d.getDate() - daysAgo);
+        return d.toISOString().split('T')[0];
+    };
+
+    // --- Pools ---
     const lastNames = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Huỳnh', 'Phan', 'Vũ', 'Võ', 'Đặng'];
     const middleNames = ['Văn', 'Thị', 'Đức', 'Ngọc', 'Minh', 'Thanh', 'Hữu', 'Thu', 'Quang', 'Xuân'];
     const firstNames = ['An', 'Bình', 'Cường', 'Dung', 'Phúc', 'Giang', 'Hà', 'Hiếu', 'Khánh', 'Lan', 'Minh', 'Nam', 'Oanh', 'Phú', 'Quân', 'Sơn', 'Tâm', 'Uyên', 'Vinh', 'Yến'];
-
     const careLevels = ['Chăm sóc 1', 'Chăm sóc 2', 'Chăm sóc 3', 'Chăm sóc 4', 'Chăm sóc 5'];
 
     const users = [];
     const currentYear = new Date().getFullYear();
 
-    for (let i = 1; i <= 10; i++) {
-        // Random Name
-        const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-        const middleName = middleNames[Math.floor(Math.random() * middleNames.length)];
-        const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    for (let i = 1; i <= 5; i++) {
+        // --- 0. Identity ---
+        const lastName = rItem(lastNames);
+        const middleName = rItem(middleNames);
+        const firstName = rItem(firstNames);
         const fullName = `${lastName} ${middleName} ${firstName}`;
 
-        // Random Gender (Roughly based on middle name or random)
+        // Gender logic
         let gender = Math.random() > 0.5 ? 'male' : 'female';
-        if (middleName === 'Thị' || middleName === 'Thu' || middleName === 'Oanh' || middleName === 'Lan') gender = 'female';
-        if (middleName === 'Văn' || middleName === 'Đức' || middleName === 'Hữu') gender = 'male';
+        if (['Thị', 'Thu', 'Oanh', 'Lan', 'Uyên', 'Yến'].includes(middleName)) gender = 'female';
+        if (['Văn', 'Đức', 'Hữu', 'Quang', 'Sơn', 'Quân'].includes(middleName)) gender = 'male';
 
-        // Random DOB (Age 60-95)
-        const age = 60 + Math.floor(Math.random() * 36);
+        const age = rInt(65, 90);
         const birthYear = currentYear - age;
-        const birthMonth = String(1 + Math.floor(Math.random() * 12)).padStart(2, '0');
-        const birthDay = String(1 + Math.floor(Math.random() * 28)).padStart(2, '0');
-        const dateOfBirth = `${birthYear}-${birthMonth}-${birthDay}`;
-
-        // Random Care Level
-        const careLevel = careLevels[Math.floor(Math.random() * careLevels.length)];
-
+        const dob = `${birthYear}-${String(rInt(1, 12)).padStart(2, '0')}-${String(rInt(1, 28)).padStart(2, '0')}`;
         const userId = String(i).padStart(3, '0') + '-DAY-' + String(currentYear).slice(-2);
+        const careLevel = rItem(careLevels);
 
+        // --- 1. Module 1: Face Sheet ---
+        const module1Data = {
+            admin: {
+                consultationDate: getDate(rInt(30, 60)),
+                creator: 'Admin System',
+                type: 'day_service',
+                residenceStatus: Math.random() > 0.7 ? 'facility' : 'home'
+            },
+            basic: {
+                nickname: '',
+                fullName: fullName.toUpperCase(),
+                gender: gender,
+                dob: dob,
+                age: age + ' tuổi',
+                postalCode: '70000',
+                fullAddress: `${rInt(1, 999)} Đường Nguyễn Văn Linh, Hà Nội`,
+                fixedPhone: '024' + rInt(1000000, 9999999),
+                mobilePhone: '09' + rInt(10000000, 99999999)
+            },
+            disability: {
+                level: rItem(['independent', 'J1', 'J2', 'A1', 'A2']),
+                dementiaLevel: rItem(['independent', 'I', 'IIa', 'IIb']),
+                careLevel: 'care_' + rInt(1, 5),
+                certStartDate: `${currentYear}-01-01`,
+                certEndDate: `${currentYear + 2}-01-01`,
+                checklistResult: 'eligible',
+                checklistDate: getDate(10),
+                types: [],
+                otherType: ''
+            },
+            environment: { housingType: 'house', roomType: 'private', floorNumber: '1', renovation: 'no' },
+            economic: { incomeSources: ['pension'], otherIncome: '' },
+            contacts: [{ name: `${lastName} Văn Z`, relation: 'Con trai', address: 'Cùng địa chỉ' }],
+            others: { genogramDesc: 'Gia đình hòa thuận.', familyRelations: 'Tốt', preventionServiceDesire: 'yes' },
+            lastUpdated: new Date().toISOString()
+        };
+        localStorage.setItem(`mirabocaresync_${userId}_facesheet`, JSON.stringify(module1Data));
+
+        // --- 2. Module 2: Meetings (History) ---
+        // DISABLED: User requested no dummy data for Module 2
+        // const meetings = [
+        //    { meetingDate: getDate(60), meetingTime: '09:00', meetingLocation: 'Phòng họp 1', discussion: { familyWishes: 'Mong muốn cải thiện sức khỏe.' }, conclusions: { carePlanContent: 'Tập vận động nhẹ.' } },
+        //    { meetingDate: getDate(30), meetingTime: '14:00', meetingLocation: 'Phòng họp 2', discussion: { familyWishes: 'Gia đình hài lòng.' }, conclusions: { carePlanContent: 'Duy trì bài tập.' } }
+        // ];
+        // localStorage.setItem(`mirabocaresync_${userId}_meetings`, JSON.stringify(meetings));
+
+        // --- 3. Module 3: ADL/IADL ---
+        const adlData = {
+            adl: {
+                feeding: { level: 10, hasProblem: false },
+                bathing: { level: 5, hasProblem: true, notes: 'Cần ghế tắm' },
+                grooming: { level: 5, hasProblem: false },
+                dressing: { level: 5, hasProblem: true },
+                bowel: { level: 10, hasProblem: false },
+                bladder: { level: 10, hasProblem: false },
+                toilet: { level: 10, hasProblem: false },
+                transfer: { level: 15, hasProblem: false },
+                mobility: { level: 10, hasProblem: true },
+                stairs: { level: 5, hasProblem: true }
+            },
+            iadl: {
+                phone: { level: 1, hasProblem: false },
+                shopping: { level: 0, hasProblem: true },
+                foodPrep: { level: 1, hasProblem: false },
+                housekeeping: { level: 1, hasProblem: false },
+                laundry: { level: 1, hasProblem: false },
+                transport: { level: 0, hasProblem: true },
+                meds: { level: 1, hasProblem: false },
+                finance: { level: 0, hasProblem: true }
+            },
+            adlEnvironment: 'Nhà sàn gỗ, có tay vịn cầu thang.',
+            adlProblems: 'Khó khăn khi đi lại xa.',
+            generalNotes: 'Cần người hỗ trợ khi ra ngoài.',
+            lastUpdated: new Date().toISOString()
+        };
+        localStorage.setItem(`mirabocaresync_${userId}_adl_assessment`, JSON.stringify(adlData));
+
+        // --- 4. Module 4: Interests ---
+        const interests = {
+            history: { job: 'Cán bộ hưu trí', hobbies: 'Xem TV, Đọc báo' },
+            preferences: { food: 'Ăn nhạt', music: 'Nhạc đỏ', activities: ['Cờ tướng', 'Đọc sách'] },
+            matrix: { sports: 2, music: 4, reading: 5, social: 3 },
+            notes: 'Hòa đồng, vui vẻ.'
+        };
+        localStorage.setItem(`mirabocaresync_${userId}_interests_assessment`, JSON.stringify(interests));
+
+        // --- 5. Module 5: Care Plan ---
+        const plan = {
+            startDate: getDate(0),
+            longTermGoals: [{ text: 'Duy trì chức năng sinh hoạt', deadline: getDate(-180) }],
+            shortTermGoals: [{ text: 'Tăng cường sức mạnh cơ chân', deadline: getDate(-30) }],
+            supports: [{ service: 'Vật lý trị liệu', frequency: '2 lần/tuần' }],
+            schedule: { monday: 'Sáng: Tập gym, Chiều: Nghỉ', wednesday: 'Sáng: Cờ tướng' }
+        };
+        localStorage.setItem(`mirabocaresync_${userId}_plan`, JSON.stringify(plan)); // Key might differ slightly in mod5? No, inferred from grep.
+
+        // --- 6. Module 6: Body Composition (History) ---
+        // DISABLED: User requested no dummy data for Module 6
+        // const bodyHistory = [
+        //     { assessmentDate: getDate(30), general: { height: 165, weight: 60, bmi: 22, bodyFat: 25, muscleMass: 42 }, muscle: { rightArm: 2.2, leftArm: 2.1, rightLeg: 7.5, leftLeg: 7.4, trunk: 22 }, notes: 'Lần đầu' },
+        //     { assessmentDate: getDate(0), general: { height: 165, weight: 61, bmi: 22.4, bodyFat: 24.5, muscleMass: 42.5 }, muscle: { rightArm: 2.3, leftArm: 2.2, rightLeg: 7.6, leftLeg: 7.5, trunk: 22.2 }, notes: 'Có cải thiện' }
+        // ];
+        // localStorage.setItem(`mirabocaresync_${userId}_body_assessments`, JSON.stringify(bodyHistory));
+
+        // --- 7. Module 7: Motor Function ---
+        // DISABLED: User requested no dummy data for Module 7
+        // const motorHistory = [
+        //     { id: `m7_${userId}_1`, date: getDate(30), totalScore: 70, rating: 'Trung bình', comment: 'Cần nỗ lực' },
+        //     { id: `m7_${userId}_2`, date: getDate(0), totalScore: 75, rating: 'Khá', comment: 'Tiến bộ tốt' }
+        // ];
+        // localStorage.setItem(`mirabo_m7_records_${userId}`, JSON.stringify(motorHistory));
+
+        // --- 8. Module 8: Privacy ---
+        localStorage.setItem(`mirabocaresync_${userId}_privacy`, JSON.stringify({ lastUpdated: getDate(0), notes: 'Đã đồng ý chia sẻ thông tin.' }));
+
+        // --- 9. Module 9: Home Survey ---
+        localStorage.setItem(`mirabocaresync_${userId}_home_survey`, JSON.stringify({ surveyDate: getDate(60), address: module1Data.basic.fullAddress, notes: 'Nhà cửa gọn gàng' }));
+
+        // --- 10. Module 10: Posture History ---
+        // DISABLED: User requested no dummy data for Module 10
+        // const postureHistory = [
+        //     {
+        //         id: `ph_${userId}_${Date.now() - 86400000}`,
+        //         date: getDate(30),
+        //         timestamp: Date.now() - 86400000,
+        //         viewMode: 'FRONT',
+        //         captures: { FRONT: { image: tinyImage, landmarks: [] } },
+        //         analysis: { metrics: { headTilt: 2, shoulderLevel: 1 }, conclusions: ['Tư thế đầu hơi nghiêng phải', 'Vai phải thấp hơn vai trái'] }
+        //     },
+        //     {
+        //         id: `ph_${userId}_${Date.now()}`,
+        //         date: getDate(0),
+        //         timestamp: Date.now(),
+        //         viewMode: 'SIDE',
+        //         captures: { SIDE: { image: tinyImage, landmarks: [] } },
+        //         analysis: { metrics: { neckFlexion: 5 }, conclusions: ['Cổ hơi gập về phía trước (Forward Head Posture)'] }
+        //     }
+        // ];
+        // localStorage.setItem(`mirabocaresync_posture_history_${userId}`, JSON.stringify(postureHistory));
+
+
+        // --- Status ---
+        const status = { module1: true, module2: true, module3: true, module4: true, module5: true, module6: true, module7: true, module8: true, module9: true, module10: true };
+        localStorage.setItem(`mirabocaresync_${userId}_status`, JSON.stringify(status));
+
+        // Push User
         users.push({
             id: userId,
             fullName: fullName,
-            dateOfBirth: dateOfBirth,
+            dateOfBirth: dob,
             gender: gender,
             careLevel: careLevel,
             active: true,
@@ -329,6 +563,10 @@ function generateDummyUsers() {
             createdAt: new Date().toISOString()
         });
     }
+
+    // Save User List (Scoped)
+    const storageKey = getPatientStorageKey();
+    localStorage.setItem(storageKey, JSON.stringify(users));
 
     return users;
 }
@@ -387,7 +625,8 @@ function createUser(userData) {
     };
 
     users.push(newUser);
-    localStorage.setItem('mirabocaresync_patients', JSON.stringify(users));
+    const storageKey = getPatientStorageKey();
+    localStorage.setItem(storageKey, JSON.stringify(users));
 
     // Set as active user
     setCurrentUserId(userId);
@@ -412,7 +651,8 @@ function deactivateUser(userId, reason, notes) {
         user.deactivationReason = reason;
         user.deactivationNotes = notes || '';
 
-        localStorage.setItem('mirabocaresync_patients', JSON.stringify(users));
+        const storageKey = getPatientStorageKey();
+        localStorage.setItem(storageKey, JSON.stringify(users));
         return true;
     }
     return false;
@@ -431,7 +671,8 @@ function reactivateUser(userId) {
         user.status = 'active';
         user.reactivatedDate = new Date().toISOString();
 
-        localStorage.setItem('mirabocaresync_patients', JSON.stringify(users));
+        const storageKey = getPatientStorageKey();
+        localStorage.setItem(storageKey, JSON.stringify(users));
         return true;
     }
     return false;

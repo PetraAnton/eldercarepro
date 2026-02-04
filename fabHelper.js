@@ -100,7 +100,7 @@ function createFABManager(config) {
      * Cập nhật hiển thị FABs
      */
     function updateFABs() {
-        const container = document.getElementById(fabContainerId);
+        const container = document.getElementById('module-actions-slot');
         if (!container) {
             console.error(`[FAB ${moduleId}] Container ${fabContainerId} not found`);
             return;
@@ -138,7 +138,7 @@ function createFABManager(config) {
         container.classList.remove('hidden');
         container.innerHTML = `
             <button type="button" onclick="${moduleId}FAB.enterEditMode()" 
-                class="pointer-events-auto w-14 h-14 bg-amber-500 text-white rounded-full shadow-[0_8px_25px_rgb(245,158,11,0.5)] hover:bg-amber-400 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+                class="pointer-events-auto w-14 h-14 bg-amber-500 text-white rounded-full shadow-lg shadow-amber-200 hover:bg-amber-400 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
                 <i data-lucide="edit-2" class="w-6 h-6"></i>
                 <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
                     Chỉnh sửa
@@ -155,8 +155,9 @@ function createFABManager(config) {
 
         let html = `
             <!-- Close button (always visible in edit mode) -->
+            <!-- Close button (uniform size w-14) -->
             <button type="button" onclick="${moduleId}FAB.cancelEdit()" 
-                class="pointer-events-auto w-12 h-12 bg-white text-slate-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-slate-200 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-slate-100 ring-2 ring-white">
+                class="pointer-events-auto w-14 h-14 bg-white text-slate-500 rounded-full shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-slate-100 ring-4 ring-white/60">
                 <i data-lucide="x" class="w-6 h-6"></i>
                 <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
                     Đóng / Hủy
@@ -166,11 +167,12 @@ function createFABManager(config) {
 
         // Update button (only if dirty)
         if (isDirty) {
+            /* Updated to uniform size w-14 h-14 */
             html = `
                 <button type="button" onclick="${moduleId}FAB.save()" 
-                    class="pointer-events-auto w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-                    <i data-lucide="save" class="w-7 h-7"></i>
-                    <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                    class="pointer-events-auto w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-lg shadow-blue-500/40 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+                    <i data-lucide="save" class="w-6 h-6"></i>
+                    <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
                         Lưu thay đổi
                     </span>
                 </button>
@@ -194,18 +196,18 @@ function createFABManager(config) {
 
         console.log(`[FAB ${moduleId}] ACTIVATING SAVE BUTTON`);
         container.innerHTML = `
-            <!-- Save button (Indigo Gradient) -->
+            <!-- Save button (Standardized w-14) -->
             <button id="${moduleId}-fab-save-btn" type="button" onclick="${moduleId}FAB.save()" style="pointer-events: auto; display: flex;"
-                class="w-16 h-16 bg-gradient-to-br from-indigo-600 to-violet-700 text-white rounded-full shadow-[0_8px_30px_rgb(79,70,229,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-                <i data-lucide="save" class="w-7 h-7"></i>
-                <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
+                class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-violet-700 text-white rounded-full shadow-lg shadow-indigo-500/40 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+                <i data-lucide="save" class="w-6 h-6"></i>
+                <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
                     Lưu dữ liệu
                 </span>
             </button>
 
-            <!-- Reset button (White with Red Icon) -->
+            <!-- Reset button (Standardized w-14) -->
             <button type="button" onclick="${moduleId}FAB.reset()" style="pointer-events: auto; display: flex;"
-                class="w-12 h-12 bg-white text-rose-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-rose-100 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-rose-50 ring-2 ring-white ml-auto mr-2">
+                class="w-14 h-14 bg-white text-rose-500 rounded-full shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-slate-100 ring-4 ring-white/60">
                 <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
                 <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
                     Nhập lại
@@ -357,7 +359,7 @@ function createFABManager(config) {
                 try {
                     onReset();
                 } catch (err) {
-                    console.error(`[FAB ${moduleId}] Error in onReset callback:`, err);
+                    console.error(`[FAB ${moduleId}]Error in onReset callback: `, err);
                 }
             }
 
@@ -399,9 +401,5 @@ function createFABManager(config) {
  * @returns {string} HTML string
  */
 function generateFABContainerHTML(moduleId) {
-    return `
-            < div id = "${moduleId}-fab-container" class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none hidden" >
-        < !--FABs will be injected here by FAB Manager-- >
-    </div >
-            `;
+    return '';
 }

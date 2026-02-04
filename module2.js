@@ -244,13 +244,13 @@ window.module2Content = `
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-300px)]">
             <!-- Left: Meeting List (30%) -->
             <div class="lg:col-span-1 bg-slate-50 rounded-2xl p-4 overflow-y-auto">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-black text-slate-800 flex items-center gap-2">
-                        <i data-lucide="list" class="w-5 h-5"></i>
+                <div class="flex items-center justify-between mb-4 sticky top-0 bg-slate-50 pt-2 pb-2 z-10 border-b border-slate-200">
+                    <h3 class="font-black text-slate-800 flex items-center gap-2 text-sm">
+                        <i data-lucide="list" class="w-4 h-4"></i>
                         Danh sách cuộc họp
                     </h3>
-                    <button onclick="switchModule2Tab('form'); toggleM2Fab(true); if(typeof resetModule2Form === 'function') resetModule2Form(true); m2EditingIndex = null; showToast('Đã mở form tạo mới', 'info');" 
-                        class="btn-ios btn-ios-primary btn-ios-sm"
+                    <button type="button" onclick="switchModule2Tab('form'); toggleM2Fab(true); if(typeof resetModule2Form === 'function') resetModule2Form(true); m2EditingIndex = null; showToast('Đã mở form tạo mới', 'info');" 
+                        class="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-md active:scale-95"
                         title="Tạo biên bản mới">
                         <i data-lucide="plus" class="w-4 h-4"></i>
                     </button>
@@ -360,22 +360,35 @@ function switchModule2Tab(tabName) {
         }
     });
 
-    // Portal Actions Logic (Removed - moved to internal UI)
-    const actions = document.getElementById('module-actions');
-    if (actions) actions.innerHTML = '';
+    // Global FAB Slot Management
+    const fabContainer = document.getElementById('module-actions-slot');
 
     // Load history if switching to history tab
     if (tabName === 'history') {
         loadMeetingHistory();
-        // Force hide FAB container
-        const fab = document.getElementById('m2-fab-container');
-        if (fab) fab.classList.add('hidden');
+        if (fabContainer) fabContainer.innerHTML = ''; // Clear FABs
     } else {
-        // If switching to form, update state to show (if applicable)
-        if (typeof updateModule2FabState === 'function') updateModule2FabState(m2EditingIndex !== null ? 'edit' : 'create');
+        // Form Tab logic
+        if (window.module2FAB) {
+            if (m2EditingIndex !== null) {
+                // Editing existing
+                window.module2FAB.enterEditMode();
+            } else {
+                // Creating new
+                window.module2FAB.enterCreateMode();
+                // Ensure form is reset if switching to create
+                if (typeof resetModule2Form === 'function') resetModule2Form();
+            }
+            window.module2FAB.updateFABs();
+        } else {
+            // Fallback if FAB not ready
+            if (typeof initModule2 === 'function') initModule2();
+        }
     }
 
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 }
 
 function loadMeetingHistory() {
@@ -407,7 +420,7 @@ function loadMeetingHistory() {
                 </p>
                 <p class="text-xs text-slate-500 font-semibold">
                     <i data-lucide="user" class="w-3 h-3 inline"></i>
-                    ${meeting.recorder}
+                    ${meeting.recorder || '---'}
                 </p>
             </div>
         `).join('');
@@ -420,6 +433,20 @@ function showMeetingDetail(index) {
     const userId = getCurrentUserId();
     const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_meetings`) || '[]');
     const meeting = meetings[index];
+
+    // Debug logging
+    console.log('[Module2] showMeetingDetail called with index:', index);
+    console.log('[Module2] userId:', userId);
+    console.log('[Module2] Total meetings:', meetings.length);
+    console.log('[Module2] Selected meeting:', meeting);
+
+    // Safety check
+    if (!meeting) {
+        console.error('Meeting not found at index:', index);
+        showToast('Không tìm thấy thông tin cuộc họp', 'error');
+        return;
+    }
+
     const detailContainer = document.getElementById('meeting-detail');
 
     // Highlight selected item

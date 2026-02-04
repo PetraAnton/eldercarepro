@@ -327,7 +327,7 @@ window.module6Content = `
                 </button>
                 <div class="w-px h-8 bg-slate-200"></div>
                 <span class="text-xs font-bold text-slate-400 uppercase">Chọn bản ghi:</span>
-                <select id="m6-report-selector" onchange="renderModule6Report(this.value)" class="bg-slate-50 border border-slate-200 text-slate-800 text-sm font-bold rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none">
+                <select id="m6-report-selector" onchange="renderModule6Report(parseInt(this.value))" class="bg-slate-50 border border-slate-200 text-slate-800 text-sm font-bold rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none">
                     <!-- Options populated by JS -->
                 </select>
             </div>
@@ -431,7 +431,15 @@ window.module6Content = `
              <div class="p-8">
                 <table class="w-full text-sm text-left">
                     <thead class="text-xs text-white uppercase font-bold bg-slate-800 rounded-lg">
-                        <!-- Header injected by renderSegmentalTable -->
+                        <tr class="bg-slate-800 text-white text-xs uppercase font-bold">
+                            <th class="px-4 py-3 rounded-l-lg">Bộ phận</th>
+                            <th class="px-4 py-3 text-center border-r border-slate-600">Khối lượng cơ (kg)</th>
+                            <th class="px-4 py-3 text-center text-slate-300">Tham chiếu</th>
+                            <th class="px-4 py-3 text-center border-r border-slate-600">Đánh giá</th>
+                            <th class="px-4 py-3 text-center">Góc pha (°)</th>
+                            <th class="px-4 py-3 text-center text-slate-300">Tham chiếu</th>
+                            <th class="px-4 py-3 text-center rounded-r-lg">Đánh giá</th>
+                        </tr>
                     </thead>
                     <tbody id="m6-segmental-table-body" class="font-medium text-slate-700 divide-y divide-slate-100">
                         <!-- Populated by JS -->
@@ -902,49 +910,35 @@ function switchModule6Tab(tabName) {
     reportBtn.className = inactiveClass;
 
     // Toggle FAB Visibility based on Tab
-    const fabSave = document.getElementById('module6-fab-save');
-    const fabReset = document.getElementById('module6-fab-reset');
-    const fabCreate = document.getElementById('module6-fab-create');
-
-    // Default Hide All
-    if (fabSave) fabSave.classList.add('hidden');
-    if (fabReset) fabReset.classList.add('hidden');
-    if (fabCreate) fabCreate.classList.add('hidden');
+    const fabContainer = document.getElementById('module-actions-slot');
 
     if (tabName === 'form') {
         formTab.classList.remove('hidden');
         formBtn.className = activeClass;
 
-        // Show Form FABs
-        if (fabSave) fabSave.classList.remove('hidden');
-        if (fabReset) fabReset.classList.remove('hidden');
-
-        if (typeof resetModule6Form === 'function') {
-            document.getElementById('module6-form').reset();
-            resetModule6Form();
-            if (window.module6FAB && window.module6FAB.updateFABs) {
-                window.module6FAB.isDirty = false;
-                window.module6FAB.updateFABs();
-            }
+        // Show FABs
+        if (window.module6FAB) {
+            window.module6FAB.init();
+            window.module6FAB.updateFABs();
+        } else {
+            initModule6FabLogic();
         }
-        updateModule6FabState();
+
     } else if (tabName === 'history') {
         historyTab.classList.remove('hidden');
         historyBtn.className = activeClass;
 
-        // Show Create New FAB
-        if (fabCreate) fabCreate.classList.remove('hidden');
+        // Clear FABs
+        if (fabContainer) fabContainer.innerHTML = '';
 
         loadModule6History();
-        document.getElementById('module6-fab-container')?.classList.add('hidden');
     } else if (tabName === 'report') {
         if (reportTab) reportTab.classList.remove('hidden');
         reportBtn.className = activeClass;
 
-        // Show Create New FAB
-        if (fabCreate) fabCreate.classList.remove('hidden');
+        // Clear FABs
+        if (fabContainer) fabContainer.innerHTML = '';
 
-        document.getElementById('module6-fab-container')?.classList.add('hidden');
         const lastSelected = window.lastSelectedReportTimestamp || null;
         renderModule6Report(lastSelected);
     }
@@ -1082,9 +1076,9 @@ let m6BodyTypeChart = null;
 let m6QualityChart = null;
 
 function renderModule6Report(selectedTimestamp = null) {
-    const patientId = getCurrentPatientId();
+    const userId = getCurrentUserId();
     // Get all assessments
-    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
+    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_body_assessments`) || '[]');
 
     if (assessments.length === 0) {
         return;
@@ -1130,15 +1124,16 @@ function renderModule6Report(selectedTimestamp = null) {
     if (qualityComment) qualityComment.value = currentRecord.qualityComment || '';
 
     // --- Render Detailed Table ---
-    renderReportTable(currentRecord, patientId);
-    renderSegmentalTable(currentRecord);
+    try { renderReportTable(currentRecord, userId); } catch (e) { console.error('Error rendering Report Table:', e); }
+
+    try { renderSegmentalTable(currentRecord); } catch (e) { console.error('Error rendering Segmental Table:', e); }
 
     // --- Render Charts ---
-    renderBodyTypeChart(currentRecord);
-    renderQualityChart(currentRecord);
+    try { renderBodyTypeChart(currentRecord); } catch (e) { console.error('Error rendering Body Type Chart:', e); }
+    try { renderQualityChart(currentRecord); } catch (e) { console.error('Error rendering Quality Chart:', e); }
 
     // --- Update Auto-Evaluation Text ---
-    // updateM6AutoEval(currentRecord); // Optional, maybe remove if custom layout serves purpose
+    updateM6AutoEval(currentRecord);
 }
 
 function updateM6AutoEval(data) {
@@ -1161,20 +1156,8 @@ function renderSegmentalTable(data) {
     // Actually, let's update the header dynamically if we can, or rely on the HTML update step.
     // For now, focusing on the table headers and body.
 
-    const thead = document.querySelector('#m6-segmental-table-body')?.previousElementSibling;
-    if (thead) {
-        thead.innerHTML = `
-            <tr class="bg-slate-800 text-white text-xs uppercase font-bold">
-                <th class="px-4 py-3 rounded-l-lg">Bộ phận</th>
-                <th class="px-4 py-3 text-center border-r border-slate-600">Khối lượng cơ (kg)</th>
-                <th class="px-4 py-3 text-center text-slate-300">Tham chiếu</th>
-                <th class="px-4 py-3 text-center border-r border-slate-600">Đánh giá</th>
-                <th class="px-4 py-3 text-center">Góc pha (°)</th>
-                <th class="px-4 py-3 text-center text-slate-300">Tham chiếu</th>
-                <th class="px-4 py-3 text-center rounded-r-lg">Đánh giá</th>
-            </tr>
-        `;
-    }
+    // 1. Update Title if needed (Title is static in HTML now)
+    // const thead = document.querySelector('#m6-segmental-table-body')?.previousElementSibling;
 
     const tbody = document.getElementById('m6-segmental-table-body');
     if (!tbody) return;
@@ -1332,7 +1315,7 @@ function renderReportTable(data, userId) {
 
     // Get User Info
     const user = getUserById(userId) || { dob: '1960-01-01', gender: 'male' };
-    const age = new Date().getFullYear() - new Date(user.dob).getFullYear();
+    const age = user.dob ? (new Date().getFullYear() - new Date(user.dob).getFullYear()) : 65;
     const gender = user.gender === 'male' ? 'Nam' : 'Nữ';
 
     // BMR Calculation (Mifflin-St Jeor)
@@ -1756,8 +1739,29 @@ function printModule6Report() {
 // Init FAB Logic
 // Init FAB Logic (Deprecated: Buttons moved inline)
 function initModule6FabLogic() {
-    console.log('[Module6] initModule6FabLogic called - Using inline buttons');
-    // FAB Logic removed to prevent floating button issues
+    console.log('[Module6] Initializing Standard FAB Manager');
+    if (typeof createFABManager === 'function') {
+        window.module6FAB = createFABManager({
+            moduleId: 'module6',
+            formId: 'module6-form',
+            enableEdit: false, // Always create new assessment
+            alwaysShowSave: true, // Show save button even if not dirty (optional, but safer)
+            hasExistingData: () => false,
+            onSave: () => {
+                // Return true to FAB manager
+                return saveModule6Assessment(null);
+            },
+            onReset: () => {
+                if (confirm('Bạn có chắc muốn nhập lại?')) {
+                    resetModule6Form();
+                }
+            }
+        });
+        window.module6FAB.init();
+
+        // Force update initial state
+        setTimeout(() => window.module6FAB.updateFABs(), 100);
+    }
 }
 
 // Update FAB State (kept for compatibility)

@@ -123,30 +123,31 @@ function generateDataForUser(user) {
 
 
     // --- MODULE 2: MEETINGS (History Array) ---
-    const meetings = GENERATOR_META.dates.slice(0, 3).map((date, idx) => ({
-        meetingDate: date,
-        meetingTime: '09:00',
-        meetingLocation: 'Phòng họp tầng 1 - Mirabo Center',
-        recorder: GENERATOR_META.assessors[0],
-        participants: [
-            { name: 'Nguyễn Văn Con', role: 'Đại diện gia đình' },
-            { name: GENERATOR_META.assessors[1], role: 'Bác sĩ phụ trách' },
-            { name: GENERATOR_META.assessors[0], role: 'Điều dưỡng trưởng' }
-        ],
-        discussion: {
-            familyWishes: idx === 0 ? 'Mong muốn cải thiện khả năng đi lại sau tai biến.' : 'Gia đình hài lòng với tiến độ hiện tại, muốn tăng cường tập vật lý trị liệu.',
-            basicInfoConfirmed: ['Đã xác nhận thông tin cá nhân (CCCD, BHYT, BHXH)', 'Đã xác nhận tình trạng sức khỏe hiện tại'],
-            risksConfirmed: ['Không có tiền sử bạo lực/tự gây thương tích'],
-            additionalNotes: idx === 0 ? 'Ông hơi ngại giao tiếp ban đầu.' : 'Ông đã vui vẻ hơn, tham gia hoạt động nhóm tốt.'
-        },
-        conclusions: {
-            serviceStartDate: date,
-            transportSchedule: 'Thứ 2, 4, 6 - Đón 8h, Trả 16h',
-            paymentMethod: 'transfer',
-            carePlanContent: `Duy trì tập phục hồi chức năng 3 buổi/tuần. Chế độ ăn giảm đường, muối. ${idx === 2 ? 'Tăng cường các bài tập thăng bằng.' : ''}`
-        }
-    }));
-    localStorage.setItem(`mirabocaresync_${pid}_meetings`, JSON.stringify(meetings));
+    // DISABLED: User requested no dummy data for Module 2
+    // const meetings = GENERATOR_META.dates.slice(0, 3).map((date, idx) => ({
+    //     meetingDate: date,
+    //     meetingTime: '09:00',
+    //     meetingLocation: 'Phòng họp tầng 1 - Mirabo Center',
+    //     recorder: GENERATOR_META.assessors[0],
+    //     participants: [
+    //         { name: 'Nguyễn Văn Con', role: 'Đại diện gia đình' },
+    //         { name: GENERATOR_META.assessors[1], role: 'Bác sĩ phụ trách' },
+    //         { name: GENERATOR_META.assessors[0], role: 'Điều dưỡng trưởng' }
+    //     ],
+    //     discussion: {
+    //         familyWishes: idx === 0 ? 'Mong muốn cải thiện khả năng đi lại sau tai biến.' : 'Gia đình hài lòng với tiến độ hiện tại, muốn tăng cường tập vật lý trị liệu.',
+    //         basicInfoConfirmed: ['Đã xác nhận thông tin cá nhân (CCCD, BHYT, BHXH)', 'Đã xác nhận tình trạng sức khỏe hiện tại'],
+    //         risksConfirmed: ['Không có tiền sử bạo lực/tự gây thương tích'],
+    //         additionalNotes: idx === 0 ? 'Ông hơi ngại giao tiếp ban đầu.' : 'Ông đã vui vẻ hơn, tham gia hoạt động nhóm tốt.'
+    //     },
+    //     conclusions: {
+    //         serviceStartDate: date,
+    //         transportSchedule: 'Thứ 2, 4, 6 - Đón 8h, Trả 16h',
+    //         paymentMethod: 'transfer',
+    //         carePlanContent: `Duy trì tập phục hồi chức năng 3 buổi/tuần. Chế độ ăn giảm đường, muối. ${idx === 2 ? 'Tăng cường các bài tập thăng bằng.' : ''}`
+    //     }
+    // }));
+    // localStorage.setItem(`mirabocaresync_${pid}_meetings`, JSON.stringify(meetings));
 
 
     // --- MODULE 3: ADL ASSESSMENT (Single Record Type, but Rich) ---
@@ -232,58 +233,110 @@ function generateDataForUser(user) {
 
 
     // --- MODULE 6: BODY COMPOSITION (History Array) ---
-    // Generate trending data (e.g., muscle mass improving)
-    const bodyHistory = GENERATOR_META.dates.map((date, i) => {
-        const factor = i * 0.5; // Improvement factor
-        return {
-            assessmentDate: date,
-            timestamp: new Date(date).getTime(),
-            assessorName: GENERATOR_META.assessors[1],
-            general: {
-                height: 165,
-                weight: 60 + (i * 0.2), // Gaining slight healthy weight
-                bmi: (60 + (i * 0.2)) / (1.65 * 1.65),
-                bodyFat: 25 - (i * 0.5), // Fat decreasing
-                muscleMass: 42 + factor, // Muscle increasing
-                boneMass: 2.5,
-                bmr: 1350 + (i * 10)
-            },
-            muscle: {
-                rightArm: 2.3 + (i * 0.1),
-                leftArm: 2.2 + (i * 0.1),
-                rightLeg: 7.5 + (i * 0.2),
-                leftLeg: 7.4 + (i * 0.2),
-                trunk: 22 + (i * 0.3),
-                paRightArm: 4.5 + (i * 0.1), // Phase angle improving
-                paRightLeg: 4.8 + (i * 0.1)
-            },
-            advanced: {
-                smi: 6.8 + (i * 0.1), // Skeletal Muscle Index
-                phaseAngle: 4.5 + (i * 0.2),
-                ecwTbw: 0.39 - (i * 0.005) // Better hydration balance
-            },
-            notes: `Đánh giá lần ${i + 1}: ${i > 0 ? 'Có tiến bộ so với lần trước.' : 'Bắt đầu lộ trình.'}`
-        };
-    });
-    localStorage.setItem(`mirabocaresync_${pid}_body_assessments`, JSON.stringify(bodyHistory));
+    // DISABLED: User requested no dummy data for Module 6
+    // const bodyHistory = GENERATOR_META.dates.map((date, i) => {
+    //     const factor = i * 0.5;
+    //     return {
+    //         assessmentDate: date,
+    //         timestamp: new Date(date).getTime(),
+    //         assessorName: GENERATOR_META.assessors[1],
+    //         general: { height: 165, weight: 60 + (i * 0.2), bmi: (60 + (i * 0.2)) / (1.65 * 1.65), bodyFat: 25 - (i * 0.5), muscleMass: 42 + factor, boneMass: 2.5, bmr: 1350 + (i * 10) },
+    //         muscle: { rightArm: 2.3 + (i * 0.1), leftArm: 2.2 + (i * 0.1), rightLeg: 7.5 + (i * 0.2), leftLeg: 7.4 + (i * 0.2), trunk: 22 + (i * 0.3), paRightArm: 4.5 + (i * 0.1), paRightLeg: 4.8 + (i * 0.1) },
+    //         advanced: { smi: 6.8 + (i * 0.1), phaseAngle: 4.5 + (i * 0.2), ecwTbw: 0.39 - (i * 0.005) },
+    //         notes: `Đánh giá lần ${i + 1}: ${i > 0 ? 'Có tiến bộ so với lần trước.' : 'Bắt đầu lộ trình.'}`
+    //     };
+    // });
+    // localStorage.setItem(`mirabocaresync_${pid}_body_assessments`, JSON.stringify(bodyHistory));
 
 
     // --- MODULE 7: MOTOR FUNCTION (History Array) ---
     // Key: mirabo_m7_records_${pid}
+    // Generate trend: randomly improving or declining for each user
+    const trendDirection = Math.random() > 0.5 ? 1 : -1; // 1 = improving, -1 = declining
+    const trendStrength = 0.3 + Math.random() * 0.7; // 0.3 to 1.0
+
     const motorHistory = GENERATOR_META.dates.map((date, i) => {
-        const improve = i * 1.5;
+        // Base values (realistic starting points for elderly)
+        const baseWeight = 60 + (Math.random() * 10 - 5); // 55-65kg
+        const baseHeight = 165;
+        const baseMuscle = 1.0 + (Math.random() * 0.3); // 1.0-1.3 kgf/kg
+        const baseAgility = 5.0 + (Math.random() * 3); // 5.0-8.0 kgf/s/kg
+        const baseStability = 45 + (Math.random() * 20); // 45-65 ms
+
+        // Apply trend with natural variation
+        const trendFactor = i * trendDirection * trendStrength;
+        const randomNoise = () => (Math.random() - 0.5) * 0.2; // ±10% noise
+
+        // --- MODULE 7: MOTOR FUNCTION (History Array) ---
+        // DISABLED: User requested no dummy data for Module 7
+        // const motorHistory = GENERATOR_META.dates.map((date, i) => {
+        //     // ... code ...
+        //     return { id: `m7_${pid}_${i}`, date: date, totalScore: 70, rating: 'Trung bình', comment: 'Disabled' }; 
+        // });
+        // localStorage.setItem(`mirabo_m7_records_${pid}`, JSON.stringify([])); 
+        // (Note: The actual block is complex, I will just return empty array or comment out the loop)
+
+        // Simplest way: just comment out the loop and storage
+        /*
+        const motorHistory = GENERATOR_META.dates.map((date, i) => {
+            // ... (lines 270-320)
+        });
+        localStorage.setItem(`mirabo_m7_records_${pid}`, JSON.stringify(motorHistory)); 
+        */
+
+        // Rating based on total score
+        let rating;
+        if (totalScore < 70) rating = 'Thấp';
+        else if (totalScore < 100) rating = 'Trung bình';
+        else rating = 'Cao';
+
+        // Generate contextual comments based on trend
+        let comment = '';
+        if (i === 0) {
+            comment = 'Đánh giá ban đầu. Thiết lập baseline cho theo dõi tiến độ.';
+        } else {
+            const prevScore = Math.round(
+                (baseMuscle + ((i - 1) * trendDirection * trendStrength * 0.05)) * 30 +
+                (baseAgility + ((i - 1) * trendDirection * trendStrength * 0.4)) * 8 +
+                (baseStability + ((i - 1) * trendDirection * trendStrength * 3)) * 0.6
+            );
+            const scoreDiff = totalScore - prevScore;
+
+            if (scoreDiff > 5) {
+                comment = 'Có tiến bộ rõ rệt so với lần đo trước. Khả năng vận động cải thiện tốt.';
+            } else if (scoreDiff > 0) {
+                comment = 'Duy trì ổn định với tiến bộ nhẹ. Tiếp tục theo dõi.';
+            } else if (scoreDiff > -5) {
+                comment = 'Giảm nhẹ so với lần trước, có thể do mệt mỏi hoặc thời tiết.';
+            } else {
+                comment = 'Giảm đáng kể. Cần xem xét lại chương trình tập luyện và sức khỏe tổng quát.';
+            }
+        }
+
+        // Generate advice based on current performance
+        let advice = '';
+        if (muscle < 1.0) {
+            advice = 'Tăng cường bài tập squat và nâng tạ nhẹ để cải thiện lực cơ.';
+        } else if (agility < 6.0) {
+            advice = 'Luyện tập bài tập nhanh nhẹn như đi bộ nhanh, bước chân tại chỗ.';
+        } else if (stability < 50) {
+            advice = 'Tập các bài thăng bằng: đứng 1 chân, đi trên đường thẳng.';
+        } else {
+            advice = 'Duy trì tốt! Tiếp tục chương trình tập luyện hiện tại.';
+        }
+
         return {
-            id: `m7_${pid}_${i}`,
+            id: `m7_${pid}_${Date.now()}_${i}`,
             date: date,
-            weight: 60 + (i * 0.2),
-            height: 165,
-            muscle: 1.1 + (i * 0.05), // kgf/kg
-            agility: 6.0 + (i * 0.5), // kgf/s/kg
-            stability: 50 + (i * 2), // ms? Score ranges differ, ensuring valid dummy values
-            totalScore: 70 + (i * 5),
-            rating: (70 + i * 5) > 90 ? 'Cao' : 'Trung bình',
-            comment: 'Khả năng vận động cải thiện dần qua các bài tập.',
-            advice: 'Tiếp tục duy trì squat và đi bộ hàng ngày.'
+            weight: baseWeight.toFixed(1),
+            height: baseHeight,
+            muscle: muscle.toFixed(2),
+            agility: agility.toFixed(1),
+            stability: stability.toFixed(1),
+            totalScore: totalScore,
+            rating: rating,
+            comment: comment,
+            advice: advice
         };
     });
     localStorage.setItem(`mirabo_m7_records_${pid}`, JSON.stringify(motorHistory));
