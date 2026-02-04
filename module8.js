@@ -3,14 +3,14 @@
  */
 
 function renderModule8(container) {
-    const patientId = getCurrentPatientId();
-    if (!patientId) {
-        container.innerHTML = '<div class="p-8 text-center text-slate-500">Vui lòng chọn bệnh nhân.</div>';
+    const userId = getCurrentUserId();
+    if (!userId) {
+        container.innerHTML = '<div class="p-8 text-center text-slate-500">Vui lòng chọn người dùng.</div>';
         return;
     }
 
     // Load Data
-    const savedData = loadModule8Data(patientId);
+    const savedData = loadModule8Data(userId);
     m8OriginalData = savedData; // Global state init
 
     const data = savedData || {
@@ -26,7 +26,7 @@ function renderModule8(container) {
                     <h2 class="text-2xl font-black text-slate-800">Bảo mật & Đồng ý</h2>
                     <p class="text-slate-500 text-sm">Quản lý các văn bản chấp thuận và hồ sơ bảo mật</p>
                 </div>
-                 <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-bold font-mono">ID: ${patientId}</span>
+                 <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-bold font-mono">ID: ${userId}</span>
             </div>
 
             <!-- 1. Document Templates -->
@@ -113,18 +113,49 @@ function renderModule8(container) {
 
         </div>
 
-        <!-- FABs -->
-        <div class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
-             <!-- SAVE -->
-            <button type="button" onclick="saveModule8()" 
-                class="w-16 h-16 bg-gradient-to-br from-indigo-600 to-violet-700 text-white rounded-full shadow-[0_8px_30px_rgb(79,70,229,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-                <i data-lucide="save" class="w-7 h-7"></i>
-                <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                    Lưu hồ sơ
-                </span>
+        <!-- Module 8 Inline Actions -->
+        </div>
+        
+    <!-- Module 8 Actions Source (Hidden - Portaled to FAB Container) -->
+    <div id="module8-actions-source" class="hidden">
+        <div class="flex flex-col-reverse gap-3 items-center">
+             <!-- CANCEL (Edit Mode) -->
+            <button type="button" id="module8-fab-close" onclick="cancelModule8Edit()"
+                class="w-12 h-12 bg-white text-slate-500 rounded-full shadow-lg hover:bg-slate-50 hover:text-slate-700 transition-all flex items-center justify-center border border-slate-200 hidden pointer-events-auto" title="Hủy bỏ">
+                 <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <!-- SAVE (Create/Edit Mode) -->
+            <button type="button" id="module8-fab-save" onclick="saveModule8()"
+                class="w-12 h-12 bg-indigo-600 text-white rounded-full shadow-xl shadow-indigo-200 hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all flex items-center justify-center hidden pointer-events-auto" title="Lưu hồ sơ">
+                <i data-lucide="save" class="w-6 h-6"></i>
+            </button>
+
+             <!-- UPDATE (Edit Mode) -->
+            <button type="button" id="module8-fab-update" onclick="saveModule8()"
+                class="w-12 h-12 bg-blue-600 text-white rounded-full shadow-xl shadow-blue-200 hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all flex items-center justify-center hidden pointer-events-auto" title="Lưu thay đổi">
+                <i data-lucide="save" class="w-6 h-6"></i>
+            </button>
+            
+            <!-- EDIT (View Mode) -->
+            <button type="button" id="module8-fab-edit" onclick="toggleModule8EditMode(true)"
+                class="w-12 h-12 bg-amber-500 text-white rounded-full shadow-xl shadow-amber-200 hover:bg-amber-600 hover:scale-105 active:scale-95 transition-all flex items-center justify-center pointer-events-auto" title="Chỉnh sửa">
+                <i data-lucide="edit-2" class="w-6 h-6"></i>
             </button>
         </div>
+    </div>
     `;
+
+    // Portal Actions to Unified Slot
+    const actionSource = document.getElementById('module8-actions-source');
+    const actionTarget = document.getElementById('module-actions-slot');
+
+    if (actionSource && actionTarget) {
+        actionTarget.innerHTML = '';
+        while (actionSource.firstChild) {
+            actionTarget.appendChild(actionSource.firstChild);
+        }
+    }
 
     // Initialize Global Cache for M8
     window.currentM8Images = savedData?.scannedImages || [];
@@ -146,9 +177,9 @@ function renderModule8(container) {
     }
 }
 
-function loadModule8Data(patientId) {
+function loadModule8Data(userId) {
     try {
-        return JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_privacy`) || 'null');
+        return JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_privacy`) || 'null');
     } catch (e) {
         return null;
     }
@@ -157,19 +188,19 @@ function loadModule8Data(patientId) {
 function saveModule8(e) {
     if (e) e.preventDefault();
     try {
-        const patientId = getCurrentPatientId();
+        const userId = getCurrentUserId();
         const data = {
             lastUpdated: new Date().toISOString(),
             notes: document.getElementById('m8-notes').value,
             scannedImages: window.currentM8Images || []
         };
 
-        localStorage.setItem(`mirabocaresync_${patientId}_privacy`, JSON.stringify(data));
+        localStorage.setItem(`mirabocaresync_${userId}_privacy`, JSON.stringify(data));
 
         // Mark complete
-        const status = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_status`) || '{}');
+        const status = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_status`) || '{}');
         status.module8 = true;
-        localStorage.setItem(`mirabocaresync_${patientId}_status`, JSON.stringify(status));
+        localStorage.setItem(`mirabocaresync_${userId}_status`, JSON.stringify(status));
 
         window.dispatchEvent(new Event('module-data-saved'));
         showToast('Đã lưu hồ sơ bảo mật!', 'success');
@@ -205,69 +236,38 @@ function initModule8FabLogic() {
 
 // Update FAB State
 function updateModule8FabState() {
-    const fabContainer = document.querySelector('.fixed.bottom-48.right-8');
-    if (!fabContainer) return;
+    const editBtn = document.getElementById('module8-fab-edit');
+    const saveBtn = document.getElementById('module8-fab-save');
+    const updateBtn = document.getElementById('module8-fab-update');
+    const closeBtn = document.getElementById('module8-fab-close');
+
+    // Hide ALL first
+    [editBtn, saveBtn, updateBtn, closeBtn].forEach(btn => {
+        if (btn) btn.classList.add('hidden');
+    });
 
     const notes = document.getElementById('m8-notes');
-    // Determine mode based on readonly attribute or m8OriginalData logic
-    // But toggleModule8EditMode toggles the readonly attribute.
     const isEditMode = notes && !notes.hasAttribute('readonly');
-
-    let html = '';
 
     if (isEditMode) {
         // EDIT MODE
-        html += `<div id="m8-fab-group" class="flex flex-col-reverse items-end gap-5">`;
+        if (closeBtn) closeBtn.classList.remove('hidden');
 
-        // 1. Save/Update Button (Only if dirty)
+        // Only show Save/Update if Dirty
         if (m8IsDirty) {
             if (m8OriginalData) {
-                // UPDATE Button (Blue)
-                html += `
-                <button type="button" onclick="saveModule8()" 
-                    class="pointer-events-auto w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-                    <i data-lucide="save" class="w-7 h-7"></i>
-                    <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                        Lưu thay đổi
-                    </span>
-                </button>`;
+                // UPDATE
+                if (updateBtn) updateBtn.classList.remove('hidden');
             } else {
-                // SAVE Button (Indigo/Violet) - Create Mode
-                html += `
-                <button type="button" onclick="saveModule8()" 
-                    class="pointer-events-auto w-16 h-16 bg-gradient-to-br from-indigo-600 to-violet-700 text-white rounded-full shadow-[0_8px_30px_rgb(79,70,229,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-                    <i data-lucide="save" class="w-7 h-7"></i>
-                    <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                        Lưu hồ sơ
-                    </span>
-                </button>`;
+                // SAVE
+                if (saveBtn) saveBtn.classList.remove('hidden');
             }
         }
-
-        // 2. Cancel/Close Button
-        html += `
-            <button type="button" onclick="cancelModule8Edit()" 
-                class="pointer-events-auto w-12 h-12 bg-white text-slate-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-slate-200 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-slate-100 ring-2 ring-white">
-                <i data-lucide="x" class="w-6 h-6"></i>
-                <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                    ${m8OriginalData ? 'Đóng / Hủy' : 'Hủy bỏ'}
-                </span>
-            </button>
-        </div>`;
-
     } else {
-        // VIEW MODE: Show Edit Button (Amber)
-        html = `
-        <button type="button" onclick="toggleModule8EditMode(true)" 
-            class="pointer-events-auto w-14 h-14 bg-amber-500 text-white rounded-full shadow-[0_8px_25px_rgb(245,158,11,0.5)] hover:bg-amber-400 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-            <i data-lucide="edit-2" class="w-6 h-6"></i>
-             <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Chỉnh sửa
-            </span>
-        </button>`;
+        // VIEW MODE: Show Edit Button
+        if (editBtn) editBtn.classList.remove('hidden');
     }
 
-    fabContainer.innerHTML = html;
     if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
@@ -275,8 +275,8 @@ function cancelModule8Edit() {
     if (m8IsDirty) {
         if (confirm('Hủy bỏ các thay đổi? Dữ liệu chưa lưu sẽ bị mất.')) {
             // Revert Data
-            const patientId = getCurrentPatientId();
-            const savedData = loadModule8Data(patientId) || { notes: '', scannedImages: [] };
+            const userId = getCurrentUserId();
+            const savedData = loadModule8Data(userId) || { notes: '', scannedImages: [] };
 
             // Revert UI fields
             const notes = document.getElementById('m8-notes');
@@ -298,7 +298,7 @@ function toggleModule8EditMode(isEdit) {
     const uploadInput = document.getElementById('m8-image-upload');
     const uploadLabel = document.querySelector('label[for="m8-image-upload"]');
     const notes = document.getElementById('m8-notes');
-    const fabContainer = document.querySelector('.fixed.bottom-48.right-8'); // Updated selector
+    // const fabContainer selector removed 
 
     if (isEdit) {
         // Edit Mode

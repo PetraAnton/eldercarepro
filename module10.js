@@ -24,8 +24,33 @@ const GESTURE_DURATION = 1500; // ms to hold gesture
 // 1. History View (Default)
 const historyViewTemplate = `
 <div class="h-full flex flex-col bg-slate-50">
+    <!-- Header with Action -->
+    <div class="px-8 py-6 flex items-center justify-between">
+        <h2 class="text-2xl font-black text-slate-800">Lịch sử Đánh giá</h2>
+        <div class="flex gap-2">
+             <button onclick="importModule10Data()" 
+                    class="btn-ios btn-ios-secondary"
+                    title="Nhập dữ liệu">
+                <i data-lucide="upload" class="w-5 h-5"></i>
+                <span class="hidden sm:inline">Import</span>
+            </button>
+             <button onclick="exportModule10Data()" 
+                    class="btn-ios btn-ios-secondary"
+                    title="Xuất dữ liệu">
+                <i data-lucide="download" class="w-5 h-5"></i>
+                <span class="hidden sm:inline">Export</span>
+            </button>
+            <button onclick="openNewSession()" 
+                    class="btn-ios btn-ios-primary"
+                    title="Tạo đánh giá mới">
+                <i data-lucide="plus" class="w-5 h-5"></i>
+                <span>Tạo đánh giá mới</span>
+            </button>
+        </div>
+    </div>
+
     <!-- History List -->
-    <div class="flex-1 overflow-y-auto p-8" id="posture-history-container">
+    <div class="flex-1 overflow-y-auto px-8 pb-8" id="posture-history-container">
         <!-- Content injected by JS -->
         <div class="flex flex-col items-center justify-center h-64 text-slate-400">
             <i data-lucide="loader-2" class="w-8 h-8 animate-spin mb-2"></i>
@@ -283,18 +308,9 @@ window.renderModule10 = async function (container) {
         container = document.getElementById('module-content');
     }
 
-    // Inject Create Button into Header Actions
+    // Clear Header Actions
     const actionsContainer = document.getElementById('module-actions');
-    if (actionsContainer) {
-        actionsContainer.innerHTML = `
-        <button onclick="openNewSession()" 
-                class="btn-ios btn-ios-primary"
-                title="Tạo đánh giá mới">
-            <i data-lucide="plus" class="w-5 h-5"></i>
-            <span>Tạo đánh giá mới</span>
-        </button>
-        `;
-    }
+    if (actionsContainer) actionsContainer.innerHTML = '';
 
     if (container) {
         // Inject History View
@@ -323,13 +339,13 @@ window.renderModule10 = async function (container) {
 window.initModule10 = window.renderModule10;
 
 // 2. LocalStorage Helpers
-function getHistoryKey(patientId) {
-    return `mirabocaresync_posture_history_${patientId}`;
+function getHistoryKey(userId) {
+    return `mirabocaresync_posture_history_${userId}`;
 }
 
-function getPostureHistory(patientId) {
+function getPostureHistory(userId) {
     try {
-        const data = localStorage.getItem(getHistoryKey(patientId));
+        const data = localStorage.getItem(getHistoryKey(userId));
         return data ? JSON.parse(data) : [];
     } catch (e) {
         console.error('Failed to load history', e);
@@ -337,15 +353,15 @@ function getPostureHistory(patientId) {
     }
 }
 
-function savePostureHistory(patientId, history) {
-    localStorage.setItem(getHistoryKey(patientId), JSON.stringify(history));
+function savePostureHistory(userId, history) {
+    localStorage.setItem(getHistoryKey(userId), JSON.stringify(history));
 }
 
 // 3. Render History List
 function renderHistoryList() {
     const container = document.getElementById('posture-history-container');
-    const patientId = getCurrentPatientId();
-    const history = getPostureHistory(patientId);
+    const userId = getCurrentUserId();
+    const history = getPostureHistory(userId);
 
     // Sort by date desc
     history.sort((a, b) => b.timestamp - a.timestamp);
@@ -466,18 +482,18 @@ function saveSessionToHistory() {
         return;
     }
 
-    const patientId = getCurrentPatientId();
+    const userId = getCurrentUserId();
     const session = {
         id: 'sess_' + Date.now(),
         timestamp: Date.now(),
         captures: postureState.captures,
-        patientId: patientId
+        userId: userId
     };
 
     // Save to History
-    const history = getPostureHistory(patientId);
+    const history = getPostureHistory(userId);
     history.push(session);
-    savePostureHistory(patientId, history);
+    savePostureHistory(userId, history);
 
     // Cleanup & Close UI
     stopPostureCamera();
@@ -491,18 +507,18 @@ function saveSessionToHistory() {
 function deleteSession(sessionId) {
     if (!confirm('Are you sure you want to delete this session?')) return;
 
-    const patientId = getCurrentPatientId();
-    let history = getPostureHistory(patientId);
+    const userId = getCurrentUserId();
+    let history = getPostureHistory(userId);
     history = history.filter(s => s.id !== sessionId);
-    savePostureHistory(patientId, history);
+    savePostureHistory(userId, history);
     showToast('Session deleted.', 'success');
     renderHistoryList();
 }
 
 function viewReport(sessionId, directPdf = false) {
     try {
-        const patientId = getCurrentPatientId();
-        const history = getPostureHistory(patientId);
+        const userId = getCurrentUserId();
+        const history = getPostureHistory(userId);
         const session = history.find(s => s.id === sessionId);
 
         if (!session) return;
@@ -953,7 +969,7 @@ function generateReportForSession(session) {
     <div class="space-y-6 bg-white p-8" style="font-family: Arial, sans-serif; color: #000; line-height: 1.6;">`;
 
     // Patient Info - Simple text
-    const patient = getPatientById(session.patientId);
+    const patient = getUserById(session.userId || session.patientId);
     if (patient) {
         html += `
         <div class="mb-6 border-b border-gray-200 pb-4">
@@ -1422,3 +1438,85 @@ function downloadReportPdf() {
 
 // Cleanup
 window.addEventListener('beforeunload', stopPostureCamera);
+
+// Export Data
+window.exportModule10Data = function () {
+    try {
+        const userId = getCurrentUserId();
+        const history = getPostureHistory(userId);
+
+        if (!history || history.length === 0) {
+            showToast('Không có dữ liệu để xuất', 'warning');
+            return;
+        }
+
+        const dataStr = JSON.stringify(history, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
+        const exportFileDefaultName = `posture_history_${userId}_${new Date().toISOString().slice(0, 10)}.json`;
+
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+
+        showToast('Xuất dữ liệu thành công', 'success');
+    } catch (e) {
+        console.error('Export failed', e);
+        showToast('Lỗi xuất dữ liệu: ' + e.message, 'error');
+    }
+};
+
+// Import Data
+window.importModule10Data = function () {
+    // Create hidden input
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+
+    input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            try {
+                const jsonObj = JSON.parse(event.target.result);
+                if (!Array.isArray(jsonObj)) {
+                    throw new Error('Định dạng file không hợp lệ (phải là danh sách bản ghi)');
+                }
+
+                const userId = getCurrentUserId();
+                let currentHistory = getPostureHistory(userId);
+
+                // Merge strategies:
+                // 1. Filter out duplicates by ID
+                const existingIds = new Set(currentHistory.map(h => h.id));
+                let addedCount = 0;
+
+                jsonObj.forEach(item => {
+                    if (item.id && !existingIds.has(item.id)) {
+                        currentHistory.push(item);
+                        existingIds.add(item.id);
+                        addedCount++;
+                    }
+                });
+
+                if (addedCount > 0) {
+                    savePostureHistory(userId, currentHistory);
+                    renderHistoryList();
+                    showToast(`Đã nhập thành công ${addedCount} bản ghi`, 'success');
+                } else {
+                    showToast('Không có bản ghi mới nào được thêm (trùng lặp)', 'info');
+                }
+
+            } catch (err) {
+                console.error('Import error', err);
+                showToast('Lỗi nhập dữ liệu: ' + err.message, 'error');
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    input.click();
+};

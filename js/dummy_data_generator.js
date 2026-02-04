@@ -3,7 +3,7 @@
  * Generates comprehensive data for all modules (1-9) for demo purposes.
  */
 
-const DUMMY_PATIENTS = [
+const DUMMY_USERS = [
     {
         id: 'P001',
         name: 'Nguyễn Văn An',
@@ -49,26 +49,26 @@ window.generateDummyData = function () {
     // Clear existing data for these IDs to avoid duplicates if run multiple times
     // (Optional: clear all? No, just overwrite specific keys)
 
-    DUMMY_PATIENTS.forEach(patient => {
-        generateDataForPatient(patient);
+    DUMMY_USERS.forEach(user => {
+        generateDataForUser(user);
     });
 
-    // Also update the global patient list (Module 0 / Main App context)
-    updateGlobalPatientList();
+    // Also update the global user list (Module 0 / Main App context)
+    updateGlobalUserList();
 
     console.log('Data generation complete. Reloading...');
-    // alert('Đã tạo dữ liệu mẫu thành công cho 3 bệnh nhân: Nguyễn Văn An, Trần Thị Bưởi, Lê Văn Cường. Vui lòng tải lại trang.');
+    // alert('Đã tạo dữ liệu mẫu thành công cho 3 người dùng: Nguyễn Văn An, Trần Thị Bưởi, Lê Văn Cường. Vui lòng tải lại trang.');
     location.reload();
 };
 
-function updateGlobalPatientList() {
+function updateGlobalUserList() {
     // Assuming there is a main key for list of patients, often 'mirabocaresync_patients'
     // Based on common patterns. If not, this might need adjustment.
     // Checking app.js likely reveals this, but usually standard.
     // Let's assume 'mirabocaresync_patients' stores array of basic info.
     const currentList = JSON.parse(localStorage.getItem('mirabocaresync_patients') || '[]');
 
-    DUMMY_PATIENTS.forEach(dummy => {
+    DUMMY_USERS.forEach(dummy => {
         const exists = currentList.find(p => p.id === dummy.id);
         if (!exists) {
             currentList.push({
@@ -86,19 +86,19 @@ function updateGlobalPatientList() {
     localStorage.setItem('mirabocaresync_patients', JSON.stringify(currentList));
 }
 
-function generateDataForPatient(patient) {
-    console.log(`Generating data for ${patient.name} (${patient.id})...`);
-    const pid = patient.id;
+function generateDataForUser(user) {
+    console.log(`Generating data for ${user.name} (${user.id})...`);
+    const pid = user.id;
 
     // --- MODULE 1: FACESHEET (Single) ---
     const faceSheet = {
         basic: {
-            fullName: patient.name,
-            gender: patient.gender,
-            dob: `${patient.birthYear}-05-20`,
-            age: new Date().getFullYear() - patient.birthYear,
-            phone: patient.phone,
-            address: patient.address,
+            fullName: user.name,
+            gender: user.gender,
+            dob: `${user.birthYear}-05-20`,
+            age: new Date().getFullYear() - user.birthYear,
+            phone: user.phone,
+            address: user.address,
             emergencyContact: 'Nguyễn Văn Con (Con trai) - 0999888777'
         },
         careInfo: {
@@ -107,7 +107,7 @@ function generateDataForPatient(patient) {
             expiry: '2025-12-31'
         },
         history: {
-            medicalHistory: patient.history,
+            medicalHistory: user.history,
             medications: 'Amlodipine 5mg (1 viên/ngày), Glucophage 500mg (2 viên/ngày)'
         },
         family: {
@@ -151,7 +151,7 @@ function generateDataForPatient(patient) {
 
     // --- MODULE 3: ADL ASSESSMENT (Single Record Type, but Rich) ---
     const adlData = {
-        patientId: pid,
+        userId: pid,
         assessmentDate: GENERATOR_META.dates[3], // Latest
         assessor: GENERATOR_META.assessors[0],
         adl: {
@@ -178,7 +178,7 @@ function generateDataForPatient(patient) {
             meds: { level: 1, hasProblem: false },
             finance: { level: 1, hasProblem: false }
         },
-        generalNotes: 'Bệnh nhân tỉnh táo, hợp tác tốt. Cần chú ý nguy cơ té ngã khi leo cầu thang.'
+        generalNotes: 'Người dùng tỉnh táo, hợp tác tốt. Cần chú ý nguy cơ té ngã khi leo cầu thang.'
     };
     localStorage.setItem(`mirabocaresync_${pid}_adl_assessment`, JSON.stringify(adlData));
 

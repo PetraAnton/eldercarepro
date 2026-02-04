@@ -228,52 +228,40 @@ window.module4Content = `
 
 <!-- FLOATING ACTION BUTTONS (FAB) - Moved Outside -->
 <!-- FABs for Module 4 -->
-            <div id="module4-fab-container" class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
+            <!-- Module 4 Inline Actions -->
+            <!-- Module 4 Actions Source (Hidden - Portaled to FAB Container) -->
+            <div id="module4-actions-source" class="hidden">
+                 <div class="flex flex-col-reverse gap-3 items-center">
+                    <!-- CANCEL (Edit Mode) -->
+                    <button type="button" id="module4-fab-close" onclick="cancelModule4Edit()"
+                        class="w-12 h-12 bg-white text-slate-500 rounded-full shadow-lg hover:bg-slate-50 hover:text-slate-700 transition-all flex items-center justify-center border border-slate-200 hidden pointer-events-auto" title="Hủy bỏ">
+                         <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
 
-                <!-- SAVE (Create Mode) -->
-                <button type="button" id="module4-fab-save" onclick="saveModule4Assessment()"
-                    class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-pink-600 to-rose-500 text-white rounded-full shadow-[0_8px_30px_rgb(219,39,119,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-                    <i data-lucide="save" class="w-7 h-7"></i>
-                    <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                        Lưu đánh giá
-                    </span>
-                </button>
+                    <!-- SAVE (Create/Edit Mode) -->
+                    <button type="button" id="module4-fab-save" onclick="saveModule4Assessment()"
+                        class="w-12 h-12 bg-pink-600 text-white rounded-full shadow-xl shadow-pink-200 hover:bg-pink-700 hover:scale-105 active:scale-95 transition-all flex items-center justify-center hidden pointer-events-auto" title="Lưu đánh giá">
+                        <i data-lucide="save" class="w-6 h-6"></i>
+                    </button>
 
-                <!-- UPDATE (Edit Mode) -->
-                <button type="button" id="module4-fab-update" onclick="saveModule4Assessment()"
-                    class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-                    <i data-lucide="save" class="w-7 h-7"></i>
-                    <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                        Lưu thay đổi
-                    </span>
-                </button>
+                    <!-- UPDATE (Edit Mode) -->
+                    <button type="button" id="module4-fab-update" onclick="saveModule4Assessment()"
+                        class="w-12 h-12 bg-indigo-600 text-white rounded-full shadow-xl shadow-indigo-200 hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all flex items-center justify-center hidden pointer-events-auto" title="Lưu thay đổi">
+                        <i data-lucide="save" class="w-6 h-6"></i>
+                    </button>
 
-                <!-- EDIT (View Mode) -->
-                <button type="button" id="module4-fab-edit" onclick="toggleModule4EditMode(true)"
-                    class="pointer-events-auto w-14 h-14 bg-amber-500 text-white rounded-full shadow-[0_8px_25px_rgb(245,158,11,0.5)] hover:bg-amber-400 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-                    <i data-lucide="edit-2" class="w-6 h-6"></i>
-                    <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                        Chỉnh sửa
-                    </span>
-                </button>
-
-                <!-- CLOSE (Cancel Edit) -->
-                <button type="button" id="module4-fab-close" onclick="cancelModule4Edit()"
-                    class="pointer-events-auto hidden w-12 h-12 bg-white text-slate-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-slate-200 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-slate-100 ring-2 ring-white">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                    <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                        Đóng / Hủy
-                    </span>
-                </button>
-
-                <!-- RESET (Create Mode) -->
-                <button type="button" id="module4-fab-reset" onclick="resetModule4Form()"
-                    class="pointer-events-auto hidden w-12 h-12 bg-white text-rose-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-rose-100 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-rose-50 ring-2 ring-white">
-                    <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
-                    <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                        Nhập lại
-                    </span>
-                </button>
+                    <!-- RESET (Create Mode) -->
+                    <button type="button" id="module4-fab-reset" onclick="resetModule4Form()"
+                        class="w-12 h-12 bg-white text-rose-500 rounded-full shadow-lg hover:bg-rose-50 hover:text-rose-700 transition-all flex items-center justify-center border border-rose-100 hidden pointer-events-auto" title="Nhập lại">
+                        <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+                    </button>
+                    
+                    <!-- EDIT (View Mode) -->
+                    <button type="button" id="module4-fab-edit" onclick="toggleModule4EditMode(true)"
+                        class="w-12 h-12 bg-amber-500 text-white rounded-full shadow-xl shadow-amber-200 hover:bg-amber-600 hover:scale-105 active:scale-95 transition-all flex items-center justify-center pointer-events-auto" title="Chỉnh sửa">
+                        <i data-lucide="edit-2" class="w-6 h-6"></i>
+                    </button>
+                </div>
             </div>
 `;
 
@@ -533,10 +521,10 @@ function resetModule4Form() {
 // ============================================
 
 function initModule4() {
-    const patientId = getCurrentPatientId();
+    const userId = getCurrentUserId();
 
     // Load existing data (Single Record)
-    const savedData = localStorage.getItem(`mirabocaresync_${patientId} _interests_assessment`); // New key
+    const savedData = localStorage.getItem(`mirabocaresync_${userId}_interests_assessment`); // New key
 
     if (savedData) {
         try {
@@ -549,7 +537,7 @@ function initModule4() {
         }
     } else {
         // Check legacy array data for migration
-        const legacyData = localStorage.getItem(`mirabocaresync_${patientId} _interests`);
+        const legacyData = localStorage.getItem(`mirabocaresync_${userId}_interests`);
         if (legacyData) {
             try {
                 const arr = JSON.parse(legacyData);
@@ -575,7 +563,7 @@ function initModule4() {
 
     // Global Save Function for Module 4
     window.saveModule4Assessment = function () {
-        const patientId = getCurrentPatientId();
+        const userId = getCurrentUserId();
 
         // Collect activity data
         const activities = {};
@@ -612,7 +600,7 @@ function initModule4() {
             .map(el => el.textContent);
 
         const assessmentData = {
-            patientId: patientId,
+            userId: userId,
             assessmentDate: new Date().toLocaleDateString('vi-VN'),
             assessor: 'Administrator', // Mock user
             activities: activities,
@@ -622,10 +610,10 @@ function initModule4() {
         };
 
         // Save Single Record
-        localStorage.setItem('mirabocaresync_' + patientId + '_interests_assessment', JSON.stringify(assessmentData));
+        localStorage.setItem('mirabocaresync_' + userId + '_interests_assessment', JSON.stringify(assessmentData));
 
         // Mark complete and show toast
-        if (typeof markModuleComplete === 'function') markModuleComplete(patientId, 'module4');
+        if (typeof markModuleComplete === 'function') markModuleComplete(userId, 'module4');
 
         // Dispatch event for sidebar update
         window.dispatchEvent(new Event('module-data-saved'));
@@ -646,4 +634,24 @@ function initModule4() {
     setTimeout(function () {
         lucide.createIcons();
     }, 100);
+
+    // Portal Actions to Unified Slot
+    const actionSource = document.getElementById('module4-actions-source');
+    const actionTarget = document.getElementById('module-actions-slot');
+
+    if (actionSource && actionTarget) {
+        actionTarget.innerHTML = '';
+        while (actionSource.firstChild) {
+            actionTarget.appendChild(actionSource.firstChild);
+        }
+
+        // Cleanup
+        const observer = new MutationObserver((mutations) => {
+            if (!document.getElementById('module4-form')) {
+                actionTarget.innerHTML = ''; // Clear FABs
+                observer.disconnect();
+            }
+        });
+        observer.observe(document.getElementById('module-content'), { childList: true });
+    }
 }

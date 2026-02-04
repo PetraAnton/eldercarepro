@@ -11,15 +11,15 @@ let m7EditingRecordId = null; // If editing a specific past record
 
 function renderModule7(container) {
     console.log('[Module7] renderModule7 triggered');
-    const patientId = getCurrentPatientId();
-    console.log('[Module7] Patient ID:', patientId);
-    if (!patientId) {
-        container.innerHTML = '<div class="p-8 text-center text-slate-500">Vui lòng chọn bệnh nhân.</div>';
+    const userId = getCurrentUserId();
+    console.log('[Module7] User ID:', userId);
+    if (!userId) {
+        container.innerHTML = '<div class="p-8 text-center text-slate-500">Vui lòng chọn người dùng.</div>';
         return;
     }
 
     // Load Data (Array of records)
-    const records = loadM7Records(patientId);
+    const records = loadM7Records(userId);
 
     // Initial Layout Scaffolding
     container.innerHTML = `
@@ -30,7 +30,7 @@ function renderModule7(container) {
                     <h2 class="text-2xl font-black text-blue-900">Chức năng vận động</h2>
                     <p class="text-slate-500 text-sm">Đánh giá sức cơ, độ nhanh nhẹn và ổn định</p>
                 </div>
-                 <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-bold font-mono">ID: ${patientId}</span>
+                 <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-bold font-mono">ID: ${userId}</span>
             </div>
 
             <!-- Tab Navigation -->
@@ -51,8 +51,7 @@ function renderModule7(container) {
                 <!-- Content injected by switchM7Tab -->
             </div>
         </div>
-        <!-- Dedicated FAB Container (Outside Animation) -->
-        <div id="m7-fab-container"></div>
+        <!-- Dedicated FAB Container (Removed) -->
     `;
 
     // Render Initial Active Tab
@@ -61,8 +60,8 @@ function renderModule7(container) {
 
 function switchM7Tab(tabName, reRenderContainer = true) {
     m7ActiveTab = tabName;
-    const patientId = getCurrentPatientId();
-    const records = loadM7Records(patientId);
+    const userId = getCurrentUserId();
+    const records = loadM7Records(userId);
 
     // Update Tab UI
     if (document.getElementById('tab-m7-create')) {
@@ -77,11 +76,9 @@ function switchM7Tab(tabName, reRenderContainer = true) {
     }
 
     const contentDiv = document.getElementById('m7-tab-content');
-    const fabContainer = document.getElementById('m7-fab-container');
     if (!contentDiv) return;
 
     contentDiv.innerHTML = '';
-    if (fabContainer) fabContainer.innerHTML = ''; // Clear FABs
 
     // Cleanup Charts
     if (m7ChartHistory) { m7ChartHistory.destroy(); m7ChartHistory = null; }
@@ -91,32 +88,8 @@ function switchM7Tab(tabName, reRenderContainer = true) {
 
     if (tabName === 'create') {
         contentDiv.innerHTML = renderM7CreateTab();
-        // Inject Create FABs
-        if (fabContainer) {
-            fabContainer.innerHTML = `
-                <div id="m7-fab-buttons" class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none hidden">
-                    <!-- SAVE (Submit) -->
-                    <button type="button" id="module7-fab-save" onclick="document.getElementById('m7-create-form').requestSubmit()" 
-                        class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-                        <i data-lucide="save" class="w-7 h-7"></i>
-                        <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                            Lưu kết quả
-                        </span>
-                    </button>
-
-                    <!-- CANCEL (Reset) -->
-                    <button type="button" id="module7-fab-cancel" onclick="resetModule7Form()" 
-                        class="pointer-events-auto hidden w-12 h-12 bg-white text-rose-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-rose-100 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-rose-50 ring-2 ring-white">
-                        <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
-                        <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                            Nhập lại
-                        </span>
-                    </button>
-                </div>`;
-
-            // Init Logic for dynamic content
-            setTimeout(initModule7FabLogic, 50);
-        }
+        // Inline buttons are now part of renderM7CreateTab
+        setTimeout(initModule7FabLogic, 50);
     } else if (tabName === 'history') {
         contentDiv.innerHTML = renderM7HistoryTab(records);
     } else if (tabName === 'report') {
@@ -131,25 +104,25 @@ function switchM7Tab(tabName, reRenderContainer = true) {
 }
 
 // --- Data Logic (Multiple Records) ---
-function loadM7Records(patientId) {
-    const key = `mirabo_m7_records_${patientId}`;
+function loadM7Records(userId) {
+    const key = `mirabo_m7_records_${userId}`;
     const stored = localStorage.getItem(key);
     return stored ? JSON.parse(stored) : [];
 }
 
-function saveM7Record(record, patientId) {
-    const records = loadM7Records(patientId);
+function saveM7Record(record, userId) {
+    const records = loadM7Records(userId);
     records.push(record);
     // Sort logic? (Optional)
-    localStorage.setItem(`mirabo_m7_records_${patientId}`, JSON.stringify(records));
+    localStorage.setItem(`mirabo_m7_records_${userId}`, JSON.stringify(records));
 }
 
 function deleteM7Record(index) {
     if (!confirm('Bạn có chắc muốn xóa bản ghi này?')) return;
-    const patientId = getCurrentPatientId();
-    const records = loadM7Records(patientId);
+    const userId = getCurrentUserId();
+    const records = loadM7Records(userId);
     records.splice(index, 1);
-    localStorage.setItem(`mirabo_m7_records_${patientId}`, JSON.stringify(records));
+    localStorage.setItem(`mirabo_m7_records_${userId}`, JSON.stringify(records));
     switchM7Tab('history'); // Refresh
     showToast('Đã xóa bản ghi', 'info');
 }
@@ -335,11 +308,11 @@ function handleM7CreateSubmit(e) {
     else record.rating = 'Cao';
 
     // 3. Save
-    const patientId = getCurrentPatientId();
-    saveM7Record(record, patientId);
+    const userId = getCurrentUserId();
+    saveM7Record(record, userId);
 
     // Mark complete
-    if (typeof markModuleComplete === 'function') markModuleComplete(patientId, 'module7');
+    if (typeof markModuleComplete === 'function') markModuleComplete(userId, 'module7');
 
     // Dispatch event for sidebar update
     window.dispatchEvent(new Event('module-data-saved'));
@@ -538,7 +511,7 @@ function renderM7ReportTab(data, records) {
                     </span>
                 </button>
 
-                 <button type="button" onclick="exportM7Excel('${getCurrentPatientId()}')" 
+                 <button type="button" onclick="exportM7Excel('${getCurrentUserId()}')" 
                     class="pointer-events-auto w-14 h-14 bg-emerald-500 text-white rounded-full shadow-[0_8px_25px_rgb(16,185,129,0.4)] hover:shadow-emerald-200 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
                     <i data-lucide="sheet" class="w-6 h-6"></i>
                     <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
@@ -551,13 +524,13 @@ function renderM7ReportTab(data, records) {
 }
 
 function saveM7Evaluation(recordId) {
-    const patientId = getCurrentPatientId();
-    const records = loadM7Records(patientId);
+    const userId = getCurrentUserId();
+    const records = loadM7Records(userId);
     const record = records.find(r => r.id === recordId);
     if (record) {
         record.comment = document.getElementById('m7-eval-comment').value;
         record.advice = document.getElementById('m7-eval-advice').value;
-        localStorage.setItem(`mirabo_m7_records_${patientId}`, JSON.stringify(records));
+        localStorage.setItem(`mirabo_m7_records_${userId}`, JSON.stringify(records));
         showToast('Đã lưu đánh giá chuyên môn', 'success');
     }
 }
@@ -634,12 +607,12 @@ function renderM7Charts(records) {
 }
 
 // Export logic updated for Array structure
-function exportM7Excel(patientId) {
+function exportM7Excel(userId) {
     if (typeof XLSX === 'undefined') {
         showToast('Thư viện Excel chưa được tải.', 'error');
         return;
     }
-    const records = loadM7Records(patientId);
+    const records = loadM7Records(userId);
     if (records.length === 0) {
         showToast('Không có dữ liệu để xuất.', 'warning');
         return;
@@ -647,7 +620,7 @@ function exportM7Excel(patientId) {
 
     // Flatten all records
     let flatData = [['BÁO CÁO LỊCH SỬ ĐÁNH GIÁ CHỨC NĂNG VẬN ĐỘNG', '']];
-    flatData.push(['Mã Bệnh nhân:', patientId]);
+    flatData.push(['Mã Người dùng:', userId]);
     flatData.push(['Ngày xuất:', new Date().toLocaleDateString('vi-VN')]);
     flatData.push(['', '']);
     flatData.push(['Ngày đo', 'Tổng điểm', 'Lực cơ', 'Nhanh nhẹn', 'Ổn định', 'Nhận xét', 'Lời khuyên']);
@@ -668,13 +641,13 @@ function exportM7Excel(patientId) {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "LichSu_M7");
 
-    XLSX.writeFile(wb, `LichSu_M7_${patientId}.xlsx`);
+    XLSX.writeFile(wb, `LichSu_M7_${userId}.xlsx`);
 }
 
 // Print specific assessment
 function printModule7Assessment(index) {
-    const patientId = getCurrentPatientId();
-    const records = loadM7Records(patientId);
+    const userId = getCurrentUserId();
+    const records = loadM7Records(userId);
     const record = records[index];
     if (!record) return;
 
@@ -707,8 +680,8 @@ function printModule7Assessment(index) {
             </div>
             
             <div class="meta">
-                <div class="row"><span class="label">Bệnh nhân:</span> <span class="value">${getPatientById(patientId).fullName}</span></div>
-                <div class="row"><span class="label">Mã hồ sơ:</span> <span class="value">${patientId}</span></div>
+                <div class="row"><span class="label">Người dùng:</span> <span class="value">${getUserById(userId).fullName}</span></div>
+                <div class="row"><span class="label">Mã hồ sơ:</span> <span class="value">${userId}</span></div>
                 <div class="row"><span class="label">Ngày đánh giá:</span> <span class="value">${new Date(record.date).toLocaleDateString('vi-VN')}</span></div>
             </div>
 

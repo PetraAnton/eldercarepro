@@ -283,7 +283,8 @@ window.module6Content = `
                           class="input-glass w-full px-4 py-3 rounded-2xl outline-none text-sm font-medium resize-none shadow-inner"></textarea>
             </div>
 
-            <!-- FAB moved to m6-fab-container -->
+            <!-- INLINE ACTION BUTTONS REMOVED - MOVED TO FAB STACK -->
+            <div class="h-8"></div>
 
         </form>
     </div>
@@ -441,9 +442,27 @@ window.module6Content = `
 
     </div>
 
-    <!-- FAB Container (Moved to Root Level for Visibility) -->
-    <div id="module6-fab-container" class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-[50] pointer-events-none hidden">
-        <!-- FABs will be injected here by FAB Manager -->
+    <!-- Module 6 Actions Source (Hidden - Portaled to FAB Container) -->
+    <div id="module6-actions-source" class="hidden">
+        <div class="flex flex-col-reverse gap-3 items-center">
+             <!-- RESET (Form Mode) -->
+            <button type="button" id="module6-fab-reset" onclick="resetModule6Form()"
+                class="w-12 h-12 bg-white text-rose-500 rounded-full shadow-lg hover:bg-rose-50 hover:text-rose-700 transition-all flex items-center justify-center border border-rose-100 pointer-events-auto" title="Nhập lại">
+                <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+            </button>
+
+            <!-- SAVE (Form Mode) -->
+            <button type="button" id="module6-fab-save" onclick="saveModule6Assessment()"
+                class="w-12 h-12 bg-indigo-600 text-white rounded-full shadow-xl shadow-indigo-200 hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all flex items-center justify-center pointer-events-auto" title="Lưu đánh giá">
+                <i data-lucide="save" class="w-6 h-6"></i>
+            </button>
+            
+            <!-- CREATE NEW (Report/History Mode) -->
+             <button type="button" id="module6-fab-create" onclick="switchModule6Tab('form')"
+                class="w-12 h-12 bg-indigo-600 text-white rounded-full shadow-xl shadow-indigo-200 hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all flex items-center justify-center hidden pointer-events-auto" title="Tạo đánh giá mới">
+                <i data-lucide="plus" class="w-6 h-6"></i>
+            </button>
+        </div>
     </div>
 `;
 
@@ -453,15 +472,15 @@ function initModule6() {
         container.innerHTML = window.module6Content;
     }
 
-    const patientId = getCurrentPatientId();
-    const patient = getPatientById(patientId);
+    const userId = getCurrentUserId();
+    const user = getUserById(userId);
 
-    // Load patient info if available
-    if (patient) {
-        // Update any patient name displays
+    // Load user info if available
+    if (user) {
+        // Update any user name displays
         const nameDisplays = document.querySelectorAll('.patient-name-display');
         nameDisplays.forEach(el => {
-            el.textContent = patient.fullName || 'Chưa có tên';
+            el.textContent = user.fullName || 'Chưa có tên';
         });
     }
 
@@ -470,8 +489,48 @@ function initModule6() {
     // const resetFormState = setupFormChangeDetection('module6-form', 'module6-save-btn');
     // module6ResetFormState = resetFormState; // Make accessible to resetForm()
 
-    // Init FAB Logic
-    initModule6FabLogic();
+    // Portal Actions to Unified Slot
+    const actionSource = document.getElementById('module6-actions-source');
+    const actionTarget = document.getElementById('module-actions-slot');
+
+    if (actionSource && actionTarget) {
+        actionTarget.innerHTML = '';
+        while (actionSource.firstChild) {
+            actionTarget.appendChild(actionSource.firstChild);
+        }
+
+        // Initial State for Form Tab: HIDE by default (Ghost Mode)
+        const fabSave = document.getElementById('module6-fab-save');
+        const fabReset = document.getElementById('module6-fab-reset');
+
+        // Ensure they are hidden initially
+        if (fabSave) fabSave.classList.add('hidden');
+        if (fabReset) fabReset.classList.add('hidden');
+
+        // Setup Cleanup on Module Change
+        const observer = new MutationObserver((mutations) => {
+            if (!document.getElementById('module6-form')) {
+                // We navigated away
+                actionTarget.innerHTML = '';
+                observer.disconnect();
+            }
+        });
+        observer.observe(document.getElementById('module-content'), { childList: true });
+    }
+
+    // Dirty Detection Logic (Ghost Buttons)
+    const form = document.getElementById('module6-form');
+    if (form) {
+        form.addEventListener('input', () => {
+            // Show FABs on any input
+            const fabSave = document.getElementById('module6-fab-save');
+            const fabReset = document.getElementById('module6-fab-reset');
+            if (fabSave) fabSave.classList.remove('hidden');
+            if (fabReset) fabReset.classList.remove('hidden');
+        });
+    }
+
+    // BMI Auto-calculation
 
     // BMI Auto-calculation
     const heightInput = document.getElementById('height');
@@ -517,7 +576,8 @@ function initModule6() {
     }
 
     // Check history (Optional: can use to show count or similar, but tab stays visible)
-    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
+    // Check history (Optional: can use to show count or similar, but tab stays visible)
+    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_body_assessments`) || '[]');
     const reportBtn = document.getElementById('module6-tab-report');
     if (reportBtn) {
         reportBtn.classList.remove('hidden'); // Always show
@@ -712,6 +772,12 @@ function resetModule6Form() {
     // Update charts to zero
     if (typeof updateMuscleChart === 'function') updateMuscleChart();
     if (typeof updateBodyPartChart === 'function') updateBodyPartChart();
+
+    // Hide FABs (Ghost Mode)
+    const fabSave = document.getElementById('module6-fab-save');
+    const fabReset = document.getElementById('module6-fab-reset');
+    if (fabSave) fabSave.classList.add('hidden');
+    if (fabReset) fabReset.classList.add('hidden');
 }
 
 
@@ -719,11 +785,11 @@ function resetModule6Form() {
 function saveModule6Assessment(e) {
     if (e) e.preventDefault();
 
-    const patientId = getCurrentPatientId();
+    const userId = getCurrentUserId();
     const timestamp = Date.now();
 
     const assessmentData = {
-        patientId: patientId,
+        userId: userId,
         assessmentDate: new Date().toLocaleDateString('vi-VN'),
         general: {
             height: parseFloat(document.getElementById('height').value) || null,
@@ -760,12 +826,12 @@ function saveModule6Assessment(e) {
     };
 
     // Save to LocalStorage (Array Pattern)
-    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
+    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_body_assessments`) || '[]');
     assessments.push(assessmentData);
-    localStorage.setItem(`mirabocaresync_${patientId}_body_assessments`, JSON.stringify(assessments));
+    localStorage.setItem(`mirabocaresync_${userId}_body_assessments`, JSON.stringify(assessments));
 
     // Mark complete and show toast
-    if (typeof markModuleComplete === 'function') markModuleComplete(patientId, 'module6');
+    if (typeof markModuleComplete === 'function') markModuleComplete(userId, 'module6');
 
     // Dispatch event for sidebar update
     window.dispatchEvent(new Event('module-data-saved'));
@@ -790,8 +856,8 @@ function saveModule6Assessment(e) {
 function deleteModule6Assessment(index) {
     if (!confirm('Bạn có chắc chắn muốn xóa bản ghi này không?')) return;
 
-    const patientId = getCurrentPatientId();
-    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
+    const userId = getCurrentUserId();
+    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_body_assessments`) || '[]');
 
     // Sort logic in loadHistory was Newest First, so we need to match that index or filter by ID.
     // Ideally we should use ID. But for now, let's reverse the index mapping or just handle consistent sorting.
@@ -804,7 +870,7 @@ function deleteModule6Assessment(index) {
     assessments.sort((a, b) => b.timestamp - a.timestamp); // Match UI sort
     assessments.splice(index, 1); // Remove item
 
-    localStorage.setItem(`mirabocaresync_${patientId}_body_assessments`, JSON.stringify(assessments));
+    localStorage.setItem(`mirabocaresync_${userId}_body_assessments`, JSON.stringify(assessments));
 
     // Clear last selected report state to prevent showing deleted data
     window.lastSelectedReportTimestamp = null;
@@ -835,27 +901,23 @@ function switchModule6Tab(tabName) {
     historyBtn.className = inactiveClass;
     reportBtn.className = inactiveClass;
 
-    // Portal Actions Logic
-    const actions = document.getElementById('module-actions');
-    if (actions) {
-        if (tabName !== 'form') {
-            actions.innerHTML = `
-                <button onclick="switchModule6Tab('form')" 
-                    class="btn-ios btn-ios-primary"
-                    title="Tạo đánh giá mới">
-                    <i data-lucide="plus" class="w-5 h-5"></i>
-                    <span>Tạo đánh giá mới</span>
-                </button>
-            `;
-            lucide.createIcons();
-        } else {
-            actions.innerHTML = '';
-        }
-    }
+    // Toggle FAB Visibility based on Tab
+    const fabSave = document.getElementById('module6-fab-save');
+    const fabReset = document.getElementById('module6-fab-reset');
+    const fabCreate = document.getElementById('module6-fab-create');
+
+    // Default Hide All
+    if (fabSave) fabSave.classList.add('hidden');
+    if (fabReset) fabReset.classList.add('hidden');
+    if (fabCreate) fabCreate.classList.add('hidden');
 
     if (tabName === 'form') {
         formTab.classList.remove('hidden');
         formBtn.className = activeClass;
+
+        // Show Form FABs
+        if (fabSave) fabSave.classList.remove('hidden');
+        if (fabReset) fabReset.classList.remove('hidden');
 
         if (typeof resetModule6Form === 'function') {
             document.getElementById('module6-form').reset();
@@ -869,11 +931,19 @@ function switchModule6Tab(tabName) {
     } else if (tabName === 'history') {
         historyTab.classList.remove('hidden');
         historyBtn.className = activeClass;
+
+        // Show Create New FAB
+        if (fabCreate) fabCreate.classList.remove('hidden');
+
         loadModule6History();
         document.getElementById('module6-fab-container')?.classList.add('hidden');
     } else if (tabName === 'report') {
         if (reportTab) reportTab.classList.remove('hidden');
         reportBtn.className = activeClass;
+
+        // Show Create New FAB
+        if (fabCreate) fabCreate.classList.remove('hidden');
+
         document.getElementById('module6-fab-container')?.classList.add('hidden');
         const lastSelected = window.lastSelectedReportTimestamp || null;
         renderModule6Report(lastSelected);
@@ -886,11 +956,11 @@ function switchModule6Tab(tabName) {
 
 // Load history
 function loadModule6History() {
-    const patientId = getCurrentPatientId();
+    const userId = getCurrentUserId();
     const historyList = document.getElementById('history-list');
 
     // Get all assessments from LocalStorage (Array Key)
-    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
+    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_body_assessments`) || '[]');
 
     // Sort by timestamp (newest first)
     assessments.sort((a, b) => b.timestamp - a.timestamp);
@@ -1256,14 +1326,14 @@ function renderMuscleEvalTable(data) {
     `;
 }
 
-function renderReportTable(data, patientId) {
+function renderReportTable(data, userId) {
     const tbody = document.getElementById('m6-report-table-body');
     if (!tbody) return;
 
-    // Get Patient Info
-    const patient = getPatientById(patientId) || { dob: '1960-01-01', gender: 'male' };
-    const age = new Date().getFullYear() - new Date(patient.dob).getFullYear();
-    const gender = patient.gender === 'male' ? 'Nam' : 'Nữ';
+    // Get User Info
+    const user = getUserById(userId) || { dob: '1960-01-01', gender: 'male' };
+    const age = new Date().getFullYear() - new Date(user.dob).getFullYear();
+    const gender = user.gender === 'male' ? 'Nam' : 'Nữ';
 
     // BMR Calculation (Mifflin-St Jeor)
     // Men: 10W + 6.25H - 5A + 5
@@ -1272,7 +1342,7 @@ function renderReportTable(data, patientId) {
     if (!bmr && data.general.weight && data.general.height) {
         const w = parseFloat(data.general.weight);
         const h = parseFloat(data.general.height);
-        if (patient.gender === 'male') {
+        if (user.gender === 'male') {
             bmr = (10 * w) + (6.25 * h) - (5 * age) + 5;
         } else {
             bmr = (10 * w) + (6.25 * h) - (5 * age) - 161;
@@ -1472,8 +1542,8 @@ function saveM6ReportData(type = 'all') {
     if (!selector) return;
     const timestamp = selector.value;
 
-    const patientId = getCurrentPatientId();
-    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
+    const userId = getCurrentUserId();
+    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_body_assessments`) || '[]');
 
     // Find and update
     const index = assessments.findIndex(a => a.timestamp == timestamp);
@@ -1485,14 +1555,14 @@ function saveM6ReportData(type = 'all') {
             assessments[index].qualityComment = document.getElementById('m6-quality-comment').value;
         }
 
-        localStorage.setItem(`mirabocaresync_${patientId}_body_assessments`, JSON.stringify(assessments));
+        localStorage.setItem(`mirabocaresync_${userId}_body_assessments`, JSON.stringify(assessments));
         showToast('Đã lưu nhận xét thành công!', 'success');
     }
 }
 
 // Print specific assessment
 function printModule6Assessment(index) {
-    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${getCurrentPatientId()}_body_assessments`) || '[]');
+    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${getCurrentUserId()}_body_assessments`) || '[]');
     const assessment = assessments[index];
     if (!assessment) return;
 
@@ -1518,8 +1588,8 @@ function printModule6Assessment(index) {
             <h1>Phiếu Đánh giá Thành phần Cơ thể</h1>
             
             <div class="meta">
-                <div class="row"><span class="label">Bệnh nhân:</span> <span class="value">${getPatientById(getCurrentPatientId()).fullName}</span></div>
-                <div class="row"><span class="label">Mã hồ sơ:</span> <span class="value">${getCurrentPatientId()}</span></div>
+                <div class="row"><span class="label">Người dùng:</span> <span class="value">${getUserById(getCurrentUserId()).fullName}</span></div>
+                <div class="row"><span class="label">Mã hồ sơ:</span> <span class="value">${getCurrentUserId()}</span></div>
                 <div class="row"><span class="label">Ngày đánh giá:</span> <span class="value">${new Date(assessment.assessmentDate).toLocaleDateString('vi-VN')}</span></div>
                 <div class="row"><span class="label">Người thực hiện:</span> <span class="value">${assessment.assessor || 'Quản trị viên'}</span></div>
             </div>
@@ -1655,7 +1725,7 @@ function printModule6Report() {
         <body>
             <div class="text-center mb-10 pb-6 border-b border-slate-200">
                 <h1 class="text-2xl font-black uppercase text-slate-800">Báo cáo Phân tích Thành phần Cơ thể</h1>
-                <p class="text-slate-500 font-bold mt-2">Bệnh nhân: ${getPatientById(getCurrentPatientId()).fullName} - ID: ${getCurrentPatientId()}</p>
+                <p class="text-slate-500 font-bold mt-2">Người dùng: ${getUserById(getCurrentUserId()).fullName} - ID: ${getCurrentUserId()}</p>
                 <p class="text-xs text-slate-400 mt-1">Ngày xuất báo cáo: ${new Date().toLocaleDateString('vi-VN')}</p>
             </div>
             
@@ -1684,28 +1754,14 @@ function printModule6Report() {
 // ==========================================
 
 // Init FAB Logic
+// Init FAB Logic (Deprecated: Buttons moved inline)
 function initModule6FabLogic() {
-    console.log('[Module6] initModule6FabLogic called');
-    window.module6FAB = createFABManager({
-        moduleId: 'module6',
-        formId: 'module6-form',
-
-        // Module 6 Currently Create-Only/Append-Only in this version
-        hasExistingData: () => false,
-
-        onSave: () => saveModule6Assessment(),
-        onReset: () => resetModule6Form(),
-        enableEdit: false, // Not supporting Edit yet, just Create
-        alwaysShowSave: false // Only show when dirty (User confirmed inputs trigger logs)
-    });
-
-    window.module6FAB.init();
+    console.log('[Module6] initModule6FabLogic called - Using inline buttons');
+    // FAB Logic removed to prevent floating button issues
 }
 
-// Update FAB State (kept for compatibility if called elsewhere, but delegates to FAB Manager)
+// Update FAB State (kept for compatibility)
 function updateModule6FabState() {
-    if (window.module6FAB) {
-        window.module6FAB.updateFABs();
-    }
+    // No-op
 }
 

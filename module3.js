@@ -279,10 +279,11 @@ function generateADLTableRows() {
         const levelCells = activity.levels.map(function (level) {
             return `
             <td class="p-3 text-center">
-                <label class="relative flex items-center justify-center cursor-pointer">
+                <label class="inline-flex items-center gap-2 cursor-pointer">
                     <input type="radio" name="adl-level-${activity.id}" value="${level.value}" 
                         onchange="updateADLScore()"
                         class="w-5 h-5 text-emerald-600 focus:ring-emerald-100">
+                    <span class="text-xs font-bold text-slate-600">${level.value}</span>
                 </label>
             </td>`;
         }).join('');
@@ -297,9 +298,10 @@ function generateADLTableRows() {
             ${levelCells}
             ${emptyCells}
             <td class="p-3 text-center">
-                <label class="relative flex items-center justify-center cursor-pointer">
+                <label class="inline-flex items-center gap-2 cursor-pointer glass-panel px-2 py-1.5 rounded-xl border border-white/40 hover:bg-rose-50 hover:border-rose-200 transition-all shadow-sm">
                     <input type="checkbox" id="adl-status-${activity.id}" 
-                        class="w-5 h-5 rounded text-emerald-600 focus:ring-emerald-100">
+                        class="w-4 h-4 rounded text-rose-600 focus:ring-rose-100">
+                    <span class="text-[10px] font-black text-rose-500 uppercase tracking-wider">Có</span>
                 </label>
             </td>
             ${mergedCells}
@@ -328,37 +330,42 @@ function generateIADLTableRows() {
         <tr class="border-b border-violet-50 hover:bg-violet-50/30 transition-colors group">
             <td class="p-4 font-bold text-slate-700">${activity.name}</td>
             <td class="p-3 text-center">
-                <label class="relative flex items-center justify-center cursor-pointer">
+                <label class="inline-flex items-center gap-2 cursor-pointer">
                     <input type="radio" name="iadl-level-${activity.id}" value="2" 
                         onchange="updateIADLScore()"
                         class="w-5 h-5 text-emerald-600 focus:ring-emerald-100">
+                    <span class="text-xs font-bold text-slate-600">2</span>
                 </label>
             </td>
             <td class="p-3 text-center">
-                <label class="relative flex items-center justify-center cursor-pointer">
+                <label class="inline-flex items-center gap-2 cursor-pointer">
                     <input type="radio" name="iadl-level-${activity.id}" value="1.5" 
                         onchange="updateIADLScore()"
                         class="w-5 h-5 text-blue-600 focus:ring-blue-100">
+                    <span class="text-xs font-bold text-slate-600">1.5</span>
                 </label>
             </td>
             <td class="p-3 text-center">
-                <label class="relative flex items-center justify-center cursor-pointer">
+                <label class="inline-flex items-center gap-2 cursor-pointer">
                     <input type="radio" name="iadl-level-${activity.id}" value="1" 
                         onchange="updateIADLScore()"
                         class="w-5 h-5 text-amber-600 focus:ring-amber-100">
+                    <span class="text-xs font-bold text-slate-600">1</span>
                 </label>
             </td>
             <td class="p-3 text-center">
-                <label class="relative flex items-center justify-center cursor-pointer">
+                <label class="inline-flex items-center gap-2 cursor-pointer">
                     <input type="radio" name="iadl-level-${activity.id}" value="0" 
                         onchange="updateIADLScore()"
                         class="w-5 h-5 text-slate-600 focus:ring-slate-100">
+                    <span class="text-xs font-bold text-slate-600">0</span>
                 </label>
             </td>
             <td class="p-3 text-center">
-                <label class="relative flex items-center justify-center cursor-pointer">
+                <label class="inline-flex items-center gap-2 cursor-pointer glass-panel px-2 py-1.5 rounded-xl border border-white/40 hover:bg-rose-50 hover:border-rose-200 transition-all shadow-sm">
                     <input type="checkbox" id="iadl-status-${activity.id}" 
-                        class="w-5 h-5 rounded text-violet-600 focus:ring-violet-100">
+                        class="w-4 h-4 rounded text-rose-600 focus:ring-rose-100">
+                    <span class="text-[10px] font-black text-rose-500 uppercase tracking-wider">Có</span>
                 </label>
             </td>
             ${mergedCells}
@@ -428,29 +435,93 @@ window.module3Content = `
     
     <form id="module3-form" class="space-y-6 pb-20">
 
+
+
         <!-- ADL Assessment Table - Barthel Index -->
-        <div class="glass-panel rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
-            <div class="bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-4">
-                <h3 class="font-black text-white text-sm flex items-center gap-2 tracking-wide uppercase">
-                    <i data-lucide="user-check" class="w-5 h-5"></i>
-                    Barthel Index - Hoạt động Sinh hoạt Cơ bản (ADL)
-                </h3>
+        <div class="glass-panel rounded-[32px] group hover:shadow-xl transition-all duration-300">
+            <div class="bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-4 rounded-t-[32px]">
+                <div class="flex items-center justify-between w-full">
+                    <h3 class="font-black text-white text-sm flex items-center gap-2 tracking-wide uppercase">
+                        <i data-lucide="user-check" class="w-5 h-5"></i>
+                        Barthel Index - Hoạt động Sinh hoạt Cơ bản (ADL)
+                    </h3>
+                    
+                    <!-- Info Tooltip (Moved to Right) -->
+                    <div class="relative group/tooltip z-[60]">
+                        <i data-lucide="help-circle" class="w-5 h-5 text-emerald-100 hover:text-white cursor-help transition-colors"></i>
+                        <div class="absolute top-full right-0 mt-3 hidden group-hover/tooltip:block z-[100] w-[450px] pointer-events-none animate-fade-in origin-top-right">
+                            <div class="bg-slate-900/95 backdrop-blur text-white text-xs font-normal normal-case tracking-normal rounded-xl px-5 py-4 shadow-2xl text-left border border-slate-700/50 relative">
+                                
+                                <!-- Part 1: Intro -->
+                                <div class="mb-4 border-b border-slate-700/50 pb-3">
+                                    <div class="font-bold text-base text-emerald-400 mb-1">Barthel Index (ADL)</div>
+                                    <div class="text-slate-300 leading-relaxed mb-2">
+                                        Đánh giá khả năng <strong>tự lập</strong> trong các hoạt động cơ bản (ăn uống, tắm rửa, di chuyển...).
+                                        <br/>
+                                        <span class="text-[11px] text-emerald-200/70 mt-1 block">
+                                            • Tổng điểm: <strong>0 - 100</strong>.<br/>
+                                            • Nguyên tắc: Đánh giá dựa trên những gì người bệnh <strong>thực sự làm được</strong>.
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Part 2: Detailed Levels -->
+                                <div class="font-bold mb-2 text-emerald-400">Chi tiết phân loại điểm:</div>
+                                <div class="space-y-3 opacity-90">
+                                    
+                                    <!-- 4 Levels Group -->
+                                    <div class="bg-white/5 rounded px-3 py-2">
+                                        <div class="text-[11px] font-bold text-slate-400 mb-1 uppercase tracking-wider">Nhóm 4 mức (Di chuyển, Chuyển ghế...)</div>
+                                        <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                                            <div class="flex justify-between border-b border-white/10 pb-0.5"><span class="text-emerald-300">Độc lập</span> <span class="font-bold">15đ</span></div>
+                                            <div class="flex justify-between border-b border-white/10 pb-0.5"><span class="text-emerald-200">Hỗ trợ nhỏ/Giám sát</span> <span class="font-bold">10đ</span></div>
+                                            <div class="flex justify-between border-b border-white/10 pb-0.5"><span class="text-emerald-100">Hỗ trợ nhiều</span> <span class="font-bold">5đ</span></div>
+                                            <div class="flex justify-between border-b border-white/10 pb-0.5"><span class="text-rose-300">Không thể</span> <span class="font-bold">0đ</span></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 3 Levels Group -->
+                                    <div class="bg-white/5 rounded px-3 py-2">
+                                        <div class="text-[11px] font-bold text-slate-400 mb-1 uppercase tracking-wider">Nhóm 3 mức (Ăn uống, Toilet...)</div>
+                                        <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                                            <div class="flex justify-between border-b border-white/10 pb-0.5"><span class="text-emerald-300">Tự lập</span> <span class="font-bold">10đ</span></div>
+                                            <div class="flex justify-between border-b border-white/10 pb-0.5"><span class="text-emerald-200">Cần hỗ trợ</span> <span class="font-bold">5đ</span></div>
+                                            <div class="flex justify-between border-b border-white/10 pb-0.5 col-span-2"><span class="text-rose-300">Phụ thuộc hoàn toàn</span> <span class="font-bold">0đ</span></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 2 Levels Group -->
+                                    <div class="bg-white/5 rounded px-3 py-2">
+                                        <div class="text-[11px] font-bold text-slate-400 mb-1 uppercase tracking-wider">Nhóm 2 mức (Tắm, Chải đầu...)</div>
+                                        <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                                            <div class="flex justify-between border-b border-white/10 pb-0.5"><span class="text-emerald-300">Tự lập</span> <span class="font-bold">5đ</span></div>
+                                            <div class="flex justify-between border-b border-white/10 pb-0.5"><span class="text-rose-300">Cần hỗ trợ</span> <span class="font-bold">0đ</span></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!-- Arrow pointing UP to the icon -->
+                                <div class="absolute bottom-full right-1 -mb-1 border-4 border-transparent border-b-slate-900/95"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto rounded-b-[32px]">
                 <table class="w-full">
                     <thead class="bg-emerald-50/50 backdrop-blur-md">
                         <tr class="border-b border-emerald-100">
                             <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Hạng mục</th>
                             <th colspan="4" class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Mức độ</th>
-                            <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Tình trạng</th>
+                            <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Vấn đề</th>
                             <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Môi trường<br/>(địa điểm thực hiện và dụng cụ hỗ trợ)</th>
                             <th rowspan="2" class="p-4 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest">Tình trạng - vấn đề<br/>sinh hoạt</th>
                         </tr>
                         <tr class="border-b border-emerald-100">
-                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-24">Mức 1<br/><span class="text-emerald-600">(15-10-5)</span></th>
-                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-24">Mức 2<br/><span class="text-emerald-600">(10-5)</span></th>
-                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-24">Mức 3<br/><span class="text-emerald-600">(5)</span></th>
-                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-24">Mức 4<br/><span class="text-emerald-600">(0)</span></th>
+                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-24">Mức 1</th>
+                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-24">Mức 2</th>
+                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-24">Mức 3</th>
+                            <th class="p-3 text-center font-black text-emerald-900 text-[10px] uppercase tracking-widest w-24">Mức 4</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50/50">
@@ -473,58 +544,69 @@ window.module3Content = `
         </div>
 
         <!-- IADL Assessment Table -->
-        <div class="glass-panel rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
-            <div class="bg-gradient-to-r from-violet-500 to-purple-500 px-6 py-4">
-                <h3 class="font-black text-white text-sm flex items-center gap-2 tracking-wide uppercase">
-                    <i data-lucide="briefcase" class="w-5 h-5"></i>
-                    Lawton Scale - Hoạt động Sinh hoạt Công cụ (IADL)
-                </h3>
+        <div class="glass-panel rounded-[32px] group hover:shadow-xl transition-all duration-300">
+            <div class="bg-gradient-to-r from-violet-500 to-purple-500 px-6 py-4 rounded-t-[32px]">
+                <div class="flex items-center justify-between w-full">
+                    <h3 class="font-black text-white text-sm flex items-center gap-2 tracking-wide uppercase">
+                        <i data-lucide="briefcase" class="w-5 h-5"></i>
+                        Lawton Scale - Hoạt động Sinh hoạt Công cụ (IADL)
+                    </h3>
+                    
+                    <!-- Info Tooltip -->
+                    <div class="relative group/tooltip z-[60]">
+                        <i data-lucide="help-circle" class="w-5 h-5 text-violet-100 hover:text-white cursor-help transition-colors"></i>
+                        <div class="absolute top-full right-0 mt-3 hidden group-hover/tooltip:block z-[100] w-[400px] pointer-events-none animate-fade-in origin-top-right">
+                            <div class="bg-slate-900/95 backdrop-blur text-white text-xs font-normal normal-case tracking-normal rounded-xl px-5 py-4 shadow-2xl text-left border border-slate-700/50 relative">
+                                
+                                <!-- Part 1: Intro -->
+                                <div class="mb-4 border-b border-slate-700/50 pb-3">
+                                    <div class="font-bold text-base text-violet-400 mb-1">Lawton Scale (IADL)</div>
+                                    <div class="text-slate-300 leading-relaxed mb-2">
+                                        Đánh giá các hoạt động <strong>phức tạp hơn</strong> (dùng điện thoại, mua sắm...) để xác định mức độ độc lập trong cộng đồng.
+                                        <br/>
+                                        <span class="text-[11px] text-violet-200/70 mt-1 block">
+                                            • Tổng điểm: <strong>0 - 8 (hoặc 16)</strong>.<br/>
+                                            • Yêu cầu: Xác định khả năng cao nhất người bệnh có thể làm.
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Part 2: Details -->
+                                <div class="font-bold mb-2 text-violet-400">Chi tiết phân loại điểm:</div>
+                                <div class="space-y-2 opacity-90">
+                                    <div class="bg-white/5 rounded px-2 py-1.5">
+                                        <div class="flex justify-between items-center mb-0.5"><span class="font-bold text-violet-300">Tự lập</span> <span class="font-mono text-[10px] bg-violet-900/50 px-1 rounded text-violet-400">2 điểm</span></div>
+                                        <div class="text-[10px] text-slate-300 italic">Thực hiện hoàn toàn, an toàn, đúng trình tự.</div>
+                                    </div>
+                                    <div class="bg-white/5 rounded px-2 py-1.5">
+                                        <div class="flex justify-between items-center mb-0.5"><span class="font-bold text-violet-300">Giám sát</span> <span class="font-mono text-[10px] bg-violet-900/50 px-1 rounded text-violet-400">1.5 điểm</span></div>
+                                        <div class="text-[10px] text-slate-300 italic">Cần nhắc nhở, chuẩn bị hoặc theo dõi.</div>
+                                    </div>
+                                    <div class="bg-white/5 rounded px-2 py-1.5">
+                                        <div class="flex justify-between items-center mb-0.5"><span class="font-bold text-violet-300">Hỗ trợ</span> <span class="font-mono text-[10px] bg-violet-900/50 px-1 rounded text-violet-400">1 điểm</span></div>
+                                        <div class="text-[10px] text-slate-300 italic">Cần người khác làm giúp một phần công việc.</div>
+                                    </div>
+                                    <div class="bg-rose-500/10 rounded px-2 py-1.5">
+                                        <div class="flex justify-between items-center mb-0.5"><span class="font-bold text-rose-300">Phụ thuộc</span> <span class="font-mono text-[10px] bg-rose-900/50 px-1 rounded text-rose-400">0 điểm</span></div>
+                                        <div class="text-[10px] text-slate-300 italic">Không thể làm, phụ thuộc hoàn toàn.</div>
+                                    </div>
+                                </div>
+                                <!-- Arrow pointing UP to the icon -->
+                                <div class="absolute bottom-full right-1 -mb-1 border-4 border-transparent border-b-slate-900/95"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto rounded-b-[32px]">
                 <table class="w-full">
                     <thead class="bg-violet-50/50 backdrop-blur-md border-b border-violet-100/50">
                         <tr>
                             <th class="p-4 text-left font-black text-violet-900 text-[10px] uppercase tracking-widest">Hạng mục</th>
-                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24 relative group cursor-help">
-                                <div>Tự lập<br/><span class="text-violet-600">(2)</span></div>
-                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50 w-64">
-                                    <div class="bg-slate-900 text-white text-xs font-normal normal-case tracking-normal rounded-lg px-4 py-3 shadow-2xl">
-                                        <div class="font-bold mb-1">Tự lập</div>
-                                        <div class="text-slate-300">Thực hiện hoàn toàn, an toàn, đúng trình tự, không cần nhắc hay hỗ trợ</div>
-                                        <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
-                                    </div>
-                                </div>
-                            </th>
-                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24 relative group cursor-help">
-                                <div>Giám sát<br/><span class="text-violet-600">(1.5)</span></div>
-                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50 w-64">
-                                    <div class="bg-slate-900 text-white text-xs font-normal normal-case tracking-normal rounded-lg px-4 py-3 shadow-2xl">
-                                        <div class="font-bold mb-1">Giám sát</div>
-                                        <div class="text-slate-300">Thực hiện được nhưng cần nhắc nhở, theo dõi hoặc giám sát</div>
-                                        <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
-                                    </div>
-                                </div>
-                            </th>
-                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24 relative group cursor-help">
-                                <div>Hỗ trợ<br/><span class="text-violet-600">(1)</span></div>
-                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50 w-64">
-                                    <div class="bg-slate-900 text-white text-xs font-normal normal-case tracking-normal rounded-lg px-4 py-3 shadow-2xl">
-                                        <div class="font-bold mb-1">Hỗ trợ</div>
-                                        <div class="text-slate-300">Cần người hỗ trợ một phần (chuẩn bị, làm cùng, hướng dẫn trực tiếp)</div>
-                                        <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
-                                    </div>
-                                </div>
-                            </th>
-                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24 relative group cursor-help">
-                                <div>Phụ thuộc<br/><span class="text-violet-600">(0)</span></div>
-                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50 w-64">
-                                    <div class="bg-slate-900 text-white text-xs font-normal normal-case tracking-normal rounded-lg px-4 py-3 shadow-2xl">
-                                        <div class="font-bold mb-1">Phụ thuộc</div>
-                                        <div class="text-slate-300">Không thể tự thực hiện, người khác làm hoàn toàn</div>
-                                        <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
-                                    </div>
-                                </div>
-                            </th>
+                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Tự lập</th>
+                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Giám sát</th>
+                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Hỗ trợ</th>
+                            <th class="p-3 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Phụ thuộc</th>
                             <th class="p-4 text-center font-black text-violet-900 text-[10px] uppercase tracking-widest w-24">Vấn đề</th>
                             <th class="p-4 text-left font-black text-violet-900 text-[10px] uppercase tracking-widest">Dung cụ hỗ trợ</th>
                             <th class="p-4 text-left font-black text-violet-900 text-[10px] uppercase tracking-widest">Ghi chú</th>
@@ -594,44 +676,44 @@ window.module3Content = `
 </div>
 
 
-    <!-- FLOATING ACTION BUTTONS (FAB) - Moved Outside -->
-    <div id="module3-fab-container" class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
+    <!-- Module 3 Inline Actions - Will be moved to header -->
+    <div id="module3-actions-source" class="hidden">
         
-        <!-- SAVE (Create Mode) -->
-        <button type="button" id="module3-fab-save" onclick="saveModule3Assessment()" 
-            class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-            <i data-lucide="save" class="w-7 h-7"></i>
-            <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Lưu đánh giá
-            </span>
-        </button>
+        <!-- EDIT MODE ACTIONS -->
+        <div id="module3-fab-save" class="hidden flex flex-col-reverse gap-3 items-center">
+             <!-- Cancel -->
+             <button type="button" onclick="cancelModule3Edit()" 
+                class="w-12 h-12 bg-white text-slate-500 rounded-full shadow-lg hover:bg-slate-50 hover:text-slate-700 transition-all flex items-center justify-center border border-slate-200 pointer-events-auto group relative" title="Hủy bỏ">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <!-- Save New -->
+            <button type="button" onclick="saveModule3Assessment()" 
+                class="w-12 h-12 bg-indigo-600 text-white rounded-full shadow-xl shadow-indigo-200 hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all flex items-center justify-center pointer-events-auto" title="Lưu đánh giá">
+                <i data-lucide="save" class="w-6 h-6"></i>
+            </button>
+        </div>
 
-        <!-- UPDATE (Edit Mode) -->
-        <button type="button" id="module3-fab-update" onclick="saveModule3Assessment()" 
-            class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-            <i data-lucide="save" class="w-7 h-7"></i>
-            <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Lưu thay đổi
-            </span>
-        </button>
+        <div id="module3-fab-update" class="hidden flex flex-col-reverse gap-3 items-center">
+             <!-- Cancel -->
+             <button type="button" onclick="cancelModule3Edit()" 
+                class="w-12 h-12 bg-white text-slate-500 rounded-full shadow-lg hover:bg-slate-50 hover:text-slate-700 transition-all flex items-center justify-center border border-slate-200 pointer-events-auto group relative" title="Hủy bỏ">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <!-- Save Changes -->
+            <button type="button" onclick="saveModule3Assessment()" 
+                class="w-12 h-12 bg-blue-600 text-white rounded-full shadow-xl shadow-blue-200 hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all flex items-center justify-center pointer-events-auto" title="Lưu thay đổi">
+                <i data-lucide="save" class="w-6 h-6"></i>
+            </button>
+        </div>
 
-        <!-- EDIT (View Mode) -->
+        <!-- VIEW MODE ACTIONS -->
         <button type="button" id="module3-fab-edit" onclick="toggleModule3EditMode(true)" 
-            class="pointer-events-auto w-14 h-14 bg-amber-500 text-white rounded-full shadow-[0_8px_25px_rgb(245,158,11,0.5)] hover:bg-amber-400 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
+            class="w-12 h-12 bg-amber-500 text-white rounded-full shadow-xl shadow-amber-200 hover:bg-amber-600 hover:scale-105 active:scale-95 transition-all flex items-center justify-center pointer-events-auto" title="Chỉnh sửa">
             <i data-lucide="edit-2" class="w-6 h-6"></i>
-            <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Chỉnh sửa
-            </span>
         </button>
-
-        <!-- CLOSE (Cancel Edit) -->
-        <button type="button" id="module3-fab-close" onclick="cancelModule3Edit()" 
-            class="pointer-events-auto hidden w-12 h-12 bg-white text-slate-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-slate-200 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-slate-100 ring-2 ring-white">
-            <i data-lucide="x" class="w-6 h-6"></i>
-            <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Đóng / Hủy
-            </span>
-        </button>
+        
+        <!-- Hidden Close Hook for Compatibility -->
+        <div id="module3-fab-close" class="hidden"></div>
     </div>
 </div>
 `;
@@ -1078,13 +1160,16 @@ function loadModule3Data(data) {
 // ----------------------------------------------------
 // INITIALIZATION
 // ----------------------------------------------------
+// ----------------------------------------------------
+// INITIALIZATION
+// ----------------------------------------------------
 function initModule3() {
-    const patientId = getCurrentPatientId();
-    console.log('[Module3] Initializing for patient:', patientId);
+    const userId = getCurrentUserId();
+    console.log('[Module3] Initializing for user:', userId);
 
     // 1. Load Data
     // Use singular key for Single Record pattern
-    const savedData = localStorage.getItem(`mirabocaresync_${patientId}_adl_assessment`);
+    const savedData = localStorage.getItem(`mirabocaresync_${userId}_adl_assessment`);
 
     if (savedData) {
         try {
@@ -1097,7 +1182,7 @@ function initModule3() {
         }
     } else {
         // Check legacy array data for migration
-        const legacyData = localStorage.getItem(`mirabocaresync_${patientId}_adl_assessments`);
+        const legacyData = localStorage.getItem(`mirabocaresync_${userId}_adl_assessments`);
         if (legacyData) {
             try {
                 const arr = JSON.parse(legacyData);
@@ -1153,8 +1238,8 @@ function initModule3() {
     });
     module3ResetFormState = resetFormState;
 
-    // 1. Load Patient Info from Module 1
-    const facesheetData = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_facesheet`) || '{}');
+    // 1. Load User Info from Module 1
+    const facesheetData = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_facesheet`) || '{}');
     if (facesheetData.basic) {
         const nameDisplay = document.getElementById('patient-name-display');
         const ageGenderDisplay = document.getElementById('patient-age-gender-display');
@@ -1169,12 +1254,35 @@ function initModule3() {
     setTimeout(function () {
         lucide.createIcons();
     }, 100);
+
+    // Portal Actions to Unified Slot
+    const actionSource = document.getElementById('module3-actions-source');
+    const actionTarget = document.getElementById('module-actions-slot');
+
+    if (actionSource && actionTarget) {
+        // Clear previous
+        actionTarget.innerHTML = '';
+
+        // Move children
+        while (actionSource.firstChild) {
+            actionTarget.appendChild(actionSource.firstChild);
+        }
+
+        // Setup Cleanup on Module Change
+        const observer = new MutationObserver((mutations) => {
+            if (!document.getElementById('module3-form')) {
+                // We navigated away
+                actionTarget.innerHTML = '';
+                observer.disconnect();
+            }
+        });
+        observer.observe(document.getElementById('module-content'), { childList: true });
+    }
 }
 
 // Global Save Function for Module 3
-// Global Save Function for Module 3
 window.saveModule3Assessment = function () {
-    const patientId = getCurrentPatientId();
+    const userId = getCurrentUserId();
 
     // Collect ADL data
     var adlData = {};
@@ -1255,7 +1363,7 @@ window.saveModule3Assessment = function () {
 
     // Construct Assessment Object
     var assessment = {
-        patientId: patientId,
+        userId: userId,
         assessmentDate: new Date().toLocaleDateString('vi-VN'),
         assessor: 'Administrator', // Mock user
         adl: adlData,
@@ -1272,7 +1380,7 @@ window.saveModule3Assessment = function () {
     };
 
     // Save Single Record
-    localStorage.setItem('mirabocaresync_' + patientId + '_adl_assessment', JSON.stringify(assessment));
+    localStorage.setItem('mirabocaresync_' + userId + '_adl_assessment', JSON.stringify(assessment));
 
     showToast('Đã lưu đánh giá ADL thành công!', 'success');
 
@@ -1283,7 +1391,7 @@ window.saveModule3Assessment = function () {
     // Reset save button state
     if (typeof module3ResetFormState === 'function') module3ResetFormState();
 
-    if (typeof markModuleComplete === 'function') markModuleComplete(patientId, 'module3');
+    if (typeof markModuleComplete === 'function') markModuleComplete(userId, 'module3');
 
     // Dispatch event for sidebar update
     window.dispatchEvent(new Event('module-data-saved'));

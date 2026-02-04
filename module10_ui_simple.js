@@ -14,13 +14,14 @@ function generateReportForSession(session) {
 
     let html = '<div class="space-y-6 bg-white p-8" style="font-family: Arial, sans-serif; color: #000; line-height: 1.6;">';
 
-    // Patient Info - Simple text
-    const patient = getPatientById(session.patientId);
-    if (patient) {
+    // User Info - Simple text
+    const uid = session.userId || session.patientId;
+    const user = getUserById(uid);
+    if (user) {
         html += `
         <div class="mb-6">
-            <div class="text-lg font-bold mb-1">${patient.fullName}</div>
-            <div class="text-sm text-gray-700">Mã hồ sơ: ${patient.id} | Giới tính: ${patient.gender === 'male' ? 'Nam' : 'Nữ'}</div>
+            <div class="text-lg font-bold mb-1">${user.fullName}</div>
+            <div class="text-sm text-gray-700">Mã hồ sơ: ${user.id} | Giới tính: ${user.gender === 'male' ? 'Nam' : 'Nữ'}</div>
         </div>`;
     }
 

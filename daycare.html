@@ -195,6 +195,7 @@
             margin: 0 auto !important;
             padding: 20px !important;
             box-shadow: none !important;
+            transform: none !important;
         }
 
         .print-mode .print-section {
@@ -361,11 +362,11 @@
                 class="mt-4 mb-2 px-1 text-[10px] font-bold text-slate-400 uppercase tracking-wide truncate block lg:hidden group-[.is-expanded]:lg:block transition-opacity delay-75">
                 Quản lý</div>
 
-            <button onclick="switchTab('patients')" id="btn-patients" title="Danh sách bệnh nhân"
+            <button onclick="switchTab('patients')" id="btn-patients" title="Danh sách người dùng"
                 class="w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all text-[17px] font-medium bg-[#007AFF]/10 text-[#007AFF] overflow-hidden whitespace-nowrap group/item">
                 <div class="w-6 h-6 flex justify-center shrink-0"><i data-lucide="users" class="w-6 h-6"></i></div>
                 <span class="block lg:hidden group-[.is-expanded]:lg:block transition-opacity duration-300">Danh sách
-                    bệnh nhân</span>
+                    người dùng</span>
             </button>
             <button onclick="switchTab('business')" id="btn-business" title="Nghiệp vụ"
                 class="w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all text-[17px] font-medium text-slate-700 hover:bg-slate-200/50 overflow-hidden whitespace-nowrap group/item">
@@ -465,11 +466,11 @@
                         <div class="relative hidden md:block">
                             <i data-lucide="search"
                                 class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                            <input type="text" id="patient-search-input" oninput="searchPatients(this.value)"
-                                placeholder="Tìm kiếm bệnh nhân..."
+                            <input type="text" id="patient-search-input" oninput="searchUsers(this.value)"
+                                placeholder="Tìm kiếm người dùng..."
                                 class="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all w-64">
                         </div>
-                        <button onclick="openCreatePatientModal()"
+                        <button onclick="openCreateUserModal()"
                             class="text-[#007AFF] text-[17px] font-normal flex items-center gap-1 active:opacity-50 hover:bg-white/50 px-3 py-1.5 rounded-xl transition-all">
                             <i data-lucide="plus" class="w-6 h-6"></i>
                         </button>
@@ -509,7 +510,7 @@
                         <table class="w-full text-left">
                             <thead class="bg-white text-slate-400 text-[10px] uppercase font-black tracking-widest">
                                 <tr>
-                                    <th class="px-4 md:px-6 lg:px-10 py-6 whitespace-nowrap">Tên Bệnh nhân</th>
+                                    <th class="px-4 md:px-6 lg:px-10 py-6 whitespace-nowrap">Tên Người dùng</th>
                                     <th class="px-4 md:px-6 lg:px-10 py-6 whitespace-nowrap">Mức độ</th>
                                     <th class="px-4 md:px-6 lg:px-10 py-6 whitespace-nowrap">Tiến độ</th>
                                     <th class="px-4 md:px-6 lg:px-10 py-6 whitespace-nowrap">Trạng thái</th>
@@ -553,13 +554,13 @@
                     <div class="flex-1 text-center md:text-left">
                         <div class="flex items-center justify-center md:justify-start gap-4 mb-2">
                             <h1 id="patient-detail-name" class="text-3xl font-black text-slate-800 tracking-tight">Chưa
-                                chọn bệnh nhân</h1>
+                                chọn người dùng</h1>
                             <!-- Patient Switcher Dropdown (Hidden trigger, styled as button) -->
                             <div class="relative group">
                                 <button
                                     onclick="document.getElementById('patient-switcher-dropdown').classList.toggle('hidden')"
                                     class="p-2 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
-                                    title="Chuyển bệnh nhân">
+                                    title="Chuyển người dùng">
                                     <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
                                 </button>
                                 <div id="patient-switcher-dropdown"
@@ -632,8 +633,8 @@
         class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-[40px] shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div class="p-8 border-b border-slate-100">
-                <h2 class="text-2xl font-black text-slate-800">Tạo bệnh nhân mới</h2>
-                <p class="text-sm text-slate-500 mt-1">Nhập thông tin cơ bản của bệnh nhân</p>
+                <h2 class="text-2xl font-black text-slate-800">Tạo người dùng mới</h2>
+                <p class="text-sm text-slate-500 mt-1">Nhập thông tin cơ bản của người dùng</p>
             </div>
 
             <form id="create-patient-form" class="p-8 space-y-6">
@@ -678,13 +679,13 @@
                 </div>
 
                 <div class="flex gap-4 pt-4">
-                    <button type="button" onclick="closeCreatePatientModal()"
+                    <button type="button" onclick="closeCreateUserModal()"
                         class="flex-1 px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-black text-sm hover:bg-slate-200 transition-all">
                         Hủy
                     </button>
                     <button type="submit"
                         class="flex-1 px-6 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm hover:bg-blue-700 shadow-xl shadow-blue-500/20 transition-all">
-                        Tạo bệnh nhân
+                        Tạo người dùng
                     </button>
                 </div>
             </form>
@@ -697,8 +698,8 @@
         <!-- ... existing modal content ... -->
         <div class="bg-white rounded-[40px] shadow-2xl max-w-lg w-full">
             <div class="p-8 border-b border-slate-100">
-                <h2 class="text-2xl font-black text-slate-800">Vô hiệu hóa bệnh nhân</h2>
-                <p class="text-sm text-slate-500 mt-1">Bệnh nhân sẽ được đánh dấu là không hoạt động</p>
+                <h2 class="text-2xl font-black text-slate-800">Vô hiệu hóa người dùng</h2>
+                <p class="text-sm text-slate-500 mt-1">Người dùng sẽ được đánh dấu là không hoạt động</p>
             </div>
 
             <form id="deactivate-patient-form" class="p-8 space-y-6">
@@ -934,7 +935,7 @@
                             <i data-lucide="alert-triangle" class="w-5 h-5"></i>
                             <span class="font-bold text-sm">Reset dữ liệu Demo</span>
                         </div>
-                        <p class="text-xs text-red-600/80">Xóa toàn bộ bệnh nhân và dữ liệu đã nhập. Tài khoản sẽ đăng
+                        <p class="text-xs text-red-600/80">Xóa toàn bộ người dùng và dữ liệu đã nhập. Tài khoản sẽ đăng
                             xuất.</p>
                         <button onclick="confirmResetData()"
                             class="w-full py-3 bg-white border border-red-200 text-red-600 rounded-xl font-bold text-xs hover:bg-red-600 hover:text-white transition-all">
@@ -1101,27 +1102,27 @@
             { id: 9, title: 'Khảo sát Nhà ở', icon: 'home' }
         ];
 
-        // --- Patient Management Functions ---
+        // --- User Management Functions ---
 
-        function updateActivePatientDisplay() {
-            // Also update patient detail profile
-            updatePatientDetailProfile();
-            renderPatientSwitcher();
+        function updateActiveUserDisplay() {
+            // Also update user detail profile
+            updateUserDetailProfile();
+            renderUserSwitcher();
         }
 
-        function renderPatientSwitcher(filterText = '') {
-            const patients = getAllPatients();
-            const activeId = getCurrentPatientId();
+        function renderUserSwitcher(filterText = '') {
+            const users = getAllUsers();
+            const activeId = getCurrentUserId();
             const container = document.getElementById('patient-switcher-dropdown');
             if (!container) return;
 
-            // Filter patients if search text exists
-            const filteredPatients = filterText
-                ? patients.filter(p => p.fullName.toLowerCase().includes(filterText.toLowerCase()) || p.id.toLowerCase().includes(filterText.toLowerCase()))
-                : patients;
+            // Filter users if search text exists
+            const filteredUsers = filterText
+                ? users.filter(p => p.fullName.toLowerCase().includes(filterText.toLowerCase()) || p.id.toLowerCase().includes(filterText.toLowerCase()))
+                : users;
 
-            const listHtml = filteredPatients.map(p => `
-                <button onclick="switchToPatient('${p.id}'); document.getElementById('patient-switcher-dropdown').classList.add('hidden');" 
+            const listHtml = filteredUsers.map(p => `
+                <button onclick="switchToUser('${p.id}'); document.getElementById('patient-switcher-dropdown').classList.add('hidden');" 
                     class="w-full text-left px-4 py-3 hover:bg-slate-50 flex items-center gap-3 transition-colors border-b last:border-0 border-slate-50 ${p.id === activeId ? 'bg-blue-50/50' : ''}">
                     <div class="w-8 h-8 rounded-lg ${p.id === activeId ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'} flex items-center justify-center font-bold text-xs">
                         ${p.fullName.charAt(0).toUpperCase()}
@@ -1138,8 +1139,8 @@
                 <div class="p-3 border-b border-slate-100 sticky top-0 bg-white z-10">
                     <div class="relative">
                         <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                         <input type="text" placeholder="Tìm bệnh nhân..." 
-                            oninput="renderPatientSwitcher(this.value)"
+                         <input type="text" placeholder="Tìm người dùng..." 
+                            oninput="renderUserSwitcher(this.value)"
                             class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue-100"
                             value="${filterText}" autofocus>
                     </div>
@@ -1148,9 +1149,9 @@
                     ${listHtml.length > 0 ? listHtml : '<p class="text-xs text-slate-400 text-center py-4">Không tìm thấy</p>'}
                 </div>
                 <div class="p-2 border-t border-slate-100 sticky bottom-0 bg-white z-10">
-                    <button onclick="document.getElementById('patient-switcher-dropdown').classList.add('hidden'); openCreatePatientModal();" 
+                    <button onclick="document.getElementById('patient-switcher-dropdown').classList.add('hidden'); openCreateUserModal();" 
                         class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all">
-                        <i data-lucide="plus" class="w-4 h-4"></i> Thêm bệnh nhân
+                        <i data-lucide="plus" class="w-4 h-4"></i> Thêm người dùng
                     </button>
                 </div>
             `;
@@ -1167,63 +1168,63 @@
             lucide.createIcons();
         }
 
-        function updatePatientDetailProfile() {
-            const patientId = getCurrentPatientId();
-            const patient = getPatientById(patientId);
+        function updateUserDetailProfile() {
+            const userId = getCurrentUserId();
+            const user = getUserById(userId);
 
-            if (patient) {
+            if (user) {
                 // Update avatar
-                document.getElementById('patient-avatar').textContent = patient.fullName.charAt(0).toUpperCase();
+                document.getElementById('patient-avatar').textContent = user.fullName.charAt(0).toUpperCase();
 
                 // Update name
-                document.getElementById('patient-detail-name').textContent = patient.fullName;
+                document.getElementById('patient-detail-name').textContent = user.fullName;
 
                 // Update care level
-                document.getElementById('patient-detail-care-level').textContent = patient.careLevel || '---';
+                document.getElementById('patient-detail-care-level').textContent = user.careLevel || '---';
 
                 // Update ID
-                document.getElementById('patient-detail-id').textContent = 'ID: ' + patient.id;
+                document.getElementById('patient-detail-id').textContent = 'ID: ' + user.id;
 
                 // Calculate age and format gender
                 let ageGenderText = '--- • ---';
-                if (patient.dateOfBirth) {
-                    const birthDate = new Date(patient.dateOfBirth);
+                if (user.dateOfBirth) {
+                    const birthDate = new Date(user.dateOfBirth);
                     const age = new Date().getFullYear() - birthDate.getFullYear();
-                    const genderText = patient.gender === 'male' ? 'Nam' : (patient.gender === 'female' ? 'Nữ' : '---');
+                    const genderText = user.gender === 'male' ? 'Nam' : (user.gender === 'female' ? 'Nữ' : '---');
                     ageGenderText = `${age} tuổi • ${genderText}`;
                 }
                 document.getElementById('patient-detail-age-gender').textContent = ageGenderText;
             } else {
                 document.getElementById('patient-avatar').textContent = '?';
-                document.getElementById('patient-detail-name').textContent = 'Chưa chọn bệnh nhân';
+                document.getElementById('patient-detail-name').textContent = 'Chưa chọn người dùng';
                 document.getElementById('patient-detail-care-level').textContent = '---';
                 document.getElementById('patient-detail-id').textContent = 'ID: ---';
                 document.getElementById('patient-detail-age-gender').textContent = '--- • ---';
             }
         }
 
-        function loadPatientList() {
-            const patients = getAllPatients();
-            const activePatientId = getCurrentPatientId();
+        function loadUserList() {
+            const users = getAllUsers();
+            const activeUserId = getCurrentUserId();
             const listContainer = document.getElementById('patient-list');
 
-            if (patients.length === 0) {
-                listContainer.innerHTML = '<p class="text-center text-slate-400 text-sm py-4">Chưa có bệnh nhân nào</p>';
+            if (users.length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-slate-400 text-sm py-4">Chưa có người dùng nào</p>';
                 return;
             }
 
-            listContainer.innerHTML = patients.map(patient => {
-                const isActive = patient.id === activePatientId;
+            listContainer.innerHTML = users.map(user => {
+                const isActive = user.id === activeUserId;
                 return `
-                    <button onclick="switchToPatient('${patient.id}')" 
+                    <button onclick="switchToUser('${user.id}')" 
                         class="w-full p-3 rounded-xl hover:bg-slate-50 transition-all text-left ${isActive ? 'bg-blue-50 border-2 border-blue-200' : 'border-2 border-transparent'}">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 font-black">
-                                ${patient.fullName.charAt(0).toUpperCase()}
+                                ${user.fullName.charAt(0).toUpperCase()}
                             </div>
                             <div class="flex-1">
-                                <p class="text-sm font-bold text-slate-800">${patient.fullName}</p>
-                                <p class="text-xs text-slate-400">${patient.id}</p>
+                                <p class="text-sm font-bold text-slate-800">${user.fullName}</p>
+                                <p class="text-xs text-slate-400">${user.id}</p>
                             </div>
                             ${isActive ? '<i data-lucide="check" class="w-4 h-4 text-blue-600"></i>' : ''}
                         </div>
@@ -1236,27 +1237,27 @@
 
         // function togglePatientSwitcher() { ... } // Removed
 
-        function switchToPatient(patientId) {
-            setCurrentPatientId(patientId);
+        function switchToUser(userId) {
+            setCurrentUserId(userId);
 
             // Update UI
-            updateActivePatientDisplay();
+            updateActiveUserDisplay();
             renderModuleTabs();
 
-            // Reload current module to show data for new patient
+            // Reload current module to show data for new user
             if (currentModuleId) {
                 renderModuleView(currentModuleId);
             }
 
             // Show Toast removed to reduce noise or keep it
-            // showToast('Đã chuyển sang bệnh nhân: ' + getPatientById(patientId).fullName, 'success');
+            // showToast('Đã chuyển sang người dùng: ' + getUserById(userId).fullName, 'success');
         }
 
-        function openCreatePatientModal() {
+        function openCreateUserModal() {
             document.getElementById('create-patient-modal').classList.remove('hidden');
         }
 
-        function closeCreatePatientModal() {
+        function closeCreateUserModal() {
             document.getElementById('create-patient-modal').classList.add('hidden');
             document.getElementById('create-patient-form').reset();
         }
@@ -1280,26 +1281,26 @@
 
 
 
-        // Handle patient creation form
+        // Handle user creation form
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('create-patient-form').addEventListener('submit', function (e) {
                 e.preventDefault();
 
-                const patientData = {
+                const userData = {
                     fullName: document.getElementById('new-patient-name').value,
                     dateOfBirth: document.getElementById('new-patient-dob').value,
                     gender: document.getElementById('new-patient-gender').value,
                     careLevel: document.getElementById('new-patient-care-level').value
                 };
 
-                const newPatient = createPatient(patientData);
+                const newUser = createUser(userData);
 
-                closeCreatePatientModal();
-                updateActivePatientDisplay();
+                closeCreateUserModal();
+                updateActiveUserDisplay();
                 renderDashboard(); // Refresh dashboard table
-                showToast('Đã tạo bệnh nhân: ' + newPatient.fullName, 'success');
+                showToast('Đã tạo người dùng: ' + newUser.fullName, 'success');
 
-                // Switch to patient detail view
+                // Switch to user detail view
                 switchTab('patients');
                 setActiveModule(1);
             });
@@ -1352,49 +1353,65 @@
 
         function initScrollButtons() {
             // Check if already exists
-            if (document.getElementById('scroll-buttons-container')) return;
+            if (document.getElementById('unified-fab-container')) return;
 
-            // Create Container
+            // Create Unified Container (Fixed Bottom Right)
             const container = document.createElement('div');
-            container.id = 'scroll-buttons-container';
-            container.className = 'fixed bottom-8 right-8 flex flex-col gap-2 z-50 transition-opacity duration-300 hidden'; // Default hidden
-            container.innerHTML = `
-                <button id="btn-scroll-top" class="p-3 bg-white/80 backdrop-blur text-slate-600 rounded-full shadow-lg hover:bg-white hover:text-blue-600 hover:scale-110 active:scale-90 transition-all border border-slate-100 ring-1 ring-slate-900/5 group" title="Lên đầu trang">
-                    <i data-lucide="arrow-up" class="w-5 h-5"></i>
-                </button>
-                <button id="btn-scroll-bottom" class="p-3 bg-white/80 backdrop-blur text-slate-600 rounded-full shadow-lg hover:bg-white hover:text-blue-600 hover:scale-110 active:scale-90 transition-all border border-slate-100 ring-1 ring-slate-900/5 group" title="Xuống cuối trang">
-                    <i data-lucide="arrow-down" class="w-5 h-5"></i>
-                </button>
-            `;
-            document.body.appendChild(container); // Append to body
+            container.id = 'unified-fab-container';
+            // Flex-col-reverse: Bottom items appear first in DOM but are visual bottom (actually flex-col-reverse renders first child at bottom? 
+            // Standard flex-col: top to bottom. reverse: bottom to top. 
+            // So First Child = Bottom Most. 
+            // Order: ScrollDown -> ScrollUp -> ModuleSlot
+            container.className = 'fixed bottom-8 right-8 flex flex-col-reverse gap-3 z-50 items-center pointer-events-none';
 
-            // Re-init icons for new buttons
+            // Inner HTML
+            container.innerHTML = `
+                <!-- 1. Bottom Anchor: Scroll Down -->
+                <button id="btn-scroll-bottom" class="w-12 h-12 bg-white/90 backdrop-blur text-slate-500 rounded-full shadow-lg hover:bg-white hover:text-blue-600 hover:scale-110 active:scale-90 transition-all border border-slate-200 pointer-events-auto flex items-center justify-center" title="Xuống cuối trang">
+                    <i data-lucide="arrow-down" class="w-6 h-6"></i>
+                </button>
+
+                <!-- 2. Scroll Up -->
+                <button id="btn-scroll-top" class="w-12 h-12 bg-white/90 backdrop-blur text-slate-500 rounded-full shadow-lg hover:bg-white hover:text-blue-600 hover:scale-110 active:scale-90 transition-all border border-slate-200 pointer-events-auto flex items-center justify-center" title="Lên đầu trang">
+                    <i data-lucide="arrow-up" class="w-6 h-6"></i>
+                </button>
+
+                <!-- 3. Dynamic Module Actions Slot (Stacked Above) -->
+                <!-- Children here should also be flex-col-reverse or just standard flex-col if we want them ordered specifically? 
+                     We want the module actions to stack UPWARDS. 
+                     If the container is flex-col-reverse, appending a DIV here puts it VISUALLY ON TOP of ScrollUp. 
+                     Inside this div, we also want items to stack upwards. -->
+                <div id="module-actions-slot" class="flex flex-col-reverse gap-3 items-center w-full pointer-events-none">
+                    <!-- Dynamic buttons injected here -->
+                </div>
+            `;
+
+            document.body.appendChild(container);
+
+            // Re-init icons
             lucide.createIcons();
 
-            // Attach event listeners explicitly (more robust than onclick string)
+            // Attach Listeners
             document.getElementById('btn-scroll-top').addEventListener('click', () => window.scrollToModule('top'));
             document.getElementById('btn-scroll-bottom').addEventListener('click', () => window.scrollToModule('bottom'));
 
-            // Visibility Check Function
+            // Visibility Check
             const checkVisibility = () => {
                 const businessSection = document.getElementById('section-business');
-                const scrollBtns = document.getElementById('scroll-buttons-container');
+                const unifiedContainer = document.getElementById('unified-fab-container');
 
                 if (businessSection && !businessSection.classList.contains('hidden-section')) {
-                    scrollBtns.classList.remove('hidden');
+                    unifiedContainer.classList.remove('hidden');
                 } else {
-                    scrollBtns.classList.add('hidden');
+                    unifiedContainer.classList.add('hidden');
                 }
             };
 
-            // Observer
             const observer = new MutationObserver(checkVisibility);
             const businessSection = document.getElementById('section-business');
             if (businessSection) {
                 observer.observe(businessSection, { attributes: true, attributeFilter: ['class'] });
             }
-
-            // Initial Check
             checkVisibility();
         }
 
@@ -1426,7 +1443,7 @@
         }
 
         function confirmResetData() {
-            if (confirm('⚠️ KHÔI PHỤC DỮ LIỆU?\n\nHành động này không thể hoàn tác.\nTất cả dữ liệu bệnh nhân sẽ bị xóa.\nTài khoản sẽ đăng xuất.')) {
+            if (confirm('⚠️ KHÔI PHỤC DỮ LIỆU?\n\nHành động này không thể hoàn tác.\nTất cả dữ liệu người dùng sẽ bị xóa.\nTài khoản sẽ đăng xuất.')) {
                 resetDemoData();
             }
         }
@@ -1507,8 +1524,8 @@
         window.onload = () => {
             lucide.createIcons();
             renderModuleTabs();
-            renderPatientList();
-            updateActivePatientDisplay();
+            renderUserList();
+            updateActiveUserDisplay();
 
             // Wait for DOM layout to stabilize before initializing scroll
             setTimeout(() => {
@@ -1572,7 +1589,7 @@
             if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'Delete') {
                 e.preventDefault();
 
-                if (confirm('⚠️ MOCKUP MODE: Xóa tất cả dữ liệu?\n\nĐiều này sẽ xóa:\n- Tất cả bệnh nhân\n- Tất cả dữ liệu module\n- Reset về trạng thái ban đầu\n\nBạn có chắc chắn?')) {
+                if (confirm('⚠️ MOCKUP MODE: Xóa tất cả dữ liệu?\n\nĐiều này sẽ xóa:\n- Tất cả người dùng\n- Tất cả dữ liệu module\n- Reset về trạng thái ban đầu\n\nBạn có chắc chắn?')) {
                     // Clear all localStorage data
                     const keysToRemove = [];
                     for (let i = 0; i < localStorage.length; i++) {
@@ -1608,7 +1625,7 @@
                 btnB.classList.remove('bg-[#007AFF]/10', 'text-[#007AFF]');
                 btnB.classList.add('text-slate-700', 'hover:bg-slate-200/50');
 
-                renderPatientList();
+                renderUserList();
             } else if (tab === 'business') {
                 btnB.classList.add('bg-[#007AFF]/10', 'text-[#007AFF]');
                 btnB.classList.remove('text-slate-700', 'hover:bg-slate-200/50');
@@ -1618,10 +1635,10 @@
             }
         }
 
-        function openPatient(id) {
-            // Set the patient as active
-            setCurrentPatientId(id);
-            updateActivePatientDisplay();
+        function openUser(id) {
+            // Set the user as active
+            setCurrentUserId(id);
+            updateActiveUserDisplay();
             renderModuleTabs(); // Ensure checkmarks update
 
             switchTab('business');
@@ -1631,12 +1648,12 @@
         let currentFilter = 'all'; // Track current filter
         let currentSearchQuery = ''; // Track search query
 
-        function searchPatients(query) {
+        function searchUsers(query) {
             currentSearchQuery = query.toLowerCase();
-            renderPatientList();
+            renderUserList();
         }
 
-        function renderPatientList(filter = currentFilter) {
+        function renderUserList(filter = currentFilter) {
             currentFilter = filter;
 
             // Update Segmented Control Styles
@@ -1647,19 +1664,19 @@
             document.getElementById('filter-active').className = filter === 'active' ? activeClass : inactiveClass;
             document.getElementById('filter-inactive').className = filter === 'inactive' ? activeClass : inactiveClass;
 
-            // Populate patient table & Mobile List
-            let patients = getAllPatients();
+            // Populate user table & Mobile List
+            let users = getAllUsers();
 
             // Apply filter
             if (filter === 'active') {
-                patients = patients.filter(p => p.active !== false);
+                users = users.filter(p => p.active !== false);
             } else if (filter === 'inactive') {
-                patients = patients.filter(p => p.active === false);
+                users = users.filter(p => p.active === false);
             }
 
             // Apply Search
             if (currentSearchQuery) {
-                patients = patients.filter(p =>
+                users = users.filter(p =>
                     p.fullName.toLowerCase().includes(currentSearchQuery) ||
                     p.id.toLowerCase().includes(currentSearchQuery)
                 );
@@ -1669,12 +1686,12 @@
 
             if (!tbody) return;
 
-            if (patients.length === 0) {
+            if (users.length === 0) {
                 const message = filter === 'all'
-                    ? 'Chưa có bệnh nhân nào. Tap "Thêm mới" để bắt đầu.'
+                    ? 'Chưa có người dùng nào. Tap "Thêm mới" để bắt đầu.'
                     : filter === 'active'
-                        ? 'Không có bệnh nhân đang hoạt động.'
-                        : 'Không có bệnh nhân đã vô hiệu.';
+                        ? 'Không có người dùng đang hoạt động.'
+                        : 'Không có người dùng đã vô hiệu.';
 
                 // Desktop Empty
                 tbody.innerHTML = `
@@ -1703,9 +1720,9 @@
             let desktopRows = '';
             let mobileItems = '';
 
-            patients.forEach(patient => {
-                const initial = patient.fullName.charAt(0).toUpperCase();
-                const isActive = patient.active !== false;
+            users.forEach(user => {
+                const initial = user.fullName.charAt(0).toUpperCase();
+                const isActive = user.active !== false;
 
                 // Status Labels
                 let statusLabel = isActive ? 'Hoạt động' : 'Vô hiệu';
@@ -1715,7 +1732,7 @@
                 let statusBadge = '';
                 if (isActive) {
                     statusBadge = '<span class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-semibold">Đang hoạt động</span>';
-                } else if (patient.status === 'deceased') {
+                } else if (user.status === 'deceased') {
                     statusBadge = '<span class="px-3 py-1 bg-red-50 text-red-600 rounded-lg text-xs font-semibold">Đã mất</span>';
                 } else {
                     statusBadge = '<span class="px-3 py-1 bg-slate-100 text-slate-500 rounded-lg text-xs font-semibold">Đã vô hiệu</span>';
@@ -1723,27 +1740,27 @@
 
                 // Action buttons (Desktop) calls existing logic
                 // Simplified for brevity in this tool call, assuming reusing similar logic or string building
-                let actionButton = `<button onclick="openPatient('${patient.id}')" class="text-blue-600 font-semibold text-sm hover:underline">Xem hồ sơ</button>`; // Simplified desktop action
+                let actionButton = `<button onclick="openUser('${user.id}')" class="text-blue-600 font-semibold text-sm hover:underline">Xem hồ sơ</button>`; // Simplified desktop action
 
                 // Calculate Progress
-                const status = JSON.parse(localStorage.getItem(`mirabocaresync_${patient.id}_status`) || '{}');
+                const status = JSON.parse(localStorage.getItem(`mirabocaresync_${user.id}_status`) || '{}');
                 const validModules = [1, 2, 3, 4, 5, 6, 7, 8, 9];
                 const realCount = validModules.filter(id => status[`module${id}`]).length;
                 const totalModules = 9;
                 const progressPercent = Math.round((realCount / totalModules) * 100);
 
                 desktopRows += `
-                    <tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 cursor-pointer" onclick="openPatient('${patient.id}')">
+                    <tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 cursor-pointer" onclick="openUser('${user.id}')">
                         <td class="px-4 md:px-6 lg:px-10 py-4 text-slate-900 flex items-center gap-4 whitespace-nowrap">
                             <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-semibold text-sm">
                                 ${initial}
                             </div>
                             <div>
-                                <div class="font-semibold text-sm">${patient.fullName}</div>
-                                <div class="text-xs text-slate-400 mt-0.5">ID: ${patient.id}</div>
+                                <div class="font-semibold text-sm">${user.fullName}</div>
+                                <div class="text-xs text-slate-400 mt-0.5">ID: ${user.id}</div>
                             </div>
                         </td>
-                        <td class="px-4 md:px-6 lg:px-10 py-4 text-slate-500 text-sm whitespace-nowrap">${patient.careLevel || 'Chăm sóc 1'}</td>
+                        <td class="px-4 md:px-6 lg:px-10 py-4 text-slate-500 text-sm whitespace-nowrap">${user.careLevel || 'Chăm sóc 1'}</td>
                         <td class="px-4 md:px-6 lg:px-10 py-4 text-slate-500 text-sm whitespace-nowrap">
                             <div class="flex items-center gap-2">
                                 <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
@@ -1763,16 +1780,16 @@
 
                 // --- Mobile Item Construction (iOS Style) ---
                 mobileItems += `
-                    <div onclick="openPatient('${patient.id}')" class="group bg-white rounded-[10px] p-4 flex items-center gap-4 shadow-[0_1px_2px_rgba(0,0,0,0.05)] active:scale-[0.98] transition-transform">
+                    <div onclick="openUser('${user.id}')" class="group bg-white rounded-[10px] p-4 flex items-center gap-4 shadow-[0_1px_2px_rgba(0,0,0,0.05)] active:scale-[0.98] transition-transform">
                         <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-[#8E8E93] text-[17px] font-semibold shrink-0">
                              ${initial}
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex justify-between items-start">
-                                <h4 class="font-semibold text-[17px] text-[#000000] truncate leading-tight">${patient.fullName}</h4>
+                                <h4 class="font-semibold text-[17px] text-[#000000] truncate leading-tight">${user.fullName}</h4>
                                 <span class="text-[13px] ${statusColorClass} font-normal shrink-0">${statusLabel}</span>
                             </div>
-                            <p class="text-[15px] text-[#8E8E93] truncate mt-0.5">${patient.careLevel || 'Chăm sóc 1'}</p>
+                            <p class="text-[15px] text-[#8E8E93] truncate mt-0.5">${user.careLevel || 'Chăm sóc 1'}</p>
                             <div class="mt-2 text-[10px] text-[#8E8E93] font-medium bg-[#F2F2F7] inline-block px-2 py-0.5 rounded-md uppercase tracking-wider">
                                 Hoàn thành ${realCount}/${totalModules}
                             </div>
@@ -1793,12 +1810,12 @@
             lucide.createIcons();
         }
 
-        function filterPatients(status) {
-            renderPatientList(status);
+        function filterUsers(status) {
+            renderUserList(status);
         }
 
-        function openDeactivateModal(patientId) {
-            document.getElementById('deactivate-patient-id').value = patientId;
+        function openDeactivateModal(userId) {
+            document.getElementById('deactivate-patient-id').value = userId;
             document.getElementById('deactivate-patient-modal').classList.remove('hidden');
         }
 
@@ -1807,14 +1824,14 @@
             document.getElementById('deactivate-patient-form').reset();
         }
 
-        function confirmReactivate(patientId) {
-            const patient = getPatientById(patientId);
-            if (!patient) return;
+        function confirmReactivate(userId) {
+            const user = getUserById(userId);
+            if (!user) return;
 
-            if (confirm(`Kích hoạt lại bệnh nhân "${patient.fullName}" ?\n\nBệnh nhân sẽ được đánh dấu là đang hoạt động.`)) {
-                if (reactivatePatient(patientId)) {
-                    showToast(`Đã kích hoạt lại bệnh nhân: ${patient.fullName} `, 'success');
-                    renderPatientList();
+            if (confirm(`Kích hoạt lại người dùng "${user.fullName}" ?\n\nNgười dùng sẽ được đánh dấu là đang hoạt động.`)) {
+                if (reactivateUser(userId)) {
+                    showToast(`Đã kích hoạt lại người dùng: ${user.fullName} `, 'success');
+                    renderUserList();
                 }
             }
         }
@@ -1840,25 +1857,25 @@
             document.getElementById('deactivate-patient-form')?.addEventListener('submit', function (e) {
                 e.preventDefault();
 
-                const patientId = document.getElementById('deactivate-patient-id').value;
+                const userId = document.getElementById('deactivate-patient-id').value;
                 const reason = document.getElementById('deactivation-reason').value;
                 const notes = document.getElementById('deactivation-notes').value;
 
-                const patient = getPatientById(patientId);
-                if (!patient) return;
+                const user = getUserById(userId);
+                if (!user) return;
 
-                if (deactivatePatient(patientId, reason, notes)) {
-                    showToast(`Đã vô hiệu hóa bệnh nhân: ${patient.fullName} `, 'success');
+                if (deactivateUser(userId, reason, notes)) {
+                    showToast(`Đã vô hiệu hóa người dùng: ${user.fullName} `, 'success');
                     closeDeactivateModal();
-                    renderPatientList();
+                    renderUserList();
                 }
             });
         });
 
         function renderModuleTabs() {
             const container = document.getElementById('module-tabs');
-            const patientId = getCurrentPatientId();
-            const status = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_status`) || '{}');
+            const userId = getCurrentUserId();
+            const status = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_status`) || '{}');
 
             container.innerHTML = modules.map(m => {
                 const isComplete = status[`module${m.id}`];
@@ -2061,11 +2078,12 @@
     <script src="module9.js"></script>
 
     <!-- PDF Preview Modal -->
+    <!-- PDF Preview Modal -->
     <div id="pdf-preview-modal"
         class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl w-full h-full max-w-6xl flex flex-col overflow-hidden shadow-2xl">
             <!-- Header -->
-            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">
                         <i data-lucide="file-text" class="w-5 h-5"></i>
@@ -2075,26 +2093,34 @@
                         <p class="text-sm text-slate-500" id="pdf-preview-filename">Report.pdf</p>
                     </div>
                 </div>
-                <button onclick="closePdfPreview()"
-                    class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
+                <div class="flex items-center gap-3">
+                    <button onclick="downloadReportPdf()"
+                        class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold transition-colors">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Tải về PDF</span>
+                    </button>
+                    <button onclick="closePdfPreview()"
+                        class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
             </div>
 
-            <!-- PDF Viewer Iframe -->
-            <div class="flex-1 bg-slate-100 relative">
-                <div id="pdf-loading"
-                    class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 gap-3">
-                    <i data-lucide="loader-2" class="w-8 h-8 animate-spin text-indigo-600"></i>
-                    <p class="font-medium">Đang tạo PDF chuẩn y khoa...</p>
+            <!-- PDF Viewer / Content Container -->
+            <div class="flex-1 bg-slate-100 overflow-y-auto p-4 md:p-8">
+                <!-- The content to be converted to PDF -->
+                <div id="pdf-page-container"
+                    class="bg-white shadow-lg mx-auto min-h-[297mm] max-w-[210mm] p-[20mm] origin-top transform transition-transform">
+                    <div id="pdf-content">
+                        <!-- Report Content Injected Here -->
+                    </div>
                 </div>
-                <iframe id="pdf-viewer-frame" class="w-full h-full border-0 hidden"></iframe>
             </div>
         </div>
     </div>
 
     <!-- Module 10 PDF Generator (Professional Medical Report) -->
-    <script src="module10_pdf.js"></script>
+    <!-- Module 10 PDF Generator (Integrated in Module 10) -->
 </body>
 
 </html>

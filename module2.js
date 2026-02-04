@@ -244,10 +244,17 @@ window.module2Content = `
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-300px)]">
             <!-- Left: Meeting List (30%) -->
             <div class="lg:col-span-1 bg-slate-50 rounded-2xl p-4 overflow-y-auto">
-                <h3 class="font-black text-slate-800 mb-4 flex items-center gap-2">
-                    <i data-lucide="list" class="w-5 h-5"></i>
-                    Danh sách cuộc họp
-                </h3>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-black text-slate-800 flex items-center gap-2">
+                        <i data-lucide="list" class="w-5 h-5"></i>
+                        Danh sách cuộc họp
+                    </h3>
+                    <button onclick="switchModule2Tab('form'); toggleM2Fab(true); if(typeof resetModule2Form === 'function') resetModule2Form(true); m2EditingIndex = null; showToast('Đã mở form tạo mới', 'info');" 
+                        class="btn-ios btn-ios-primary btn-ios-sm"
+                        title="Tạo biên bản mới">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                    </button>
+                </div>
                 <div id="meeting-list" class="space-y-3">
                     <!-- Will be populated dynamically -->
                 </div>
@@ -292,8 +299,8 @@ function initModule2() {
         // Load original data (for cancel/revert when editing)
         loadOriginalData: () => {
             if (m2EditingIndex !== null) {
-                const patientId = getCurrentPatientId();
-                const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_meetings`) || '[]');
+                const userId = getCurrentUserId();
+                const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_meetings`) || '[]');
                 if (m2EditingIndex >= 0 && m2EditingIndex < meetings.length) {
                     const meeting = meetings[m2EditingIndex];
                     loadModule2MeetingData(meeting);
@@ -353,22 +360,9 @@ function switchModule2Tab(tabName) {
         }
     });
 
-    // Portal Actions Logic
+    // Portal Actions Logic (Removed - moved to internal UI)
     const actions = document.getElementById('module-actions');
-    if (actions) {
-        if (tabName === 'history') {
-            actions.innerHTML = `
-                <button onclick="switchModule2Tab('form'); toggleM2Fab(true); if(typeof resetModule2Form === 'function') resetModule2Form(true); m2EditingIndex = null; showToast('Đã mở form tạo mới', 'info');" 
-                    class="btn-ios btn-ios-primary"
-                    title="Tạo đánh giá mới">
-                    <i data-lucide="plus" class="w-5 h-5"></i>
-                    <span>Tạo đánh giá mới</span>
-                </button>
-            `;
-        } else {
-            actions.innerHTML = '';
-        }
-    }
+    if (actions) actions.innerHTML = '';
 
     // Load history if switching to history tab
     if (tabName === 'history') {
@@ -385,8 +379,8 @@ function switchModule2Tab(tabName) {
 }
 
 function loadMeetingHistory() {
-    const patientId = getCurrentPatientId();
-    const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_meetings`) || '[]');
+    const userId = getCurrentUserId();
+    const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_meetings`) || '[]');
     const listContainer = document.getElementById('meeting-list');
 
     if (meetings.length === 0) {
@@ -423,8 +417,8 @@ function loadMeetingHistory() {
 }
 
 function showMeetingDetail(index) {
-    const patientId = getCurrentPatientId();
-    const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_meetings`) || '[]');
+    const userId = getCurrentUserId();
+    const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_meetings`) || '[]');
     const meeting = meetings[index];
     const detailContainer = document.getElementById('meeting-detail');
 
@@ -726,8 +720,8 @@ function cancelModule2Edit() {
 
 // Edit Record
 function editMeeting(index) {
-    const patientId = getCurrentPatientId();
-    const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_meetings`) || '[]');
+    const userId = getCurrentUserId();
+    const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_meetings`) || '[]');
     const meeting = meetings[index];
     if (!meeting) return;
 
@@ -845,11 +839,11 @@ function editMeeting(index) {
 function deleteMeeting(index) {
     if (!confirm('Bạn có chắc muốn xóa bản ghi biên bản họp này không? Cannot undo.')) return;
 
-    const patientId = getCurrentPatientId();
-    const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_meetings`) || '[]');
+    const userId = getCurrentUserId();
+    const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_meetings`) || '[]');
 
     meetings.splice(index, 1);
-    localStorage.setItem(`mirabocaresync_${patientId}_meetings`, JSON.stringify(meetings));
+    localStorage.setItem(`mirabocaresync_${userId}_meetings`, JSON.stringify(meetings));
 
     loadMeetingHistory(); // Refresh list
     document.getElementById('meeting-detail').innerHTML = `
@@ -875,8 +869,8 @@ function getPaymentMethodText(value) {
 
 // Print Record
 function printMeeting(index) {
-    const patientId = getCurrentPatientId();
-    const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_meetings`) || '[]');
+    const userId = getCurrentUserId();
+    const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_meetings`) || '[]');
     const meeting = meetings[index];
     if (!meeting) return;
 
@@ -1151,8 +1145,8 @@ function saveModule2Meeting() {
         };
 
         // Save to LocalStorage
-        const patientId = getCurrentPatientId();
-        const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_meetings`) || '[]');
+        const userId = getCurrentUserId();
+        const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_meetings`) || '[]');
 
         if (m2EditingIndex !== null && m2EditingIndex >= 0 && m2EditingIndex < meetings.length) {
             // Update existing
@@ -1164,13 +1158,13 @@ function saveModule2Meeting() {
             showToast('Đã lưu biên bản họp thành công!', 'success');
         }
 
-        localStorage.setItem(`mirabocaresync_${patientId}_meetings`, JSON.stringify(meetings));
+        localStorage.setItem(`mirabocaresync_${userId}_meetings`, JSON.stringify(meetings));
 
         // Reset Edit State
         m2EditingIndex = null;
 
         // Mark module as complete
-        if (typeof markModuleComplete === 'function') markModuleComplete(patientId, 'module2');
+        if (typeof markModuleComplete === 'function') markModuleComplete(userId, 'module2');
 
         // Dispatch event for sidebar update
         window.dispatchEvent(new Event('module-data-saved'));
@@ -1189,8 +1183,8 @@ function saveModule2Meeting() {
 
 // Edit Meeting (called from history)
 function editMeeting(index) {
-    const patientId = getCurrentPatientId();
-    const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_meetings`) || '[]');
+    const userId = getCurrentUserId();
+    const meetings = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_meetings`) || '[]');
     const meeting = meetings[index];
     if (!meeting) return;
 

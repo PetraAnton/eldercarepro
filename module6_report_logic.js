@@ -11,9 +11,9 @@ let m6QualityChart = null;
 // High Muscle + Low Fat = Athletic
 
 function renderModule6Report(selectedTimestamp = null) {
-    const patientId = getCurrentPatientId();
+    const userId = getCurrentUserId();
     // Get all assessments
-    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
+    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_body_assessments`) || '[]');
 
     // Log refresh confirmation
     console.log('[Module 6 Report] Đã làm mới báo cáo từ dữ liệu mới nhất (Refreshed from latest data).');
@@ -190,14 +190,14 @@ function saveM6ReportData() {
     const timestamp = selector.value;
     const comment = document.getElementById('m6-eval-comment').value;
 
-    const patientId = getCurrentPatientId();
-    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_body_assessments`) || '[]');
+    const userId = getCurrentUserId();
+    const assessments = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_body_assessments`) || '[]');
 
     // Find and update
     const index = assessments.findIndex(a => a.timestamp == timestamp);
     if (index !== -1) {
         assessments[index].expertComment = comment;
-        localStorage.setItem(`mirabocaresync_${patientId}_body_assessments`, JSON.stringify(assessments));
+        localStorage.setItem(`mirabocaresync_${userId}_body_assessments`, JSON.stringify(assessments));
         showToast('Đã lưu chẩn đoán chuyên môn!', 'success');
     }
 }

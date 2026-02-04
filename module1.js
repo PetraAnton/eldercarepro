@@ -682,14 +682,15 @@ function loadModule1Data(data) {
 // Save Module 1 Data
 function saveModule1Data() {
     try {
-        const patientId = getCurrentPatientId();
-        if (!patientId) {
-            showToast('Vui lòng chọn bệnh nhân trước!', 'error');
+        const userId = getCurrentUserId();
+        if (!userId) {
+            showToast('Vui lòng chọn người dùng trước!', 'error');
             return false;
         }
 
         // 1. Collect Data
         const formData = {
+            // ... (rest of data collection is unchanged, just saving to user key)
             // Admin Info
             admin: {
                 consultationDate: document.getElementById('consultationDate').value,
@@ -749,11 +750,11 @@ function saveModule1Data() {
         };
 
         // 2. Save to LocalStorage
-        localStorage.setItem(`mirabocaresync_${patientId}_facesheet`, JSON.stringify(formData));
+        localStorage.setItem(`mirabocaresync_${userId}_facesheet`, JSON.stringify(formData));
 
         // 3. Mark module as complete
         if (typeof markModuleComplete === 'function') {
-            markModuleComplete(patientId, 'module1');
+            markModuleComplete(userId, 'module1');
         }
 
         // 4. Feedback & UI Update
@@ -774,8 +775,8 @@ function saveModule1Data() {
 
 // Initialize Module 1
 function initModule1() {
-    const patientId = getCurrentPatientId();
-    const savedData = localStorage.getItem(`mirabocaresync_${patientId}_facesheet`);
+    const userId = getCurrentUserId();
+    const savedData = localStorage.getItem(`mirabocaresync_${userId}_facesheet`);
 
     // Create FAB Manager
     window.module1FAB = createFABManager({
@@ -784,14 +785,14 @@ function initModule1() {
 
         // Check if data exists
         hasExistingData: () => {
-            const pid = getCurrentPatientId();
+            const pid = getCurrentUserId();
             const data = localStorage.getItem(`mirabocaresync_${pid}_facesheet`);
             return !!data;
         },
 
         // Load original data (for cancel/revert)
         loadOriginalData: () => {
-            const pid = getCurrentPatientId();
+            const pid = getCurrentUserId();
             const data = localStorage.getItem(`mirabocaresync_${pid}_facesheet`);
             if (data) {
                 const parsed = JSON.parse(data);
@@ -826,21 +827,21 @@ function initModule1() {
             console.error('Error loading module 1 data:', e);
         }
     } else {
-        // New Record: Try to pre-populate from Patient Registry
-        const patient = typeof getPatientById === 'function' ? getPatientById(patientId) : null;
-        if (patient) {
+        // New Record: Try to pre-populate from User Registry
+        const user = typeof getUserById === 'function' ? getUserById(userId) : null;
+        if (user) {
             const fullNameInput = document.getElementById('fullName');
             const dobInput = document.getElementById('dob');
             const genderInput = document.getElementById('gender');
 
-            if (fullNameInput) fullNameInput.value = (patient.fullName || '').toUpperCase();
+            if (fullNameInput) fullNameInput.value = (user.fullName || '').toUpperCase();
             if (dobInput) {
-                dobInput.value = patient.dateOfBirth || '';
+                dobInput.value = user.dateOfBirth || '';
                 // Trigger age calculation
                 dobInput.dispatchEvent(new Event('change'));
             }
-            if (genderInput && patient.gender) {
-                genderInput.value = patient.gender; // "male" or "female"
+            if (genderInput && user.gender) {
+                genderInput.value = user.gender; // "male" or "female"
             }
         }
 

@@ -262,36 +262,36 @@ function logout() {
     location.reload(); // Reload to show login screen
 }
 
-// --- Patient Management ---
+// --- User Management (Service Users) ---
 
 /**
- * Get all patients from localStorage
- * @returns {Array} Array of patient objects
+ * Get all users from localStorage
+ * @returns {Array} Array of user objects
  */
-function getAllPatients() {
-    let patients = JSON.parse(localStorage.getItem('mirabocaresync_patients') || '[]');
+function getAllUsers() {
+    let users = JSON.parse(localStorage.getItem('mirabocaresync_patients') || '[]');
 
     // Auto-generate dummy data if empty
-    if (patients.length === 0) {
-        patients = generateDummyPatients();
-        localStorage.setItem('mirabocaresync_patients', JSON.stringify(patients));
+    if (users.length === 0) {
+        users = generateDummyUsers();
+        localStorage.setItem('mirabocaresync_patients', JSON.stringify(users));
     }
 
-    return patients;
+    return users;
 }
 
 /**
- * Generate 10 dummy patients for testing
- * @returns {Array} Array of patient objects
+ * Generate 10 dummy users for testing
+ * @returns {Array} Array of user objects
  */
-function generateDummyPatients() {
+function generateDummyUsers() {
     const lastNames = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Huỳnh', 'Phan', 'Vũ', 'Võ', 'Đặng'];
     const middleNames = ['Văn', 'Thị', 'Đức', 'Ngọc', 'Minh', 'Thanh', 'Hữu', 'Thu', 'Quang', 'Xuân'];
     const firstNames = ['An', 'Bình', 'Cường', 'Dung', 'Phúc', 'Giang', 'Hà', 'Hiếu', 'Khánh', 'Lan', 'Minh', 'Nam', 'Oanh', 'Phú', 'Quân', 'Sơn', 'Tâm', 'Uyên', 'Vinh', 'Yến'];
 
     const careLevels = ['Chăm sóc 1', 'Chăm sóc 2', 'Chăm sóc 3', 'Chăm sóc 4', 'Chăm sóc 5'];
 
-    const patients = [];
+    const users = [];
     const currentYear = new Date().getFullYear();
 
     for (let i = 1; i <= 10; i++) {
@@ -316,10 +316,10 @@ function generateDummyPatients() {
         // Random Care Level
         const careLevel = careLevels[Math.floor(Math.random() * careLevels.length)];
 
-        const patientId = String(i).padStart(3, '0') + '-DAY-' + String(currentYear).slice(-2);
+        const userId = String(i).padStart(3, '0') + '-DAY-' + String(currentYear).slice(-2);
 
-        patients.push({
-            id: patientId,
+        users.push({
+            id: userId,
             fullName: fullName,
             dateOfBirth: dateOfBirth,
             gender: gender,
@@ -330,108 +330,108 @@ function generateDummyPatients() {
         });
     }
 
-    return patients;
+    return users;
 }
 
 /**
- * Get the currently active patient ID
- * @returns {string} Active patient ID
+ * Get the currently active user ID
+ * @returns {string} Active user ID
  */
-function getCurrentPatientId() {
-    const activePatientId = localStorage.getItem('mirabocaresync_active_patient');
+function getCurrentUserId() {
+    const activeUserId = localStorage.getItem('mirabocaresync_active_patient');
 
-    // If no active patient, check if any patients exist
-    if (!activePatientId) {
-        const patients = getAllPatients();
-        if (patients.length > 0) {
-            // Set first patient as active
-            setCurrentPatientId(patients[0].id);
-            return patients[0].id;
+    // If no active user, check if any users exist
+    if (!activeUserId) {
+        const users = getAllUsers();
+        if (users.length > 0) {
+            // Set first user as active
+            setCurrentUserId(users[0].id);
+            return users[0].id;
         }
-        // No patients exist, return default
+        // No users exist, return default
         return '001-DAY-23';
     }
 
-    return activePatientId;
+    return activeUserId;
 }
 
 /**
- * Set the active patient ID
- * @param {string} patientId 
+ * Set the active user ID
+ * @param {string} userId 
  */
-function setCurrentPatientId(patientId) {
-    localStorage.setItem('mirabocaresync_active_patient', patientId);
+function setCurrentUserId(userId) {
+    localStorage.setItem('mirabocaresync_active_patient', userId);
 }
 
 /**
- * Create a new patient
- * @param {Object} patientData - Patient information
- * @returns {Object} Created patient object
+ * Create a new user
+ * @param {Object} userData - User information
+ * @returns {Object} Created user object
  */
-function createPatient(patientData) {
-    const patients = getAllPatients();
+function createUser(userData) {
+    const users = getAllUsers();
 
     // Generate ID
-    const nextNumber = patients.length + 1;
-    const patientId = String(nextNumber).padStart(3, '0') + '-DAY-' + new Date().getFullYear().toString().slice(-2);
+    const nextNumber = users.length + 1;
+    const userId = String(nextNumber).padStart(3, '0') + '-DAY-' + new Date().getFullYear().toString().slice(-2);
 
-    const newPatient = {
-        id: patientId,
-        fullName: patientData.fullName,
-        dateOfBirth: patientData.dateOfBirth,
-        gender: patientData.gender,
-        careLevel: patientData.careLevel || 'Chăm sóc 1',
+    const newUser = {
+        id: userId,
+        fullName: userData.fullName,
+        dateOfBirth: userData.dateOfBirth,
+        gender: userData.gender,
+        careLevel: userData.careLevel || 'Chăm sóc 1',
         active: true,
         status: 'active',
         createdAt: new Date().toISOString()
     };
 
-    patients.push(newPatient);
-    localStorage.setItem('mirabocaresync_patients', JSON.stringify(patients));
+    users.push(newUser);
+    localStorage.setItem('mirabocaresync_patients', JSON.stringify(users));
 
-    // Set as active patient
-    setCurrentPatientId(patientId);
+    // Set as active user
+    setCurrentUserId(userId);
 
-    return newPatient;
+    return newUser;
 }
 
 /**
- * Deactivate a patient (soft delete)
- * @param {string} patientId 
+ * Deactivate a user (soft delete)
+ * @param {string} userId 
  * @param {string} reason - discharged, transferred, deceased, other
  * @param {string} notes - Additional notes
  */
-function deactivatePatient(patientId, reason, notes) {
-    const patients = getAllPatients();
-    const patient = patients.find(p => p.id === patientId);
+function deactivateUser(userId, reason, notes) {
+    const users = getAllUsers();
+    const user = users.find(u => u.id === userId);
 
-    if (patient) {
-        patient.active = false;
-        patient.status = reason === 'deceased' ? 'deceased' : 'inactive';
-        patient.deactivatedDate = new Date().toISOString();
-        patient.deactivationReason = reason;
-        patient.deactivationNotes = notes || '';
+    if (user) {
+        user.active = false;
+        user.status = reason === 'deceased' ? 'deceased' : 'inactive';
+        user.deactivatedDate = new Date().toISOString();
+        user.deactivationReason = reason;
+        user.deactivationNotes = notes || '';
 
-        localStorage.setItem('mirabocaresync_patients', JSON.stringify(patients));
+        localStorage.setItem('mirabocaresync_patients', JSON.stringify(users));
         return true;
     }
     return false;
 }
 
 /**
- * Reactivate a patient
- * @param {string} patientId 
+ * Reactivate a user
+ * @param {string} userId 
  */
-function reactivatePatient(patientId) {
-    const patients = getAllPatients();
-    const patient = patients.find(p => p.id === patientId);
+function reactivateUser(userId) {
+    const users = getAllUsers();
+    const user = users.find(u => u.id === userId);
 
-    if (patient) {
-        patient.active = true;
-        patient.status = 'active';
-        patient.reactivatedDate = new Date().toISOString();
+    if (user) {
+        user.active = true;
+        user.status = 'active';
+        user.reactivatedDate = new Date().toISOString();
 
-        localStorage.setItem('mirabocaresync_patients', JSON.stringify(patients));
+        localStorage.setItem('mirabocaresync_patients', JSON.stringify(users));
         return true;
     }
     return false;
@@ -463,13 +463,13 @@ function deleteAssessmentRecord(storageKey, recordIndex, reason, notes) {
 }
 
 /**
- * Get patient by ID
- * @param {string} patientId 
- * @returns {Object|null} Patient object or null
+ * Get user by ID (Care User)
+ * @param {string} userId 
+ * @returns {Object|null} User object or null
  */
-function getPatientById(patientId) {
-    const patients = getAllPatients();
-    return patients.find(p => p.id === patientId) || null;
+function getUserById(userId) {
+    const users = getAllUsers();
+    return users.find(u => u.id === userId) || null;
 }
 
 // --- User/Patient Context ---
@@ -627,9 +627,9 @@ function showToast(message, type = 'success') {
 
 // --- Module Status ---
 
-function markModuleComplete(patientId, moduleKey) {
+function markModuleComplete(userId, moduleKey) {
     // Save completion status to local storage
-    const statusKey = `mirabocaresync_${patientId}_status`;
+    const statusKey = `mirabocaresync_${userId}_status`;
     const status = JSON.parse(localStorage.getItem(statusKey) || '{}');
 
     status[moduleKey] = true;
@@ -637,7 +637,7 @@ function markModuleComplete(patientId, moduleKey) {
 
     // Update Sidebar UI if possible
     // (This would require the side bar to re-render or check status)
-    console.log(`Module ${moduleKey} marked as complete for ${patientId}`);
+    console.log(`Module ${moduleKey} marked as complete for ${userId}`);
 }
 
 // --- Image Utils ---

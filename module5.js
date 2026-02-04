@@ -77,7 +77,7 @@ function clearWeeklySchedule() {
 
 // Init Function
 function initModule5() {
-    const patientId = getCurrentPatientId();
+    const userId = getCurrentUserId();
 
     // Create FAB Manager
     window.module5FAB = createFABManager({
@@ -85,11 +85,11 @@ function initModule5() {
         formId: 'module5-form',
         enableEdit: true,
         hasExistingData: () => {
-            const data = localStorage.getItem(getModule5Key(patientId));
+            const data = localStorage.getItem(getModule5Key(userId));
             return !!data;
         },
         loadOriginalData: () => {
-            const data = localStorage.getItem(getModule5Key(patientId));
+            const data = localStorage.getItem(getModule5Key(userId));
             if (data) {
                 const parsed = JSON.parse(data);
                 loadModule5Data(parsed);
@@ -106,7 +106,7 @@ function initModule5() {
     window.module5FAB.init();
 
     // Load Data
-    const savedData = localStorage.getItem(getModule5Key(patientId));
+    const savedData = localStorage.getItem(getModule5Key(userId));
     if (savedData) {
         try {
             loadModule5Data(JSON.parse(savedData));
@@ -124,8 +124,8 @@ function initModule5() {
     lucide.createIcons();
 }
 
-function getModule5Key(patientId) {
-    return `mirabocaresync_${patientId}_plan`;
+function getModule5Key(userId) {
+    return `mirabocaresync_${userId}_plan`;
 }
 
 function loadModule5Data(data) {
@@ -161,9 +161,9 @@ function loadModule5Data(data) {
 
 function saveModule5Data() {
     try {
-        const patientId = getCurrentPatientId();
-        if (!patientId) {
-            showToast('Chưa chọn bệnh nhân', 'error');
+        const userId = getCurrentUserId();
+        if (!userId) {
+            showToast('Chưa chọn người dùng', 'error');
             return false;
         }
 
@@ -189,10 +189,10 @@ function saveModule5Data() {
             }
         });
 
-        localStorage.setItem(getModule5Key(patientId), JSON.stringify(formData));
+        localStorage.setItem(getModule5Key(userId), JSON.stringify(formData));
 
         if (typeof markModuleComplete === 'function') {
-            markModuleComplete(patientId, 'module5');
+            markModuleComplete(userId, 'module5');
         }
 
         showToast('Đã lưu Kế hoạch!', 'success');

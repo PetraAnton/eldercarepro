@@ -7,21 +7,21 @@
 window.currentM9Images = [];
 
 function renderModule9(container) {
-    const patientId = getCurrentPatientId();
-    if (!patientId) {
-        container.innerHTML = '<div class="p-8 text-center text-slate-500">Vui lòng chọn bệnh nhân.</div>';
+    const userId = getCurrentUserId();
+    if (!userId) {
+        container.innerHTML = '<div class="p-8 text-center text-slate-500">Vui lòng chọn người dùng.</div>';
         return;
     }
 
     // Load Data
-    const savedData = loadModule9Data(patientId);
+    const savedData = loadModule9Data(userId);
 
     // Initialize Image Cache
     window.currentM9Images = savedData?.images || [];
     m9OriginalData = savedData; // Fix: Initialize global state
 
     const survey = savedData || {
-        address: (typeof getPatientById === 'function' ? getPatientById(patientId)?.address : '') || '',
+        address: (typeof getUserById === 'function' ? getUserById(userId)?.address : '') || '',
         surveyDate: new Date().toISOString().split('T')[0],
         surveyor: 'Administrator', // Mock default
         notes: '',
@@ -38,7 +38,7 @@ function renderModule9(container) {
                     <h2 class="text-2xl font-black text-slate-800">Khảo sát Nhà ở</h2>
                     <p class="text-slate-500 text-sm">Đánh giá môi trường sống và sinh hoạt của người cao tuổi</p>
                 </div>
-                 <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-bold font-mono">ID: ${patientId}</span>
+                 <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-bold font-mono">ID: ${userId}</span>
             </div>
 
             <div class="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
@@ -136,52 +136,42 @@ function renderModule9(container) {
         </div>
     </div>
 
-    <!-- FABs for Module 9 -->
-    <div id="module9-fab-container" class="fixed bottom-48 right-8 flex flex-col-reverse items-end gap-5 z-40 animate-fade-in pointer-events-none">
+    <!-- Module 9 Inline Actions -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-slate-200 p-4 z-30 flex justify-end gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] md:absolute md:bottom-0 md:bg-transparent md:border-t-0 md:shadow-none md:p-0 md:relative md:mt-8 md:mb-4">
         
         <!-- SAVE (Create Mode) -->
         <button type="button" id="module9-fab-save" onclick="document.getElementById('m9-survey-form').requestSubmit()" 
-            class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-indigo-600 to-violet-700 text-white rounded-full shadow-[0_8px_30px_rgb(79,70,229,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-            <i data-lucide="save" class="w-7 h-7"></i>
-            <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Lưu khảo sát
-            </span>
+            class="hidden px-6 py-2.5 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all active:scale-95 flex items-center gap-2">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            Lưu khảo sát
         </button>
         
         <!-- UPDATE (Edit Mode) -->
         <button type="button" id="module9-fab-update" onclick="document.getElementById('m9-survey-form').requestSubmit()" 
-            class="pointer-events-auto hidden w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.5)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-            <i data-lucide="save" class="w-7 h-7"></i>
-            <span class="absolute right-20 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Lưu thay đổi
-            </span>
+            class="hidden px-6 py-2.5 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95 flex items-center gap-2">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            Lưu thay đổi
         </button>
 
         <!-- EDIT (View Mode) -->
         <button type="button" id="module9-fab-edit" onclick="toggleModule9EditMode(true)" 
-            class="pointer-events-auto w-14 h-14 bg-amber-500 text-white rounded-full shadow-[0_8px_25px_rgb(245,158,11,0.5)] hover:bg-amber-400 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative ring-4 ring-white/60">
-            <i data-lucide="edit-2" class="w-6 h-6"></i>
-            <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Chỉnh sửa
-            </span>
+            class="px-6 py-2.5 rounded-xl font-bold text-white bg-amber-500 hover:bg-amber-600 shadow-lg shadow-amber-200 transition-all active:scale-95 flex items-center gap-2">
+            <i data-lucide="edit-2" class="w-4 h-4"></i>
+            Chỉnh sửa
         </button>
 
         <!-- CLOSE (Cancel Edit) -->
         <button type="button" id="module9-fab-close" onclick="cancelModule9Edit()" 
-            class="pointer-events-auto hidden w-12 h-12 bg-white text-slate-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-slate-200 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-slate-100 ring-2 ring-white">
-            <i data-lucide="x" class="w-6 h-6"></i>
-            <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                Đóng / Hủy
-            </span>
+            class="hidden px-5 py-2.5 rounded-xl font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all border border-slate-200 bg-white">
+            <i data-lucide="x" class="w-4 h-4 inline mr-2"></i>
+            Hủy bỏ
         </button>
 
         <!-- RESET (Create Mode) -->
         <button type="button" id="module9-fab-cancel" onclick="resetModule9Form()" 
-            class="pointer-events-auto hidden w-12 h-12 bg-white text-rose-500 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-rose-100 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative border border-rose-50 ring-2 ring-white">
-            <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
-            <span class="absolute right-16 py-2 px-4 bg-slate-900/95 backdrop-blur text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-2xl translate-x-2 group-hover:translate-x-0">
-                <span id="module9-cancel-text">Nhập lại</span>
-            </span>
+            class="hidden px-5 py-2.5 rounded-xl font-bold text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-all border border-rose-100 bg-white">
+            <i data-lucide="rotate-ccw" class="w-4 h-4 inline mr-2"></i>
+            <span id="module9-cancel-text">Nhập lại</span>
         </button>
     </div>
     `;
@@ -266,9 +256,9 @@ function updateModule9FabState(forceMode) {
 
 // --- Data Logic ---
 
-function loadModule9Data(patientId) {
+function loadModule9Data(userId) {
     try {
-        return JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_home_survey`) || 'null');
+        return JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_home_survey`) || 'null');
     } catch (e) {
         console.error('Error loading M9 data', e);
         return null;
@@ -330,8 +320,8 @@ function cancelModule9Edit() {
             document.getElementById('m9-survey-form').reset();
 
             // Revert
-            const patientId = getCurrentPatientId();
-            const data = loadModule9Data(patientId);
+            const userId = getCurrentUserId();
+            const data = loadModule9Data(userId);
             if (data) {
                 m9OriginalData = data; // Ensure cache is consistent
                 // Re-render M9 correctly
@@ -351,7 +341,7 @@ function saveModule9(e) {
     if (e) e.preventDefault();
 
     try {
-        const patientId = getCurrentPatientId();
+        const userId = getCurrentUserId();
 
         const survey = {
             lastUpdated: new Date().toISOString(),
@@ -362,12 +352,12 @@ function saveModule9(e) {
             images: window.currentM9Images || []
         };
 
-        localStorage.setItem(`mirabocaresync_${patientId}_home_survey`, JSON.stringify(survey));
+        localStorage.setItem(`mirabocaresync_${userId}_home_survey`, JSON.stringify(survey));
 
         // Mark complete
-        const status = JSON.parse(localStorage.getItem(`mirabocaresync_${patientId}_status`) || '{}');
+        const status = JSON.parse(localStorage.getItem(`mirabocaresync_${userId}_status`) || '{}');
         status.module9 = true;
-        localStorage.setItem(`mirabocaresync_${patientId}_status`, JSON.stringify(status));
+        localStorage.setItem(`mirabocaresync_${userId}_status`, JSON.stringify(status));
 
         window.dispatchEvent(new Event('module-data-saved'));
 
@@ -392,7 +382,7 @@ function toggleModule9EditMode(isEdit) {
     const form = document.getElementById('m9-survey-form');
     if (!form) return;
 
-    const savedData = loadModule9Data(getCurrentPatientId());
+    const savedData = loadModule9Data(getCurrentUserId());
 
     // 1. Toggle Inputs
     const inputs = form.querySelectorAll('input, textarea, button, select');
