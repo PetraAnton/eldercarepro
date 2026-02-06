@@ -387,12 +387,7 @@
                 <span class="block lg:hidden group-[.is-expanded]:lg:block transition-opacity duration-300">Cài
                     đặt</span>
             </button>
-            <button onclick="generateDummyData()" title="Tạo dữ liệu mẫu"
-                class="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[17px] font-medium text-amber-600 hover:bg-amber-50 overflow-hidden whitespace-nowrap group/item border-t border-slate-100 mt-4 pt-4">
-                <div class="w-6 h-6 flex justify-center shrink-0"><i data-lucide="database" class="w-6 h-6"></i></div>
-                <span class="block lg:hidden group-[.is-expanded]:lg:block transition-opacity duration-300">Tạo Dữ liệu
-                    Mẫu</span>
-            </button>
+
         </nav>
 
         <!-- Footer (Toggle) -->
@@ -937,7 +932,7 @@
                         </div>
                         <p class="text-xs text-red-600/80">Xóa toàn bộ người dùng và dữ liệu đã nhập. Tài khoản sẽ đăng
                             xuất.</p>
-                        <button onclick="confirmResetData()"
+                        <button onclick="resetDemoData()"
                             class="w-full py-3 bg-white border border-red-200 text-red-600 rounded-xl font-bold text-xs hover:bg-red-600 hover:text-white transition-all">
                             Xóa dữ liệu & Reset
                         </button>
@@ -1454,11 +1449,7 @@
             document.getElementById('change-password-form').reset();
         }
 
-        function confirmResetData() {
-            if (confirm('⚠️ KHÔI PHỤC DỮ LIỆU?\n\nHành động này không thể hoàn tác.\nTất cả dữ liệu người dùng sẽ bị xóa.\nTài khoản sẽ đăng xuất.')) {
-                resetDemoData();
-            }
-        }
+
 
         // Settings Listeners
         document.getElementById('change-password-form').addEventListener('submit', function (e) {

@@ -1117,6 +1117,30 @@ function loadModule2MeetingData(meeting) {
     lucide.createIcons();
 }
 
+// Reset Module 2 Form
+function resetModule2Form(skipConfirm = false) {
+    if (!skipConfirm && !confirm('Bạn có chắc chắn muốn xóa form và nhập lại?')) return;
+
+    const form = document.getElementById('module2-form');
+    if (form) form.reset();
+
+    // Reset Participants
+    const pList = document.getElementById('participants-list');
+    if (pList) {
+        pList.innerHTML = '';
+        if (typeof addParticipant === 'function') addParticipant();
+    }
+
+    // Reset Checkbox toggles
+    document.getElementById('basicInfoOtherText').disabled = true;
+    document.getElementById('riskOtherText').disabled = true;
+
+    // Reset global edit state
+    m2EditingIndex = null;
+
+    if (window.module2FAB) window.module2FAB.enterCreateMode();
+}
+
 // Save Module 2 Meeting
 function saveModule2Meeting() {
     try {
